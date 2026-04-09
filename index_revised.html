@@ -1,0 +1,518 @@
+// ==========================================
+// 1. 常量与基础配置
+// ==========================================
+const CONFIG = {
+  STORAGE_KEY: "pockethk-v2",
+  ONE_TIME_RESET_KEY: "pockethk-v2-reset-once",
+  SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
+  FX_TO_HKD: { HKD: 1, USD: 7.8, CNY: 1.08, JPY: 0.052, EUR: 8.5, GBP: 9.8 },
+  DEFAULT_EXPENSE_CATEGORIES: ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Rent", "Healthcare", "Education", "Travel", "Family", "Subscriptions", "Other"],
+  DEFAULT_INCOME_CATEGORIES: ["Salary", "Bonus", "Freelance", "Investment", "Gift", "Other"],
+  QUICK_CATS: [["🍔", "Food"], ["🚌", "Transport"], ["🛍", "Shopping"], ["🎮", "Entertainment"], ["🏠", "Rent"], ["📱", "Bills"], ["💊", "Healthcare"]],
+  DEFAULT_QUICK_PRESETS: [
+    { label: "MTR", amount: 13, category: "Transport", icon: "🚇" },
+    { label: "Lunch", amount: 60, category: "Food", icon: "🍱" },
+    { label: "Coffee", amount: 25, category: "Food", icon: "☕" },
+    { label: "Groceries", amount: 220, category: "Shopping", icon: "🛒" },
+    { label: "Taxi", amount: 95, category: "Transport", icon: "🚕" },
+    { label: "Movie", amount: 120, category: "Entertainment", icon: "🎬" }
+  ]
+};
+
+// ==========================================
+// 2. 集中状态管理 (Store)
+// ==========================================
+const Store = {
+  state: null,
+
+  init() {
+    this.runOneTimeDataReset();
+    this.state = this.loadState();
+  },
+
+  runOneTimeDataReset() {
+    if (localStorage.getItem(CONFIG.ONE_TIME_RESET_KEY) === "done") return;
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    localStorage.setItem(CONFIG.ONE_TIME_RESET_KEY, "done");
+  },
+
+  persist() {
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.state));
+  },
+
+  addTransaction(tx) {
+    this.state.transactions.push({ id: Utils.uid(), ...tx });
+    this.persist();
+  },
+
+  updateTransaction(id, updatedData) {
+    const tx = this.state.transactions.find(t => t.id === id);
+    if (tx && tx.type !== "transfer") {
+      Object.assign(tx, updatedData);
+      this.persist();
+    }
+  },
+
+  deleteTransaction(id) {
+    this.state.transactions = this.state.transactions.filter(t => t.id !== id);
+    this.persist();
+  },
+
+  loadState() {
+    const fallback = {
+      selectedMonth: Utils.toMonthValue(new Date()),
+      settings: {
+        monthlyBudget: 18000,
+        budgetCurrency: "HKD",
+        categoryBudgets: { Food: 2800, Transport: 1200, Bills: 2000 },
+        reminders: { daily: true, weekly: true },
+        quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS]
+      },
+      customExpenseCategories: [],
+      customIncomeCategories: [],
+      accountGroups: ["HK Account", "Ungrouped"],
+      accounts: [
+        { id: "acc-cash", name: "Cash", type: "cash", group: "HK Account", currency: "HKD", initialBalance: 2000 },
+        { id: "acc-card", name: "Credit Card", type: "card", group: "HK Account", currency: "HKD", initialBalance: 0 },
+        { id: "acc-save", name: "Savings", type: "savings", group: "HK Account", currency: "HKD", initialBalance: 15000 }
+      ],
+      transactions: [],
+      recurring: [
+        { id: "rec-rent", type: "expense", amount: 8000, currency: "HKD", category: "Rent", accountId: "acc-card", dayOfMonth: 1, note: "Monthly rent", startDate: Utils.formatISO(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), active: true }
+      ]
+    };
+
+    try {
+      const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+      if (!raw) return fallback;
+      const parsed = JSON.parse(raw);
+      
+      // 数据结构兼容处理
+      parsed.settings = { ...fallback.settings, ...parsed.settings };
+      parsed.customExpenseCategories = parsed.customExpenseCategories || [];
+      parsed.customIncomeCategories = parsed.customIncomeCategories || [];
+      parsed.accounts = parsed.accounts || fallback.accounts;
+      parsed.transactions = parsed.transactions || [];
+      parsed.recurring = parsed.recurring || [];
+      parsed.selectedMonth = parsed.selectedMonth || fallback.selectedMonth;
+      return parsed;
+    } catch {
+      return fallback;
+    }
+  }
+};
+
+// ==========================================
+// 3. 全局运行时变量与图表实例
+// ==========================================
+const Runtime = {
+  editingTransactionId: null,
+  editingQuickPresetIndex: null,
+  editingAccountId: null,
+  selectedQuickCategory: "Food",
+  selectedInsightCategories: new Set(),
+  pieChart: null,
+  lineChart: null
+};
+
+// ==========================================
+// 4. 局部视图渲染控制 (Render)
+// ==========================================
+const Render = {
+  all() {
+    this.dropdowns();
+    this.dashboard();
+    this.insights();
+    this.budget();
+    this.accounts();
+    this.recurring();
+  },
+
+  dropdowns() {
+    // 渲染各个下拉菜单选项
+    const monthPicker = document.getElementById("monthPicker");
+    monthPicker.value = Store.state.selectedMonth;
+
+    const currencyOptions = CONFIG.SUPPORTED_CURRENCIES.map(c => `<option value="${c}">${c}</option>`).join("");
+    ["currencyInput", "quickCurrency", "newAccountCurrency", "budgetCurrencyInput"].forEach(id => {
+      document.getElementById(id).innerHTML = currencyOptions;
+    });
+
+    this.categoryOptions();
+    this.accountOptions();
+  },
+
+  categoryOptions() {
+    const expenseCats = [...CONFIG.DEFAULT_EXPENSE_CATEGORIES, ...Store.state.customExpenseCategories];
+    const incomeCats = [...CONFIG.DEFAULT_INCOME_CATEGORIES, ...Store.state.customIncomeCategories];
+    
+    const type = document.getElementById("typeInput").value;
+    const currentCats = type === "income" ? incomeCats : expenseCats;
+    const catHtml = currentCats.map(c => `<option value="${Utils.escapeHTML(c)}">${Utils.escapeHTML(c)}</option>`).join("");
+    
+    document.getElementById("categoryInput").innerHTML = catHtml;
+    document.getElementById("quickPresetCategory").innerHTML = expenseCats.map(c => `<option value="${Utils.escapeHTML(c)}">${Utils.escapeHTML(c)}</option>`).join("");
+    document.getElementById("categoryBudgetSelect").innerHTML = expenseCats.map(c => `<option value="${Utils.escapeHTML(c)}">${Utils.escapeHTML(c)}</option>`).join("");
+  },
+
+  accountOptions() {
+    const options = Store.state.accounts.map(a => `<option value="${a.id}">${Utils.escapeHTML(a.name)} (${Utils.escapeHTML(a.currency)})</option>`).join("");
+    ["accountInput", "quickAccount", "fromAccountInput", "toAccountInput", "recAccount"].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = options;
+    });
+  },
+
+  dashboard() {
+    const data = Logic.computeMonthData(Store.state.selectedMonth);
+    const accountSummary = Logic.computeAccountBalances();
+    
+    // 顶部卡片
+    const total = Number(accountSummary.__totalHKD || 0);
+    document.getElementById("totalBalance").textContent = Utils.formatMoney(total, "HKD");
+    
+    const budget = Store.state.settings.monthlyBudget || 0;
+    const ratio = budget > 0 ? (data.expense / budget) * 100 : 0;
+    document.getElementById("monthlyBudgetUsage").textContent = `${ratio.toFixed(0)}%`;
+    document.getElementById("monthProgressBar").style.width = `${Math.min(100, Math.max(0, ratio))}%`;
+    
+    this.history();
+    this.quickBlocks();
+    this.alerts(data);
+  },
+
+  history() {
+    const month = Store.state.selectedMonth;
+    const query = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+    const historyList = document.getElementById("historyList");
+    
+    const txs = Store.state.transactions
+      .filter(t => t.date.startsWith(month))
+      .filter(t => !query || Object.values(t).join(" ").toLowerCase().includes(query))
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    if (!txs.length) {
+      historyList.innerHTML = `<p class="text-sm text-slate-500">No transactions in this month.</p>`;
+      return;
+    }
+
+    historyList.innerHTML = txs.map(t => {
+      const isIncome = t.type === "income";
+      const amountColor = isIncome ? "text-emerald-600" : "text-red-500";
+      const sign = isIncome ? "+" : "-";
+      
+      return `
+        <div class="rounded-xl border border-slate-200 bg-white p-3 flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-slate-700">${Utils.escapeHTML(t.category || t.type)}</p>
+            <p class="text-xs text-slate-500">${t.date} ${t.note ? ` | ${Utils.escapeHTML(t.note)}` : ""}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold ${amountColor}">${sign}${Utils.formatMoney(t.amount, t.currency)}</p>
+            <div class="flex items-center justify-end gap-2 mt-1">
+              ${t.type !== 'transfer' && t.type !== 'adjustment' ? `<button data-action="edit-tx" data-id="${t.id}" class="text-xs text-blue-600">Edit</button>` : ''}
+              <button data-action="delete-tx" data-id="${t.id}" class="text-xs text-slate-400">Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  },
+
+  quickBlocks() {
+    const wrap = document.getElementById("quickPresetWrap");
+    wrap.innerHTML = Store.state.settings.quickPresets.map((preset, index) => `
+      <button data-action="quick-preset" data-idx="${index}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-left hover:border-blue-300 hover:bg-blue-50">
+        <p class="text-base">${preset.icon}</p>
+        <p class="text-xs font-semibold text-slate-700">${preset.label}</p>
+        <p class="text-xs text-slate-500">${Utils.formatMoney(preset.amount, "HKD")}</p>
+      </button>
+    `).join("");
+
+    const catWrap = document.getElementById("quickCategoryWrap");
+    catWrap.innerHTML = CONFIG.QUICK_CATS.map(([icon, name]) => `
+      <button data-action="quick-cat" data-name="${name}" class="chip rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 bg-white ${Runtime.selectedQuickCategory === name ? 'active' : ''}">${icon} ${name}</button>
+    `).join("");
+  },
+
+  alerts(data) {
+    // 保持原有提醒逻辑的简化版本
+    const alerts = [];
+    const budget = Store.state.settings.monthlyBudget;
+    if (budget > 0 && data.expense > budget) alerts.push("Over budget warning!");
+    
+    const alertArea = document.getElementById("alertArea");
+    if (!alerts.length) {
+      alertArea.innerHTML = `<p class="text-sm text-emerald-700 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2">Budgets are on track.</p>`;
+    } else {
+      alertArea.innerHTML = alerts.map(text => `<p class="text-sm text-rose-700 rounded-xl bg-rose-50 border border-rose-200 px-3 py-2">${text}</p>`).join("");
+    }
+  },
+
+  insights() {
+    // 调用原有图表绘制逻辑
+    const scope = document.getElementById("insightsScopeSelect").value || "all";
+    const metric = document.getElementById("insightMetricSelect").value || "expense";
+    const accountIds = Logic.resolveScopeAccountIds(scope);
+    
+    const pieData = Logic.computeOverviewBreakdown(Store.state.selectedMonth, { metric, accountIds });
+    this.drawPieChart(pieData, metric);
+  },
+
+  drawPieChart(dataMap, metric) {
+    const labels = Object.keys(dataMap);
+    const values = Object.values(dataMap);
+    const colors = ["#3f8cff", "#37c674", "#ff9849", "#5a6fe2", "#24b7c9", "#f56b8f"];
+
+    if (Runtime.pieChart) Runtime.pieChart.destroy();
+    Runtime.pieChart = new Chart(document.getElementById("pieChart"), {
+      type: "pie",
+      data: {
+        labels: labels.length ? labels : ["No data"],
+        datasets: [{ data: values.length ? values : [1], backgroundColor: values.length ? colors : ["#d2ddeb"], borderWidth: 0 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  },
+
+  budget() {
+    const data = Logic.computeMonthData(Store.state.selectedMonth);
+    const wrap = document.getElementById("categoryBudgetProgressWrap");
+    const budgets = Store.state.settings.categoryBudgets;
+    
+    wrap.innerHTML = Object.keys(budgets).map(category => {
+      const budget = Number(budgets[category] || 0);
+      const spent = Number(data.expenseByCategory[category] || 0);
+      const ratio = budget > 0 ? (spent / budget) * 100 : 0;
+      return `
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="font-semibold text-slate-700">${Utils.escapeHTML(category)}</span>
+            <span class="text-slate-500">${spent.toFixed(0)} / ${budget.toFixed(0)}</span>
+          </div>
+          <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full bg-blue-500" style="width:${Math.min(100, Math.max(0, ratio))}%"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  },
+
+  accounts() {
+    const summary = Logic.computeAccountBalances();
+    const cards = document.getElementById("accountCards");
+    cards.innerHTML = Store.state.accounts.map(acc => `
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <p class="font-bold text-lg text-slate-700">${Utils.escapeHTML(acc.name)}</p>
+        <p class="font-extrabold text-blue-700 mt-2">${Utils.formatMoney(summary[acc.id] || 0, acc.currency)}</p>
+      </div>
+    `).join("");
+  },
+
+  recurring() {
+    const list = document.getElementById("recurringList");
+    list.innerHTML = Store.state.recurring.map(r => `
+      <div class="rounded-xl border border-slate-200 bg-white p-3 flex justify-between">
+        <p class="font-semibold text-slate-700">${Utils.escapeHTML(r.category)} - ${r.amount}</p>
+        <button data-action="delete-rec" data-id="${r.id}" class="text-xs text-red-500">Delete</button>
+      </div>
+    `).join("");
+  }
+};
+
+// ==========================================
+// 5. 事件委派与绑定 (Events)
+// ==========================================
+const Events = {
+  init() {
+    this.bindNavigation();
+    this.bindForms();
+    this.bindDelegations();
+  },
+
+  bindNavigation() {
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const tab = e.target.dataset.tab;
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(`tab-${tab}`).classList.remove("hidden");
+        e.target.classList.add("active");
+        
+        // 按需渲染对应面板
+        if (tab === 'insights') Render.insights();
+        if (tab === 'budget') Render.budget();
+      });
+    });
+
+    document.getElementById("monthPicker").addEventListener("change", (e) => {
+      Store.state.selectedMonth = e.target.value;
+      Store.persist();
+      Render.dashboard();
+    });
+  },
+
+  bindForms() {
+    // 快速记账
+    document.getElementById("quickAddBtn").addEventListener("click", () => {
+      const amount = Number(document.getElementById("quickAmount").value);
+      if (!amount) return;
+      Store.addTransaction({
+        type: "expense",
+        amount,
+        currency: document.getElementById("quickCurrency").value,
+        category: Runtime.selectedQuickCategory,
+        date: Utils.formatISO(new Date()),
+        accountId: document.getElementById("quickAccount").value
+      });
+      document.getElementById("quickAmount").value = "";
+      Render.dashboard(); // 仅局部刷新
+    });
+
+    // 详细记账表单
+    document.getElementById("transactionForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const amount = Number(document.getElementById("amountInput").value);
+      const payload = {
+        type: document.getElementById("typeInput").value,
+        amount,
+        currency: document.getElementById("currencyInput").value,
+        category: document.getElementById("categoryInput").value,
+        date: document.getElementById("dateInput").value,
+        note: document.getElementById("noteInput").value,
+        accountId: document.getElementById("accountInput").value
+      };
+
+      if (Runtime.editingTransactionId) {
+        Store.updateTransaction(Runtime.editingTransactionId, payload);
+        Runtime.editingTransactionId = null;
+        document.getElementById("transactionSubmitBtn").textContent = "Save Transaction";
+      } else {
+        Store.addTransaction(payload);
+      }
+      
+      e.target.reset();
+      document.getElementById("dateInput").value = Utils.formatISO(new Date());
+      Render.dashboard();
+    });
+
+    // 搜索过滤
+    document.getElementById("searchInput").addEventListener("input", () => Render.history());
+  },
+
+  bindDelegations() {
+    // 统一处理列表中的点击事件 (事件委托模式)
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+
+      switch(action) {
+        case "delete-tx":
+          Store.deleteTransaction(id);
+          Render.dashboard();
+          break;
+        case "edit-tx":
+          const tx = Store.state.transactions.find(t => t.id === id);
+          if (tx) {
+            Runtime.editingTransactionId = tx.id;
+            document.getElementById("amountInput").value = tx.amount;
+            document.getElementById("typeInput").value = tx.type;
+            Render.categoryOptions(); // 同步更新分类下拉
+            document.getElementById("categoryInput").value = tx.category;
+            document.getElementById("dateInput").value = tx.date;
+            document.getElementById("transactionSubmitBtn").textContent = "Update Transaction";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+          break;
+        case "quick-preset":
+          const preset = Store.state.settings.quickPresets[btn.dataset.idx];
+          Store.addTransaction({
+            type: "expense", amount: preset.amount, category: preset.category,
+            currency: "HKD", date: Utils.formatISO(new Date()), note: preset.label
+          });
+          Render.dashboard();
+          break;
+        case "quick-cat":
+          Runtime.selectedQuickCategory = btn.dataset.name;
+          Render.quickBlocks();
+          break;
+      }
+    });
+  }
+};
+
+// ==========================================
+// 6. 核心逻辑与计算引擎 (Logic)
+// ==========================================
+const Logic = {
+  computeMonthData(month, options = {}) {
+    const txs = Store.state.transactions.filter(t => t.date.startsWith(month));
+    let income = 0, expense = 0;
+    const expenseByCategory = {};
+
+    txs.forEach(t => {
+      const val = Utils.toHKD(t.amount, t.currency);
+      if (t.type === "expense") {
+        expense += val;
+        expenseByCategory[t.category] = (expenseByCategory[t.category] || 0) + val;
+      } else if (t.type === "income") {
+        income += val;
+      }
+    });
+    return { income, expense, expenseByCategory };
+  },
+
+  computeAccountBalances() {
+    const map = {};
+    Store.state.accounts.forEach(a => map[a.id] = Number(a.initialBalance || 0));
+    Store.state.transactions.forEach(t => {
+      if (!t.accountId || map[t.accountId] === undefined) return;
+      const val = Utils.toHKD(t.amount, t.currency);
+      if (t.type === "income" || t.type === "adjustment") map[t.accountId] += val;
+      if (t.type === "expense") map[t.accountId] -= val;
+    });
+    
+    let totalHKD = 0;
+    Object.values(map).forEach(v => totalHKD += v);
+    map.__totalHKD = totalHKD;
+    return map;
+  },
+
+  computeOverviewBreakdown(month, options) {
+    const data = this.computeMonthData(month);
+    return data.expenseByCategory;
+  },
+
+  resolveScopeAccountIds(scope) {
+    if (!scope || scope === "all") return null;
+    const groupName = scope.replace("group:", "");
+    return Store.state.accounts.filter(a => a.group === groupName).map(a => a.id);
+  }
+};
+
+// ==========================================
+// 7. 工具函数 (Utils)
+// ==========================================
+const Utils = {
+  uid: () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36),
+  formatISO: (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
+  toMonthValue: (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+  toHKD: (value, currency) => Number(value || 0) * (CONFIG.FX_TO_HKD[currency] || 1),
+  formatMoney: (value, currency) => new Intl.NumberFormat("en-HK", { style: "currency", currency: currency || "HKD", maximumFractionDigits: 2 }).format(Number(value || 0)),
+  escapeHTML: (str) => String(str ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;")
+};
+
+// ==========================================
+// 8. 初始化执行
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+  Store.init();
+  Events.init();
+  Render.all();
+  
+  // 设置默认日期
+  document.getElementById("dateInput").value = Utils.formatISO(new Date());
+});
