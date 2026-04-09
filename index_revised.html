@@ -1,4 +1,373 @@
-// ==========================================
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PocketHK Budget App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #e8f1ff;
+      --bg-b: #eefaf3;
+      --bg-c: #fff5e9;
+      --ink: #1e2f50;
+      --muted: #4f658e;
+      --card: rgba(255, 255, 255, 0.9);
+      --line: rgba(86, 116, 171, 0.17);
+      --accent: #2b8fff;
+      --accent-2: #35c36a;
+      --accent-3: #ff8a3d;
+      --accent-4: #5a6fe2;
+    }
+
+    body {
+      font-family: "Manrope", "Noto Sans TC", sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      background:
+        radial-gradient(55rem 36rem at -2% -8%, #dce9ff 0%, transparent 52%),
+        radial-gradient(52rem 32rem at 102% -15%, #dff6ea 0%, transparent 51%),
+        radial-gradient(40rem 25rem at 50% 112%, #ffe9d2 0%, transparent 44%),
+        linear-gradient(140deg, var(--bg-a) 0%, var(--bg-b) 52%, var(--bg-c) 100%);
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(55, 91, 154, 0.13);
+      backdrop-filter: blur(10px);
+    }
+
+    .fancy-title {
+      background: linear-gradient(90deg, #2f7ff4, #2cbf72, #f5943f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .chip.active {
+      background: linear-gradient(90deg, #2f7ff4, #4cb6ff);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(47, 127, 244, 0.34);
+    }
+
+    .tab-btn.active {
+      color: #1a6de3;
+      background: rgba(43, 143, 255, 0.15);
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.42s ease forwards;
+    }
+
+    .fade-up:nth-child(1) { animation-delay: 0.04s; }
+    .fade-up:nth-child(2) { animation-delay: 0.1s; }
+    .fade-up:nth-child(3) { animation-delay: 0.16s; }
+    .fade-up:nth-child(4) { animation-delay: 0.22s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="max-w-6xl mx-auto px-4 pb-28 pt-5 md:pt-8">
+    <section class="glass rounded-3xl p-5 md:p-6 fade-up">
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Hong Kong Personal Budget</p>
+          <h1 class="text-2xl md:text-3xl font-extrabold fancy-title">PocketHK App</h1>
+          <p class="text-sm text-slate-600">Fast expense logging, category budgets, account transfers, and trend intelligence.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <label for="monthPicker" class="text-sm font-semibold text-slate-700">Month</label>
+          <input id="monthPicker" type="month" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" />
+          <button id="exportCsvBtn" class="rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 text-sm font-semibold">Export CSV</button>
+        </div>
+      </div>
+      <div id="alertArea" class="mt-4 space-y-2"></div>
+    </section>
+
+    <section id="tab-dashboard" class="tab-panel mt-5 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <article class="glass rounded-2xl p-4 fade-up">
+          <p class="text-sm text-slate-500 font-semibold">Total Balance</p>
+          <p id="totalBalance" class="text-3xl font-extrabold text-blue-700 mt-1">HK$0</p>
+          <div class="mt-3 h-2 rounded-full bg-blue-100 overflow-hidden">
+            <div id="balanceMeter" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400" style="width:55%"></div>
+          </div>
+        </article>
+        <article class="glass rounded-2xl p-4 fade-up">
+          <p class="text-sm text-slate-500 font-semibold">Monthly Budget</p>
+          <p id="monthlyBudgetUsage" class="text-3xl font-extrabold text-emerald-700 mt-1">0%</p>
+          <div class="mt-3 h-2 rounded-full bg-emerald-100 overflow-hidden">
+            <div id="monthProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-green-400" style="width:0%"></div>
+          </div>
+          <p id="monthlyBudgetText" class="text-xs text-slate-500 mt-2">0 / 0</p>
+        </article>
+        <article class="glass rounded-2xl p-4 fade-up">
+          <p class="text-sm text-slate-500 font-semibold">Daily Logging Streak</p>
+          <p id="logStreak" class="text-3xl font-extrabold text-orange-500 mt-1">0 days</p>
+          <p id="comparePrevMonth" class="text-xs text-slate-600 mt-3">Compared to previous month: -</p>
+        </article>
+      </div>
+
+      <article class="glass rounded-2xl p-5">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h2 class="font-bold text-lg text-slate-700">Quick Add Expense</h2>
+          <p class="text-xs text-slate-500">Designed for 1 to 2 clicks</p>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 md:grid-cols-6 gap-2" id="quickPresetWrap"></div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input id="quickAmount" type="number" min="0" step="0.01" placeholder="Amount" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5" />
+          <select id="quickAccount" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5"></select>
+          <select id="quickCurrency" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5"></select>
+          <button id="quickAddBtn" class="rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold py-2.5">Add Expense</button>
+        </div>
+
+        <div id="quickCategoryWrap" class="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2"></div>
+
+        <div class="mt-4 border-t border-slate-200 pt-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-slate-700">Manage Quick Presets</h3>
+            <button id="quickPresetPanelToggle" type="button" class="text-xs font-semibold text-blue-600">Customize</button>
+          </div>
+          <div id="quickPresetPanel" class="hidden mt-3 space-y-3">
+            <p id="quickPresetEditHint" class="text-xs text-slate-500">Tap Edit to show details.</p>
+            <div id="quickPresetList" class="space-y-1"></div>
+            <button id="quickPresetNewBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">New Preset</button>
+            <form id="quickPresetForm" class="hidden grid grid-cols-2 md:grid-cols-6 gap-2">
+              <input id="quickPresetLabel" type="text" placeholder="Label" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+              <input id="quickPresetIcon" type="text" placeholder="Icon (e.g. 🍜)" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+              <input id="quickPresetAmount" type="number" min="0" step="0.01" placeholder="Amount" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+              <select id="quickPresetCategory" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+              <button id="quickPresetSaveBtn" class="rounded-xl bg-slate-800 text-white font-semibold px-4 py-2">Save Preset</button>
+              <button id="quickPresetCancelBtn" type="button" class="rounded-xl border border-slate-300 bg-white font-semibold px-4 py-2 text-slate-700">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-lg text-slate-700">Transaction System</h2>
+          <p id="editHint" class="text-xs text-slate-500">Add or edit records quickly</p>
+        </div>
+        <form id="transactionForm" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <label class="text-sm text-slate-700">Type
+            <select id="typeInput" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </label>
+          <label class="text-sm text-slate-700">Amount
+            <input id="amountInput" required type="number" min="0" step="0.01" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-700">Date
+            <input id="dateInput" required type="date" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-700">Category
+            <select id="categoryInput" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          </label>
+          <label class="text-sm text-slate-700">Account
+            <select id="accountInput" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          </label>
+          <label class="text-sm text-slate-700">Currency
+            <select id="currencyInput" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          </label>
+          <label class="text-sm text-slate-700 md:col-span-2 lg:col-span-1">Note (optional)
+            <input id="noteInput" type="text" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" placeholder="e.g. Dinner in Mong Kok" />
+          </label>
+          <button id="transactionSubmitBtn" class="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-4 py-2.5">Save Transaction</button>
+          <button id="transactionCancelBtn" type="button" class="hidden rounded-xl border border-slate-300 bg-white font-semibold px-4 py-2.5 text-slate-700">Cancel Edit</button>
+        </form>
+
+        <div class="mt-5 border-t border-slate-200 pt-4 grid md:grid-cols-3 gap-3 items-end">
+          <label class="text-sm text-slate-700">Add Custom Category
+            <input id="customCategoryInput" type="text" placeholder="New category" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          </label>
+          <label class="text-sm text-slate-700">For
+            <select id="customCategoryType" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </label>
+          <button id="addCustomCategoryBtn" type="button" class="rounded-xl bg-slate-800 text-white px-4 py-2.5 font-semibold">Add Category</button>
+        </div>
+
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h2 class="font-bold text-lg text-slate-700">All Transactions (This Month)</h2>
+          <input id="searchInput" type="search" placeholder="Search category, note, account..." class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm md:w-80" />
+        </div>
+        <div id="historyList" class="mt-3 space-y-2"></div>
+      </article>
+    </section>
+
+    <section id="tab-insights" class="tab-panel hidden mt-5 space-y-4">
+      <article class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-lg text-slate-700">Overview</h2>
+          <div class="flex items-center gap-2">
+            <label for="insightMetricSelect" class="text-xs text-slate-500">Metric</label>
+            <select id="insightMetricSelect" class="rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white">
+              <option value="expense" selected>Expense</option>
+              <option value="income">Income</option>
+              <option value="saving">Saving</option>
+            </select>
+            <label for="insightsScopeSelect" class="text-xs text-slate-500">Scope</label>
+            <select id="insightsScopeSelect" class="rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white"></select>
+          </div>
+        </div>
+        <p id="insightCurrencyHint" class="text-xs text-slate-500 mt-1">Values are converted by exchange rate.</p>
+        <div id="insightCategoryChips" class="mt-3 flex flex-wrap gap-2"></div>
+        <div class="mt-3 h-72">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="font-bold text-lg text-slate-700">Trend</h2>
+          <select id="trendRangeSelect" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white">
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+          </select>
+        </div>
+        <div class="mt-3 h-72">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <h3 class="font-bold text-slate-700">Category Trend vs Previous Month</h3>
+        <div id="categoryTrendList" class="mt-3 space-y-2"></div>
+      </article>
+    </section>
+
+    <section id="tab-budget" class="tab-panel hidden mt-5 space-y-4">
+      <article class="glass rounded-2xl p-5">
+        <h2 class="font-bold text-lg text-slate-700">Budget System</h2>
+        <form id="monthlyBudgetForm" class="mt-3 flex flex-col md:flex-row gap-2">
+          <input id="monthlyBudgetInput" type="number" min="0" step="1" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2" placeholder="Set monthly budget" />
+          <select id="budgetCurrencyInput" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <button class="rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 text-white px-4 py-2 font-semibold">Save Monthly Budget</button>
+        </form>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <h3 class="font-bold text-slate-700">Category Budget</h3>
+        <form id="categoryBudgetForm" class="mt-3 grid md:grid-cols-3 gap-2">
+          <select id="categoryBudgetSelect" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <input id="categoryBudgetInput" type="number" min="0" step="1" placeholder="Budget amount" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <button class="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 font-semibold">Save Category Budget</button>
+        </form>
+        <div id="categoryBudgetProgressWrap" class="mt-4 space-y-3"></div>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <h3 class="font-bold text-slate-700">Alerts & Reminders</h3>
+        <div class="mt-3 grid md:grid-cols-3 gap-3">
+          <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+            <input id="dailyReminderToggle" type="checkbox" class="size-4" />
+            <span class="text-sm">Daily reminder</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+            <input id="weeklyReminderToggle" type="checkbox" class="size-4" />
+            <span class="text-sm">Weekly reminder</span>
+          </label>
+          <button id="notifyNowBtn" class="rounded-xl bg-slate-900 text-white px-4 py-2 font-semibold">Notify Me Now</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="tab-accounts" class="tab-panel hidden mt-5 space-y-4">
+      <article class="glass rounded-2xl p-5">
+        <h2 class="font-bold text-lg text-slate-700">Multi-Account System</h2>
+        <form id="addGroupForm" class="mt-3 flex flex-col md:flex-row gap-2">
+          <input id="newGroupName" type="text" placeholder="Create total account group (e.g. HK Account)" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <button class="rounded-xl bg-slate-800 text-white font-semibold px-4 py-2">Add Group</button>
+        </form>
+        <div id="accountGroupSummary" class="mt-3 grid md:grid-cols-3 gap-3"></div>
+        <div id="accountCards" class="mt-3 grid md:grid-cols-3 gap-3"></div>
+
+        <form id="addAccountForm" class="mt-4 grid md:grid-cols-6 gap-2">
+          <input id="newAccountName" type="text" placeholder="Account name" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <select id="newAccountType" class="rounded-xl border border-slate-300 bg-white px-3 py-2">
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="savings">Savings</option>
+          </select>
+          <select id="newAccountGroup" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <select id="newAccountCurrency" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <input id="newAccountBalance" type="number" step="0.01" placeholder="Initial balance" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <button class="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold px-4 py-2">Add Account</button>
+        </form>
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <h3 class="font-bold text-slate-700">Transfer Between Accounts</h3>
+        <form id="transferForm" class="mt-3 grid md:grid-cols-5 gap-2">
+          <select id="fromAccountInput" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <select id="toAccountInput" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <input id="transferAmountInput" type="number" min="0" step="0.01" placeholder="Amount" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <input id="transferDateInput" type="date" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <button class="rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 text-white font-semibold px-4 py-2">Transfer</button>
+        </form>
+      </article>
+    </section>
+
+    <section id="tab-recurring" class="tab-panel hidden mt-5 space-y-4">
+      <article class="glass rounded-2xl p-5">
+        <h2 class="font-bold text-lg text-slate-700">Recurring Transactions</h2>
+        <form id="recurringForm" class="mt-3 grid md:grid-cols-6 gap-2">
+          <select id="recType" class="rounded-xl border border-slate-300 bg-white px-3 py-2">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+          <input id="recAmount" type="number" min="0" step="0.01" placeholder="Amount" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <select id="recCategory" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <select id="recAccount" class="rounded-xl border border-slate-300 bg-white px-3 py-2"></select>
+          <input id="recDay" type="number" min="1" max="28" placeholder="Day (1-28)" class="rounded-xl border border-slate-300 bg-white px-3 py-2" />
+          <button class="rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold px-4 py-2">Add Recurring</button>
+        </form>
+        <input id="recNote" type="text" placeholder="Note (optional, e.g. Rent / Subscriptions)" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" />
+      </article>
+
+      <article class="glass rounded-2xl p-5">
+        <h3 class="font-bold text-slate-700">Active Recurring Items</h3>
+        <div id="recurringList" class="mt-3 space-y-2"></div>
+      </article>
+
+    </section>
+  </main>
+
+  <nav class="fixed bottom-0 inset-x-0 border-t border-slate-200 bg-white/95 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 grid grid-cols-5 gap-2 text-sm">
+      <button data-tab="dashboard" class="tab-btn active rounded-xl py-2 font-semibold">Home</button>
+      <button data-tab="budget" class="tab-btn rounded-xl py-2 font-semibold">Budget</button>
+      <button data-tab="insights" class="tab-btn rounded-xl py-2 font-semibold">Insights</button>
+      <button data-tab="accounts" class="tab-btn rounded-xl py-2 font-semibold">Accounts</button>
+      <button data-tab="recurring" class="tab-btn rounded-xl py-2 font-semibold">Recurring</button>
+    </div>
+  </nav>
+
+  <script>
+  // ==========================================
 // 1. 常量与基础配置
 // ==========================================
 const CONFIG = {
@@ -516,3 +885,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 设置默认日期
   document.getElementById("dateInput").value = Utils.formatISO(new Date());
 });
+  </script>
+</body>
+</html>
