@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="zh-HK">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PocketHK - 交互式记账本</title>
+  <title>PocketHK - Interactive Budget App</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.v.tuangouai.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-a: #f0f4ff;
@@ -18,7 +18,7 @@
       --accent: #3b82f6;
     }
     body {
-      font-family: 'Manrope', 'Noto Sans TC', sans-serif;
+      font-family: 'Manrope', sans-serif;
       background: linear-gradient(135deg, var(--bg-a), var(--bg-b), var(--bg-c));
       color: var(--ink);
       min-height: 100vh;
@@ -39,97 +39,118 @@
       border-color: #3b82f6;
       color: #1e40af;
     }
+    /* Hide scrollbar for cleaner look */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body class="p-4 pb-24">
-  <div class="max-w-4xl mx-auto space-y-6">
-    <header class="flex justify-between items-center">
+  <div class="max-w-5xl mx-auto space-y-6">
+    <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
       <div>
         <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">PocketHK</h1>
-        <p class="text-sm text-slate-500">智慧记账 · 本地优先</p>
+        <p class="text-sm text-slate-500">Smart Budgeting · Local First</p>
       </div>
-      <input type="month" id="monthPicker" class="rounded-xl border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="month" id="monthPicker" class="rounded-xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
     </header>
 
     <main id="tab-dashboard" class="tab-panel space-y-6">
+      <!-- Top Overview Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="glass-card rounded-3xl p-6">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">总资产估值 (HKD)</p>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Net Worth</p>
           <h2 id="totalBalance" class="text-3xl font-black text-slate-800 mt-1">$0.00</h2>
         </div>
         <div class="glass-card rounded-3xl p-6">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">本月支出进度</p>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monthly Budget</p>
           <div class="flex items-end gap-2 mt-1">
             <h2 id="monthlyBudgetUsage" class="text-3xl font-black text-slate-800">0%</h2>
             <p id="budgetStatusText" class="text-xs text-slate-400 mb-1.5">of limit</p>
           </div>
-          <div class="w-full h-2 bg-slate-100 rounded-full mt-3 overflow-hidden">
+          <div class="w-full h-2 bg-slate-200 rounded-full mt-3 overflow-hidden">
             <div id="monthProgressBar" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
-        <div id="alertArea" class="flex flex-col gap-2">
-           </div>
+        <div class="glass-card rounded-3xl p-6">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Flow (This Month)</p>
+          <h2 id="netFlow" class="text-3xl font-black text-slate-800 mt-1">$0.00</h2>
+          <p id="netFlowSub" class="text-xs text-slate-500 mt-2">Income vs Expense</p>
+        </div>
       </div>
 
+      <!-- Action Section -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Quick Add -->
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700 flex items-center gap-2">⚡ 快速记账 (HKD)</h3>
+          <h3 class="font-bold text-slate-700 flex items-center gap-2">⚡ Quick Add</h3>
           <div id="quickCategoryWrap" class="flex flex-wrap gap-2"></div>
-          <div class="flex gap-2">
-            <input type="number" id="quickAmount" placeholder="金额" class="flex-1 rounded-xl border-none bg-white px-4 py-3 shadow-inner outline-none focus:ring-2 focus:ring-blue-500">
-            <select id="quickAccount" class="rounded-xl border-none bg-white px-3 py-3 shadow-inner outline-none"></select>
-            <button id="quickAddBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all">添加</button>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="number" id="quickAmount" placeholder="Amount" class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="quickAccount" class="rounded-xl border border-slate-200 bg-white px-3 py-3 outline-none"></select>
+            <button id="quickAddBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all">Add</button>
           </div>
-          <div id="quickPresetWrap" class="grid grid-cols-3 gap-2 mt-2"></div>
+          <p class="text-xs font-bold text-slate-500 mt-4 uppercase tracking-wider">Presets</p>
+          <div id="quickPresetWrap" class="grid grid-cols-3 gap-2"></div>
         </div>
 
-        <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">📝 记录交易</h3>
-          <form id="transactionForm" class="space-y-3">
+        <!-- Detailed Transaction -->
+        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+          <h3 class="font-bold text-slate-700 mb-4">📝 Record Transaction</h3>
+          <form id="transactionForm" class="space-y-3 h-full flex flex-col justify-center">
             <div class="grid grid-cols-2 gap-3">
-              <input type="number" id="amountInput" placeholder="金额" step="0.01" required class="rounded-xl border-slate-200 p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-              <select id="currencyInput" class="rounded-xl border-slate-200 p-2 text-sm"></select>
+              <input type="number" id="amountInput" placeholder="Amount" step="0.01" required class="rounded-xl border border-slate-200 p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <select id="currencyInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
             </div>
             <div class="grid grid-cols-2 gap-3">
-              <select id="typeInput" class="rounded-xl border-slate-200 p-2 text-sm">
-                <option value="expense">支出</option>
-                <option value="income">收入</option>
+              <select id="typeInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
               </select>
-              <select id="categoryInput" class="rounded-xl border-slate-200 p-2 text-sm"></select>
+              <select id="categoryInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
             </div>
             <div class="grid grid-cols-2 gap-3">
-              <input type="date" id="dateInput" class="rounded-xl border-slate-200 p-2 text-sm">
-              <select id="accountInput" class="rounded-xl border-slate-200 p-2 text-sm"></select>
+              <input type="date" id="dateInput" required class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
+              <select id="accountInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
             </div>
-            <input type="text" id="noteInput" placeholder="备注 (选填)" class="w-full rounded-xl border-slate-200 p-2 text-sm">
-            <button type="submit" id="transactionSubmitBtn" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900">保存交易</button>
+            <input type="text" id="noteInput" placeholder="Note (optional)" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" id="transactionSubmitBtn" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition-all mt-2">Save Transaction</button>
           </form>
         </div>
       </section>
 
+      <!-- History -->
       <section class="glass-card rounded-3xl p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="font-bold text-slate-700">📜 交易历史</h3>
-          <input type="text" id="searchInput" placeholder="搜索备注或分类..." class="text-xs border-none bg-white/50 px-3 py-2 rounded-lg outline-none focus:ring-1 focus:ring-blue-300">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+          <h3 class="font-bold text-slate-700">📜 Transaction History</h3>
+          <input type="text" id="searchInput" placeholder="Search notes or categories..." class="text-sm border border-slate-200 bg-white/50 px-4 py-2 rounded-xl outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-64">
         </div>
         <div id="historyList" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-          </div>
+          <!-- Populated by JS -->
+        </div>
       </section>
     </main>
 
     <main id="tab-insights" class="tab-panel hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">分类占比</h3>
+          <h3 class="font-bold text-slate-700 mb-4">Category Breakdown</h3>
           <div class="h-64"><canvas id="pieChart"></canvas></div>
         </div>
         <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">收支趋势</h3>
+          <h3 class="font-bold text-slate-700 mb-4">Expense Trend</h3>
           <div class="h-64"><canvas id="lineChart"></canvas></div>
         </div>
       </div>
       <div class="glass-card rounded-3xl p-6">
-        <h3 class="font-bold text-slate-700 mb-4">分类明细</h3>
+        <h3 class="font-bold text-slate-700 mb-4">Category Details</h3>
         <div id="insightCategoryList" class="space-y-2"></div>
       </div>
     </main>
@@ -137,77 +158,86 @@
     <main id="tab-budget" class="tab-panel hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700">💰 设置总预算</h3>
+          <h3 class="font-bold text-slate-700">💰 Set Total Budget</h3>
           <form id="monthlyBudgetForm" class="flex gap-2">
-            <input type="number" id="budgetLimitInput" placeholder="每月限额" class="flex-1 rounded-xl border-slate-200 p-2">
-            <button class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">更新</button>
+            <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" class="flex-1 rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700">Save</button>
           </form>
-          <div id="categoryBudgetProgressWrap" class="space-y-4 pt-4 border-t"></div>
+          <div id="categoryBudgetProgressWrap" class="space-y-4 pt-4 border-t border-slate-200"></div>
         </div>
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700">🏷 分类预算管理</h3>
+          <h3 class="font-bold text-slate-700">🏷 Category Budgets</h3>
           <form id="categoryBudgetForm" class="space-y-3">
-            <select id="categoryBudgetSelect" class="w-full rounded-xl border-slate-200 p-2"></select>
-            <input type="number" id="categoryBudgetAmount" placeholder="限额" class="w-full rounded-xl border-slate-200 p-2">
-            <button class="w-full bg-slate-800 text-white py-2 rounded-xl font-bold">设定分类预算</button>
+            <select id="categoryBudgetSelect" class="w-full rounded-xl border border-slate-200 p-3 outline-none"></select>
+            <input type="number" id="categoryBudgetAmount" placeholder="Budget Limit" class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
+            <button class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900">Set Category Budget</button>
           </form>
         </div>
       </div>
     </main>
 
     <main id="tab-accounts" class="tab-panel hidden space-y-6">
-      <div id="accountCards" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      <div id="accountCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700">🏦 新增账户</h3>
+          <h3 class="font-bold text-slate-700">🏦 Add New Account</h3>
           <form id="addAccountForm" class="space-y-3">
-            <input type="text" id="newAccountName" placeholder="账户名称 (如: 八达通)" required class="w-full rounded-xl border-slate-200 p-2">
-            <select id="newAccountType" class="w-full rounded-xl border-slate-200 p-2">
-              <option value="cash">现金</option>
-              <option value="card">银行卡/信用卡</option>
-              <option value="ewallet">电子钱包</option>
+            <input type="text" id="newAccountName" placeholder="Account Name (e.g., Octopus)" required class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="newAccountType" class="w-full rounded-xl border border-slate-200 p-3 outline-none">
+              <option value="Cash">Cash</option>
+              <option value="Card">Bank/Credit Card</option>
+              <option value="E-Wallet">E-Wallet</option>
             </select>
-            <div class="grid grid-cols-2 gap-2">
-              <select id="newAccountCurrency" class="rounded-xl border-slate-200 p-2"></select>
-              <input type="number" id="newAccountBalance" placeholder="初始余额" class="rounded-xl border-slate-200 p-2">
+            <div class="grid grid-cols-2 gap-3">
+              <select id="newAccountCurrency" class="rounded-xl border border-slate-200 p-3 outline-none"></select>
+              <input type="number" id="newAccountBalance" placeholder="Initial Balance" step="0.01" class="rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-            <button class="w-full bg-blue-600 text-white py-2 rounded-xl font-bold">创建账户</button>
+            <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 mt-2">Create Account</button>
           </form>
         </div>
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700">🔄 内部转账</h3>
+          <h3 class="font-bold text-slate-700">🔄 Transfer Between Accounts</h3>
           <form id="transferForm" class="space-y-3">
-            <div class="grid grid-cols-2 gap-2">
-              <select id="fromAccountInput" class="rounded-xl border-slate-200 p-2 text-xs"></select>
-              <select id="toAccountInput" class="rounded-xl border-slate-200 p-2 text-xs"></select>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500 ml-1">From</label>
+                <select id="fromAccountInput" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500 ml-1">To</label>
+                <select id="toAccountInput" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
+              </div>
             </div>
-            <input type="number" id="transferAmount" placeholder="金额" class="w-full rounded-xl border-slate-200 p-2">
-            <button class="w-full bg-slate-800 text-white py-2 rounded-xl font-bold">确认转账</button>
+            <input type="number" id="transferAmount" placeholder="Transfer Amount" step="0.01" class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
+            <button class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 mt-2">Confirm Transfer</button>
           </form>
         </div>
       </div>
     </main>
 
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-2xl border border-white/50 z-50">
-      <button data-tab="dashboard" class="tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm transition-all">概览</button>
-      <button data-tab="insights" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50">洞察</button>
-      <button data-tab="budget" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50">预算</button>
-      <button data-tab="accounts" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50">账户</button>
-      <button id="exportCsvBtn" class="px-5 py-2.5 rounded-xl font-bold text-sm text-emerald-600 hover:bg-emerald-50 transition-all">导出</button>
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-2xl border border-white/50 z-50 overflow-x-auto w-[90%] sm:w-auto justify-center">
+      <button data-tab="dashboard" class="tab-btn active px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap">Overview</button>
+      <button data-tab="insights" class="tab-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50 whitespace-nowrap">Insights</button>
+      <button data-tab="budget" class="tab-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50 whitespace-nowrap">Budget</button>
+      <button data-tab="accounts" class="tab-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:bg-slate-50 whitespace-nowrap">Accounts</button>
+      <button id="exportCsvBtn" class="px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-emerald-600 hover:bg-emerald-50 transition-all whitespace-nowrap border border-emerald-100">Export</button>
     </nav>
   </div>
 
   <script>
+    // ==========================================
+    // 1. Config & Store
+    // ==========================================
     const CONFIG = {
-      STORAGE_KEY: "pockethk-v2",
+      STORAGE_KEY: "pockethk-v3-eng",
       SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
-      DEFAULT_EXPENSE_CATS: ["餐饮", "交通", "购物", "娱乐", "账单", "租金", "医疗", "其他"],
-      DEFAULT_INCOME_CATS: ["工资", "奖金", "理财", "赠予", "其他"],
+      DEFAULT_EXPENSE_CATS: ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Rent", "Healthcare", "Other"],
+      DEFAULT_INCOME_CATS: ["Salary", "Bonus", "Investment", "Gift", "Other"],
       DEFAULT_QUICK_PRESETS: [
-        { label: "MTR", amount: 15, category: "交通", icon: "🚇" },
-        { label: "午餐", amount: 65, category: "餐饮", icon: "🍱" },
-        { label: "咖啡", amount: 28, category: "餐饮", icon: "☕" }
+        { label: "MTR", amount: 15, category: "Transport", icon: "🚇" },
+        { label: "Lunch", amount: 65, category: "Food", icon: "🍱" },
+        { label: "Coffee", amount: 28, category: "Food", icon: "☕" }
       ]
     };
 
@@ -220,8 +250,8 @@
           customExpenseCategories: [],
           customIncomeCategories: [],
           accounts: [
-            { id: "acc-cash", name: "现金", type: "cash", currency: "HKD", initialBalance: 1000 },
-            { id: "acc-card", name: "信用卡", type: "card", currency: "HKD", initialBalance: 0 }
+            { id: "acc-cash", name: "Wallet Cash", type: "Cash", currency: "HKD", initialBalance: 1000 },
+            { id: "acc-card", name: "Credit Card", type: "Card", currency: "HKD", initialBalance: 0 }
           ],
           transactions: []
         };
@@ -241,6 +271,10 @@
         this.persist();
       }
     };
+
+    // ==========================================
+    // 2. Logic Engine
+    // ==========================================
     const Logic = {
       getFilteredTransactions(month, search = "") {
         return Store.state.transactions
@@ -274,10 +308,10 @@
     };
 
     // ==========================================
-    // 3. 视图渲染 (Render)
+    // 3. Render Views
     // ==========================================
     const Render = {
-      runtime: { selectedQuickCategory: "餐饮", pieChart: null, lineChart: null },
+      runtime: { selectedQuickCategory: "Food", pieChart: null, lineChart: null },
       
       all() {
         this.dropdowns();
@@ -310,18 +344,29 @@
         const { income, expense } = Logic.computeSummary(txs);
         const balances = Logic.computeAccountBalances();
         
-        // 总资产 (换算为 HKD)
+        // Total Net Worth (Converted to HKD)
         let totalHKD = 0;
         Store.state.accounts.forEach(a => {
            totalHKD += Utils.toHKD(balances[a.id], a.currency);
         });
         document.getElementById("totalBalance").textContent = Utils.formatMoney(totalHKD, "HKD");
 
-        // 预算进度
+        // Net Flow
+        const netFlow = income - expense;
+        const flowEl = document.getElementById("netFlow");
+        flowEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
+        flowEl.className = `text-3xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+        // Budget Progress
         const limit = Store.state.settings.monthlyBudget || 1;
         const ratio = Math.round((expense / limit) * 100);
         document.getElementById("monthlyBudgetUsage").textContent = `${ratio}%`;
-        document.getElementById("monthProgressBar").style.width = `${Math.min(100, ratio)}%`;
+        
+        const pb = document.getElementById("monthProgressBar");
+        pb.style.width = `${Math.min(100, ratio)}%`;
+        if(ratio > 90) pb.className = "h-full transition-all duration-500 bg-rose-500";
+        else if(ratio > 70) pb.className = "h-full transition-all duration-500 bg-amber-400";
+        else pb.className = "h-full transition-all duration-500 bg-blue-500";
 
         this.history(txs);
         this.quickSection();
@@ -330,20 +375,20 @@
       history(txs) {
         const list = document.getElementById("historyList");
         if (txs.length === 0) {
-          list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">暂无本月交易记录</p>`;
+          list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">No transactions found for this month.</p>`;
           return;
         }
         list.innerHTML = txs.sort((a,b) => b.date.localeCompare(a.date)).map(t => `
-          <div class="flex justify-between items-center p-3 bg-white/50 rounded-2xl border border-slate-100">
+          <div class="flex justify-between items-center p-4 bg-white/60 rounded-2xl border border-slate-100 hover:shadow-sm transition-all">
             <div>
               <p class="font-bold text-slate-700">${t.category} <span class="text-xs font-normal text-slate-400 ml-2">${t.date}</span></p>
-              <p class="text-xs text-slate-500">${t.note || ''}</p>
+              <p class="text-xs text-slate-500 mt-0.5">${t.note || 'No notes'}</p>
             </div>
             <div class="text-right">
               <p class="font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}">
                 ${t.type === 'income' ? '+' : '-'}${Utils.formatMoney(t.amount, t.currency)}
               </p>
-              <button data-action="delete-tx" data-id="${t.id}" class="text-[10px] text-slate-300 hover:text-rose-400">删除</button>
+              <button data-action="delete-tx" data-id="${t.id}" class="text-[10px] text-slate-400 hover:text-rose-500 uppercase font-bold tracking-wider mt-1 transition-colors">Delete</button>
             </div>
           </div>
         `).join("");
@@ -352,15 +397,17 @@
       quickSection() {
         const catWrap = document.getElementById("quickCategoryWrap");
         catWrap.innerHTML = CONFIG.DEFAULT_EXPENSE_CATS.slice(0, 5).map(c => `
-          <button data-action="set-quick-cat" data-cat="${c}" class="chip px-3 py-1.5 rounded-full border border-slate-200 text-xs font-bold transition-all ${this.runtime.selectedQuickCategory === c ? 'active' : 'bg-white text-slate-500'}">${c}</button>
+          <button data-action="set-quick-cat" data-cat="${c}" class="chip px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold transition-all ${this.runtime.selectedQuickCategory === c ? 'active' : 'bg-white text-slate-500 hover:bg-slate-50'}">${c}</button>
         `).join("");
 
         const preWrap = document.getElementById("quickPresetWrap");
         preWrap.innerHTML = Store.state.settings.quickPresets.map(p => `
-          <button data-action="use-preset" data-label="${p.label}" data-amt="${p.amount}" data-cat="${p.category}" class="bg-white p-2 rounded-xl border border-slate-100 text-left hover:shadow-md transition-all">
-            <span class="text-lg">${p.icon}</span>
-            <p class="text-[10px] font-bold text-slate-700 truncate">${p.label}</p>
-            <p class="text-[10px] text-blue-500">$${p.amount}</p>
+          <button data-action="use-preset" data-label="${p.label}" data-amt="${p.amount}" data-cat="${p.category}" class="bg-white p-3 rounded-xl border border-slate-200 text-left hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between h-full">
+            <span class="text-2xl mb-1">${p.icon}</span>
+            <div>
+              <p class="text-xs font-bold text-slate-700 truncate">${p.label}</p>
+              <p class="text-[11px] font-semibold text-blue-500">$${p.amount}</p>
+            </div>
           </button>
         `).join("");
       },
@@ -368,16 +415,24 @@
       insights() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
         const { byCat, expense } = Logic.computeSummary(txs);
+        
+        // Pie Chart
         const ctxPie = document.getElementById("pieChart").getContext("2d");
         if (this.runtime.pieChart) this.runtime.pieChart.destroy();
         this.runtime.pieChart = new Chart(ctxPie, {
           type: 'doughnut',
           data: {
-            labels: Object.keys(byCat),
-            datasets: [{ data: Object.values(byCat), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderWeight: 0 }]
+            labels: Object.keys(byCat).length ? Object.keys(byCat) : ["No Data"],
+            datasets: [{ 
+              data: Object.values(byCat).length ? Object.values(byCat) : [1], 
+              backgroundColor: Object.values(byCat).length ? ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'] : ['#e2e8f0'], 
+              borderWidth: 0 
+            }]
           },
-          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
         });
+
+        // Trend Chart (Daily Expense)
         const daily = {};
         txs.filter(t => t.type === 'expense').forEach(t => { daily[t.date] = (daily[t.date] || 0) + Utils.toHKD(t.amount, t.currency); });
         const sortedDates = Object.keys(daily).sort();
@@ -388,67 +443,106 @@
           type: 'line',
           data: {
             labels: sortedDates.map(d => d.split('-')[2]),
-            datasets: [{ label: '日支出', data: sortedDates.map(d => daily[d]), borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }]
+            datasets: [{ 
+              label: 'Daily Expense', 
+              data: sortedDates.map(d => daily[d]), 
+              borderColor: '#3b82f6', 
+              tension: 0.4, 
+              fill: true, 
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              pointBackgroundColor: '#3b82f6'
+            }]
           },
-          options: { maintainAspectRatio: false }
+          options: { maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] } } } }
         });
-        document.getElementById("insightCategoryList").innerHTML = Object.entries(byCat).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
-          <div class="flex justify-between text-sm p-2 border-b border-slate-50">
-            <span class="text-slate-600">${cat}</span>
-            <span class="font-bold">${Utils.formatMoney(val, "HKD")} (${((val/expense)*100).toFixed(1)}%)</span>
-          </div>
-        `).join("");
+
+        // Category Breakdown List
+        const listEl = document.getElementById("insightCategoryList");
+        if (Object.keys(byCat).length === 0) {
+          listEl.innerHTML = `<p class="text-sm text-slate-400 py-2">No expenses logged yet.</p>`;
+        } else {
+          listEl.innerHTML = Object.entries(byCat).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
+            <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
+              <span class="text-slate-600 font-medium">${cat}</span>
+              <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/expense)*100).toFixed(1)}%)</span></span>
+            </div>
+          `).join("");
+        }
       },
 
       budget() {
+        // Init form values
+        document.getElementById("budgetLimitInput").value = Store.state.settings.monthlyBudget || '';
+
         const { byCat } = Logic.computeSummary(Logic.getFilteredTransactions(Store.state.selectedMonth));
         const wrap = document.getElementById("categoryBudgetProgressWrap");
         const b = Store.state.settings.categoryBudgets;
         
-        wrap.innerHTML = Object.entries(b).map(([cat, limit]) => {
-          const spent = byCat[cat] || 0;
-          const ratio = Math.min(100, (spent / limit) * 100);
-          return `
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="font-bold text-slate-700">${cat}</span>
-                <span class="text-slate-400">${spent.toFixed(0)} / ${limit}</span>
+        if (Object.keys(b).length === 0) {
+          wrap.innerHTML = `<p class="text-sm text-slate-400">No category budgets set.</p>`;
+        } else {
+          wrap.innerHTML = Object.entries(b).map(([cat, limit]) => {
+            const spent = byCat[cat] || 0;
+            const ratio = Math.min(100, (spent / limit) * 100);
+            const colorClass = ratio > 90 ? "bg-rose-500" : ratio > 75 ? "bg-amber-400" : "bg-emerald-500";
+            return `
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="font-bold text-slate-700">${cat}</span>
+                  <span class="text-slate-500 font-medium">${spent.toFixed(0)} / ${limit}</span>
+                </div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full ${colorClass} transition-all duration-500" style="width: ${ratio}%"></div>
+                </div>
               </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500" style="width: ${ratio}%"></div>
-              </div>
-            </div>
-          `;
-        }).join("");
+            `;
+          }).join("");
+        }
       },
 
       accounts() {
         const bals = Logic.computeAccountBalances();
         document.getElementById("accountCards").innerHTML = Store.state.accounts.map(a => `
-          <div class="glass-card p-4 rounded-2xl border-l-4 ${a.type === 'card' ? 'border-l-rose-400' : 'border-l-blue-400'}">
-            <p class="text-[10px] font-bold text-slate-400 uppercase">${a.type}</p>
-            <h4 class="font-bold text-slate-700">${a.name}</h4>
-            <p class="text-xl font-black text-slate-800 mt-1">${Utils.formatMoney(bals[a.id], a.currency)}</p>
+          <div class="glass-card p-5 rounded-3xl border-l-4 ${a.type === 'Card' ? 'border-l-rose-400' : a.type === 'E-Wallet' ? 'border-l-emerald-400' : 'border-l-blue-400'}">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${a.type}</p>
+            <h4 class="font-bold text-slate-700 text-lg mt-1">${a.name}</h4>
+            <p class="text-2xl font-black text-slate-800 mt-2">${Utils.formatMoney(bals[a.id], a.currency)}</p>
           </div>
         `).join("");
       }
     };
+
+    // ==========================================
+    // 4. Event Listeners
+    // ==========================================
     const Events = {
       init() {
+        // Navigation Tabs
         document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
           btn.addEventListener("click", (e) => {
             const tab = btn.dataset.tab;
             document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
-            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active", "text-slate-500"));
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active", "text-emerald-600", "border-emerald-100"));
+            // Style active state
+            document.querySelectorAll(".tab-btn[data-tab]").forEach(b => {
+                b.classList.add("text-slate-500");
+                b.style.backgroundColor = "transparent";
+                b.style.color = "";
+            });
             document.getElementById(`tab-${tab}`).classList.remove("hidden");
             btn.classList.add("active");
+            btn.classList.remove("text-slate-500");
+
             if (tab === 'insights') Render.insights();
             if (tab === 'budget') Render.budget();
             if (tab === 'accounts') Render.accounts();
+            
+            // Scroll to top on tab change for mobile friendliness
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           });
         });
 
-        // 记账表单
+        // Form: Record Transaction
         document.getElementById("transactionForm").addEventListener("submit", (e) => {
           e.preventDefault();
           Store.addTransaction({
@@ -461,10 +555,18 @@
             accountId: document.getElementById("accountInput").value
           });
           e.target.reset();
+          document.getElementById("dateInput").value = Utils.formatISO(new Date()); // Keep date current
           Render.dashboard();
         });
 
-        // 快速记账
+        // Change Categories dynamically based on Expense/Income selection
+        document.getElementById("typeInput").addEventListener("change", (e) => {
+           const type = e.target.value;
+           const cats = type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS;
+           document.getElementById("categoryInput").innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join("");
+        });
+
+        // Form: Quick Add
         document.getElementById("quickAddBtn").addEventListener("click", () => {
           const amt = document.getElementById("quickAmount").value;
           if (!amt) return;
@@ -477,36 +579,55 @@
           document.getElementById("quickAmount").value = "";
           Render.dashboard();
         });
+
+        // Form: Account Transfer
         document.getElementById("transferForm").addEventListener("submit", (e) => {
           e.preventDefault();
           const amt = document.getElementById("transferAmount").value;
           const from = document.getElementById("fromAccountInput").value;
           const to = document.getElementById("toAccountInput").value;
-          if (from === to || !amt) return;
+          if (from === to || !amt) {
+              alert("Please select different accounts and enter a valid amount.");
+              return;
+          }
           
           const date = Utils.formatISO(new Date());
-          Store.addTransaction({ amount: amt, currency: "HKD", type: "expense", category: "转账", note: `转出至 ${to}`, accountId: from, date });
-          Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "转账", note: `从 ${from} 转入`, accountId: to, date });
+          const fromName = Store.state.accounts.find(a => a.id === from)?.name || "Account";
+          const toName = Store.state.accounts.find(a => a.id === to)?.name || "Account";
+
+          Store.addTransaction({ amount: amt, currency: "HKD", type: "expense", category: "Transfer", note: `Transfer to ${toName}`, accountId: from, date });
+          Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "Transfer", note: `Transfer from ${fromName}`, accountId: to, date });
           
           e.target.reset();
           Render.accounts();
-          Render.dashboard();
+          Render.dashboard(); // Need to update overall balance potentially if currencies differ, though configured as HKD base here
         });
+
+        // Form: Total Budget Update
         document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => {
           e.preventDefault();
           Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value);
           Store.persist();
-          Render.dashboard();
+          Render.budget();
+          alert("Monthly limit updated successfully.");
         });
 
+        // Form: Category Budget Update
         document.getElementById("categoryBudgetForm").addEventListener("submit", (e) => {
           e.preventDefault();
           const cat = document.getElementById("categoryBudgetSelect").value;
           const amt = Number(document.getElementById("categoryBudgetAmount").value);
-          Store.state.settings.categoryBudgets[cat] = amt;
+          if(amt <= 0) {
+             delete Store.state.settings.categoryBudgets[cat];
+          } else {
+             Store.state.settings.categoryBudgets[cat] = amt;
+          }
           Store.persist();
           Render.budget();
+          document.getElementById("categoryBudgetAmount").value = "";
         });
+
+        // Form: Add New Account
         document.getElementById("addAccountForm").addEventListener("submit", (e) => {
           e.preventDefault();
           Store.state.accounts.push({
@@ -521,12 +642,15 @@
           Render.dropdowns();
           Render.accounts();
         });
+
+        // Dynamic Event Delegation (Clicks for lists/chips)
         document.addEventListener("click", (e) => {
           const btn = e.target.closest("button[data-action]");
           if (!btn) return;
           const act = btn.dataset.action;
+          
           if (act === "delete-tx") {
-            if (confirm("确定删除这条记录吗？")) {
+            if (confirm("Are you sure you want to delete this record?")) {
               Store.deleteTransaction(btn.dataset.id);
               Render.dashboard();
             }
@@ -543,36 +667,55 @@
           }
         });
 
-        // 搜索与月份切换
+        // Search and Month Filter Actions
         document.getElementById("searchInput").addEventListener("input", () => Render.dashboard());
         document.getElementById("monthPicker").addEventListener("change", (e) => {
           Store.state.selectedMonth = e.target.value;
           Store.persist();
           Render.dashboard();
+          // If viewing insights/budget, refresh them too
+          if (!document.getElementById("tab-insights").classList.contains("hidden")) Render.insights();
+          if (!document.getElementById("tab-budget").classList.contains("hidden")) Render.budget();
         });
 
-        // 导出 CSV
+        // Export to CSV
         document.getElementById("exportCsvBtn").addEventListener("click", () => {
           const csv = ["Date,Category,Type,Amount,Currency,Note"];
           Store.state.transactions.forEach(t => {
             csv.push(`${t.date},${t.category},${t.type},${t.amount},${t.currency},"${t.note || ''}"`);
           });
-          const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+          const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
           a.download = `PocketHK_Backup_${Store.state.selectedMonth}.csv`;
+          document.body.appendChild(a);
           a.click();
+          document.body.removeChild(a);
         });
       }
     };
+
+    // ==========================================
+    // 5. Utilities
+    // ==========================================
     const Utils = {
-      uid: () => Date.now().toString(36) + Math.random().toString(36).substr(2),
-      formatISO: (date) => date.toISOString().split('T')[0],
-      toMonthValue: (date) => date.toISOString().slice(0, 7),
+      uid: () => Date.now().toString(36) + Math.random().toString(36).substring(2, 7),
+      formatISO: (date) => {
+        const offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset).toISOString().split('T')[0];
+      },
+      toMonthValue: (date) => {
+        const offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset).toISOString().slice(0, 7);
+      },
       toHKD: (amt, cur) => Number(amt || 0) * (CONFIG.FX_TO_HKD[cur] || 1),
       formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val)
     };
+
+    // ==========================================
+    // 6. Bootstrap
+    // ==========================================
     document.addEventListener("DOMContentLoaded", () => {
       Store.init();
       Events.init();
