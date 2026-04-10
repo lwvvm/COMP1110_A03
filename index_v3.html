@@ -237,7 +237,7 @@
     </main>
 
     <!-- Navigation -->
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-100 shadow-2xl z-50 overflow-x-auto w- sm:w-auto justify-center">
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-100 shadow-2xl z-50 overflow-x-auto w-11/12 sm:w-auto justify-center">
       <button data-tab="dashboard" class="nav-btn active px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Overview</button>
       <button data-tab="insights" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Insights</button>
       <button data-tab="budget" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Budget</button>
@@ -255,7 +255,7 @@
     // 1. Config & Store
     // ==========================================
     const CONFIG = {
-      STORAGE_KEY: "pockethk-v7-eng",
+      STORAGE_KEY: "pockethk-v8-eng",
       SUPPORTED_CURRENCIES:,
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
       DEFAULT_EXPENSE_CATS:,
@@ -369,7 +369,7 @@
         const { income, expense } = Logic.computeSummary(txs);
         const balances = Logic.computeAccountBalances();
         
-        // Total Net Worth (Converted to HKD)
+        // Total Net Worth
         let totalHKD = 0;
         Store.state.accounts.forEach(a => {
            totalHKD += Utils.toHKD(balances, a.currency);
@@ -413,7 +413,7 @@
               <p class="font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}">
                 ${t.type === 'income' ? '+' : '-'}${Utils.formatMoney(t.amount, t.currency)}
               </p>
-              <button data-action="delete-tx" data-id="${t.id}" class="text- text-slate-400 hover:text-rose-500 uppercase font-bold tracking-wider mt-1 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100">Delete</button>
+              <button data-action="delete-tx" data-id="${t.id}" class="text-xs text-slate-400 hover:text-rose-500 uppercase font-bold tracking-wider mt-1 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100">Delete</button>
             </div>
           </div>
         `).join("");
@@ -452,9 +452,9 @@
         this.runtime.pieChart = new Chart(ctxPie, {
           type: 'doughnut',
           data: {
-            labels: labels.length ? labels :,
+            labels: labels.length > 0 ? labels :,
             datasets:, 
-              backgroundColor: values.length ? :, 
+              backgroundColor: values.length > 0 ? :, 
               borderWidth: 0 
             }]
           },
