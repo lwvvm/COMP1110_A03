@@ -34,12 +34,12 @@
     .nav-btn.active { background-color: #eff6ff; color: #2563eb; }
     .chip.active { background-color: #dbeafe; border-color: #3b82f6; color: #1e40af; }
     
-    /* Global scrollbar style */
+    /* 页面基础滚动条优化 */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
-    /* Horizontal slider for large numbers to prevent overflow */
+    /* 专属的数字滑块样式：优雅的水平滚动条，防止大数字撑爆卡片 */
     .number-slider {
       max-width: 100%;
       overflow-x: auto;
@@ -62,6 +62,7 @@
     </header>
 
     <main id="tab-dashboard" class="tab-panel space-y-6">
+      <!-- Top Overview Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="glass-card rounded-3xl p-6 hover:shadow-lg transition-shadow">
           <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Net Worth</p>
@@ -88,7 +89,9 @@
         </div>
       </div>
 
+      <!-- Action Section -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Quick Add -->
         <div class="glass-card rounded-3xl p-6 space-y-4">
           <h3 class="font-bold text-slate-700 flex items-center gap-2">⚡ Quick Add</h3>
           <div id="quickCategoryWrap" class="flex flex-wrap gap-2"></div>
@@ -112,6 +115,7 @@
           
           <div id="quickPresetWrap" class="grid grid-cols-2 sm:grid-cols-3 gap-2 relative"></div>
 
+          <!-- 自定义 Preset 隐藏表单 -->
           <form id="presetManageForm" class="hidden mt-3 bg-slate-50 border border-slate-100 p-4 rounded-2xl space-y-3 shadow-inner transition-all">
             <h4 class="text-xs font-bold text-slate-700">Add New Preset</h4>
             <div class="grid grid-cols-2 gap-2">
@@ -126,6 +130,7 @@
           </form>
         </div>
 
+        <!-- Detailed Transaction -->
         <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
           <h3 class="font-bold text-slate-700 mb-4">📝 Record Transaction</h3>
           <form id="transactionForm" class="space-y-3 h-full flex flex-col justify-center">
@@ -150,6 +155,7 @@
         </div>
       </section>
 
+      <!-- History -->
       <section class="glass-card rounded-3xl p-6">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
           <h3 class="font-bold text-slate-700">📜 Transaction History</h3>
@@ -255,7 +261,7 @@
     // 1. Config & Store
     // ==========================================
     const CONFIG = {
-      STORAGE_KEY: "pockethk-v7-eng",
+      STORAGE_KEY: "pockethk-v6-eng",
       SUPPORTED_CURRENCIES:,
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
       DEFAULT_EXPENSE_CATS:,
@@ -271,7 +277,7 @@
           settings: { 
             monthlyBudget: 15000, 
             categoryBudgets: {}, 
-            quickPresets:
+            quickPresets: 
           },
           customExpenseCategories: [],
           customIncomeCategories: [],
@@ -369,7 +375,7 @@
         const { income, expense } = Logic.computeSummary(txs);
         const balances = Logic.computeAccountBalances();
         
-        // Total Net Worth (Converted to HKD)
+        // Total Net Worth
         let totalHKD = 0;
         Store.state.accounts.forEach(a => {
            totalHKD += Utils.toHKD(balances, a.currency);
@@ -461,7 +467,7 @@
           options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
         });
 
-        // Trend Chart
+        // Trend Chart (Daily Expense)
         const daily = {};
         txs.filter(t => t.type === 'expense').forEach(t => { daily = (daily || 0) + Utils.toHKD(t.amount, t.currency); });
         const sortedDates = Object.keys(daily).sort();
@@ -710,10 +716,8 @@
             Render.runtime.selectedQuickCategory = btn.dataset.cat;
             Render.quickSection();
           } else if (act === "use-preset") {
-            if (Render.runtime.isManagingPresets) return; // Prevent adding if in edit mode
-            const idx = btn.dataset.idx;
+            if (Render.runtime.isManagingPresets) return;
             const p = Store.state.settings.quickPresets;
-            if (!p) return;
             Store.addTransaction({
               amount: p.amount, currency: "HKD", type: "expense",
               category: p.category, date: Utils.formatISO(new Date()),
