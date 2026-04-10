@@ -39,12 +39,12 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
-    /* 专属的数字滑块样式：优雅的水平滚动条，防止大数字撑爆卡片 */
+    /* 专属的数字滑块样式：优雅的水平滚动条 */
     .number-slider {
       max-width: 100%;
       overflow-x: auto;
       white-space: nowrap;
-      padding-bottom: 4px;
+      padding-bottom: 4px; /* 留出滚动条空间 */
     }
     .number-slider::-webkit-scrollbar { height: 4px; }
     .number-slider::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -66,6 +66,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="glass-card rounded-3xl p-6 hover:shadow-lg transition-shadow">
           <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Net Worth</p>
+          <!-- 加入了 number-slider 类来实现大额数字的水平滑动 -->
           <div class="number-slider mt-1">
             <h2 id="totalBalance" class="text-3xl font-black text-slate-800 inline-block">$0.00</h2>
           </div>
@@ -120,7 +121,7 @@
             <h4 class="text-xs font-bold text-slate-700">Add New Preset</h4>
             <div class="grid grid-cols-2 gap-2">
               <input type="text" id="newPresetLabel" placeholder="Label (e.g. Bus)" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
-              <input type="text" id="newPresetIcon" placeholder="Emoji (e.g. 🚌)" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="text" id="newPresetIcon" placeholder="Emoji Icon (e.g. 🚌)" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="grid grid-cols-2 gap-2">
               <input type="number" id="newPresetAmount" placeholder="Amount" step="0.01" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
@@ -261,7 +262,7 @@
     // 1. Config & Store
     // ==========================================
     const CONFIG = {
-      STORAGE_KEY: "pockethk-v6-eng",
+      STORAGE_KEY: "pockethk-v5-eng",
       SUPPORTED_CURRENCIES:,
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
       DEFAULT_EXPENSE_CATS:,
@@ -365,7 +366,7 @@
         const catOpts = CONFIG.DEFAULT_EXPENSE_CATS.map(c => `<option value="${c}">${c}</option>`).join("");
         document.getElementById("categoryInput").innerHTML = catOpts;
         document.getElementById("categoryBudgetSelect").innerHTML = catOpts;
-        document.getElementById("newPresetCategory").innerHTML = catOpts;
+        document.getElementById("newPresetCategory").innerHTML = catOpts; // Update preset category selector
         
         document.getElementById("monthPicker").value = Store.state.selectedMonth;
       },
@@ -375,7 +376,7 @@
         const { income, expense } = Logic.computeSummary(txs);
         const balances = Logic.computeAccountBalances();
         
-        // Total Net Worth
+        // Total Net Worth (Converted to HKD)
         let totalHKD = 0;
         Store.state.accounts.forEach(a => {
            totalHKD += Utils.toHKD(balances, a.currency);
@@ -432,6 +433,7 @@
         `).join("");
 
         const preWrap = document.getElementById("quickPresetWrap");
+        // Inject delete buttons if managing presets
         preWrap.innerHTML = Store.state.settings.quickPresets.map((p, idx) => `
           <div class="relative group h-full">
             <button data-action="use-preset" data-idx="${idx}" class="w-full bg-white p-3 rounded-xl border border-slate-200 text-left hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between h-full active:scale-95">
@@ -504,6 +506,7 @@
       },
 
       budget() {
+        // Init form values
         document.getElementById("budgetLimitInput").value = Store.state.settings.monthlyBudget || '';
 
         const { byCat } = Logic.computeSummary(Logic.getFilteredTransactions(Store.state.selectedMonth));
@@ -555,8 +558,6 @@
         document.querySelectorAll(".nav-btn").forEach(btn => {
           btn.addEventListener("click", (e) => {
             const tab = btn.dataset.tab;
-            if(!tab) return;
-            
             document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
             document.querySelectorAll(".nav-btn").forEach(b => {
                 b.classList.remove("active", "text-emerald-600", "border-emerald-100");
@@ -592,7 +593,7 @@
           Render.dashboard();
         });
 
-        // Change Categories dynamically
+        // Change Categories dynamically based on Expense/Income selection
         document.getElementById("typeInput").addEventListener("change", (e) => {
            const type = e.target.value;
            const cats = type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS;
@@ -701,7 +702,7 @@
           Render.accounts();
         });
 
-        // Dynamic Event Delegation
+        // Dynamic Event Delegation (Clicks for lists/chips)
         document.addEventListener("click", (e) => {
           const btn = e.target.closest("button");
           if (!btn) return;
@@ -716,7 +717,7 @@
             Render.runtime.selectedQuickCategory = btn.dataset.cat;
             Render.quickSection();
           } else if (act === "use-preset") {
-            if (Render.runtime.isManagingPresets) return;
+            if (Render.runtime.isManagingPresets) return; // Prevent adding if in edit mode
             const p = Store.state.settings.quickPresets;
             Store.addTransaction({
               amount: p.amount, currency: "HKD", type: "expense",
@@ -731,6 +732,7 @@
           }
         });
 
+        // Search and Month Filter Actions
         document.getElementById("searchInput").addEventListener("input", () => Render.dashboard());
         document.getElementById("monthPicker").addEventListener("change", (e) => {
           Store.state.selectedMonth = e.target.value;
