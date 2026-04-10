@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PocketHK - Interactive Budget App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.v.tuangouai.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #f0f4ff;
+      --bg-b: #f2faf5;
+      --bg-c: #fff8f0;
+      --ink: #1e293b;
+      --accent: #3b82f6;
+    }
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: linear-gradient(135deg, var(--bg-a), var(--bg-b), var(--bg-c));
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+    }
+    
+    /* 优化底部导航栏的动态效果与选中状态 */
+    .nav-btn {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-btn.active {
+      background-color: #eff6ff; /* Soft blue background */
+      color: #2563eb; /* Bright blue text */
+    }
+    
+    .chip.active {
+      background-color: #dbeafe;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  </style>
+</head>
+<body class="p-4 pb-28">
+  <div class="max-w-5xl mx-auto space-y-6">
+    <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">PocketHK</h1>
+        <p class="text-sm text-slate-500">Smart Budgeting · Local First</p>
+      </div>
+      <input type="month" id="monthPicker" class="rounded-xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+    </header>
+
+    <main id="tab-dashboard" class="tab-panel space-y-6">
+      <!-- Top Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="glass-card rounded-3xl p-6 hover:shadow-lg transition-shadow">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Net Worth</p>
+          <h2 id="totalBalance" class="text-3xl font-black text-slate-800 mt-1">$0.00</h2>
+        </div>
+        <div class="glass-card rounded-3xl p-6 hover:shadow-lg transition-shadow">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monthly Budget</p>
+          <div class="flex items-end gap-2 mt-1">
+            <h2 id="monthlyBudgetUsage" class="text-3xl font-black text-slate-800">0%</h2>
+            <p id="budgetStatusText" class="text-xs text-slate-400 mb-1.5">of limit</p>
+          </div>
+          <div class="w-full h-2 bg-slate-200 rounded-full mt-3 overflow-hidden">
+            <div id="monthProgressBar" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="glass-card rounded-3xl p-6 hover:shadow-lg transition-shadow">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Flow (This Month)</p>
+          <h2 id="netFlow" class="text-3xl font-black text-slate-800 mt-1">$0.00</h2>
+          <p id="netFlowSub" class="text-xs text-slate-500 mt-2">Income vs Expense</p>
+        </div>
+      </div>
+
+      <!-- Action Section -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Quick Add -->
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-700 flex items-center gap-2">⚡ Quick Add</h3>
+          <div id="quickCategoryWrap" class="flex flex-wrap gap-2"></div>
+          
+          <!-- 优化后的 Quick Add 输入区域 -->
+          <div class="flex flex-col sm:flex-row items-stretch gap-2 bg-slate-50/70 p-2 rounded-2xl border border-slate-100">
+            <input type="number" id="quickAmount" placeholder="Amount" class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+            <select id="quickAccount" class="rounded-xl border border-slate-200 bg-white px-3 py-3 outline-none shadow-sm transition-all"></select>
+            <button id="quickAddBtn" class="flex items-center justify-center gap-1 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 active:opacity-80 transition-all shadow-md">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+              Add
+            </button>
+          </div>
+
+          <!-- Presets 功能区域 -->
+          <div class="flex items-center justify-between mt-6 border-t border-slate-100 pt-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Presets</p>
+            <button id="togglePresetBtn" class="text-xs font-bold text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg active:scale-95 transition-all flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              Manage
+            </button>
+          </div>
+          
+          <div id="quickPresetWrap" class="grid grid-cols-2 sm:grid-cols-3 gap-2 relative"></div>
+
+          <!-- 自定义 Preset 隐藏表单 -->
+          <form id="presetManageForm" class="hidden mt-3 bg-slate-50 border border-slate-100 p-4 rounded-2xl space-y-3 shadow-inner transition-all">
+            <h4 class="text-xs font-bold text-slate-700">Add New Preset</h4>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="newPresetLabel" placeholder="Label (e.g. Bus)" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="text" id="newPresetIcon" placeholder="Emoji Icon (e.g. 🚌)" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="number" id="newPresetAmount" placeholder="Amount" step="0.01" required class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+              <select id="newPresetCategory" class="w-full rounded-xl border border-slate-200 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"></select>
+            </div>
+            <button type="submit" class="w-full bg-slate-800 text-white py-2.5 rounded-xl font-bold hover:bg-slate-900 active:scale-95 transition-all text-sm mt-1">Save New Preset</button>
+          </form>
+        </div>
+
+        <!-- Detailed Transaction -->
+        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+          <h3 class="font-bold text-slate-700 mb-4">📝 Record Transaction</h3>
+          <form id="transactionForm" class="space-y-3 h-full flex flex-col justify-center">
+            <div class="grid grid-cols-2 gap-3">
+              <input type="number" id="amountInput" placeholder="Amount" step="0.01" required class="rounded-xl border border-slate-200 p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              <select id="currencyInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <select id="typeInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+              <select id="categoryInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <input type="date" id="dateInput" required class="rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all">
+              <select id="accountInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all"></select>
+            </div>
+            <input type="text" id="noteInput" placeholder="Note (optional)" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button type="submit" id="transactionSubmitBtn" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 active:scale-95 active:opacity-90 transition-all mt-2">Save Transaction</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="glass-card rounded-3xl p-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+          <h3 class="font-bold text-slate-700">📜 Transaction History</h3>
+          <input type="text" id="searchInput" placeholder="Search notes or categories..." class="text-sm border border-slate-200 bg-white/50 px-4 py-2 rounded-xl outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-64 transition-all">
+        </div>
+        <div id="historyList" class="space-y-3 max-h- overflow-y-auto pr-2"></div>
+      </section>
+    </main>
+
+    <main id="tab-insights" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="font-bold text-slate-700 mb-4">Category Breakdown</h3>
+          <div class="h-64"><canvas id="pieChart"></canvas></div>
+        </div>
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="font-bold text-slate-700 mb-4">Expense Trend</h3>
+          <div class="h-64"><canvas id="lineChart"></canvas></div>
+        </div>
+      </div>
+      <div class="glass-card rounded-3xl p-6">
+        <h3 class="font-bold text-slate-700 mb-4">Category Details</h3>
+        <div id="insightCategoryList" class="space-y-2"></div>
+      </div>
+    </main>
+
+    <main id="tab-budget" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-700">💰 Set Total Budget</h3>
+          <form id="monthlyBudgetForm" class="flex gap-2">
+            <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" class="flex-1 rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all">Save</button>
+          </form>
+          <div id="categoryBudgetProgressWrap" class="space-y-4 pt-4 border-t border-slate-200"></div>
+        </div>
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-700">🏷 Category Budgets</h3>
+          <form id="categoryBudgetForm" class="space-y-3">
+            <select id="categoryBudgetSelect" class="w-full rounded-xl border border-slate-200 p-3 outline-none transition-all"></select>
+            <input type="number" id="categoryBudgetAmount" placeholder="Budget Limit" class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 active:scale-95 transition-all">Set Category Budget</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <main id="tab-accounts" class="tab-panel hidden space-y-6">
+      <div id="accountCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-700">🏦 Add New Account</h3>
+          <form id="addAccountForm" class="space-y-3">
+            <input type="text" id="newAccountName" placeholder="Account Name (e.g., Octopus)" required class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <select id="newAccountType" class="w-full rounded-xl border border-slate-200 p-3 outline-none transition-all">
+              <option value="Cash">Cash</option>
+              <option value="Card">Bank/Credit Card</option>
+              <option value="E-Wallet">E-Wallet</option>
+            </select>
+            <div class="grid grid-cols-2 gap-3">
+              <select id="newAccountCurrency" class="rounded-xl border border-slate-200 p-3 outline-none transition-all"></select>
+              <input type="number" id="newAccountBalance" placeholder="Initial Balance" step="0.01" class="rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            </div>
+            <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 mt-2 active:scale-95 transition-all">Create Account</button>
+          </form>
+        </div>
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-700">🔄 Transfer Between Accounts</h3>
+          <form id="transferForm" class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500 ml-1">From</label>
+                <select id="fromAccountInput" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all"></select>
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500 ml-1">To</label>
+                <select id="toAccountInput" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none transition-all"></select>
+              </div>
+            </div>
+            <input type="number" id="transferAmount" placeholder="Transfer Amount" step="0.01" class="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 mt-2 active:scale-95 transition-all">Confirm Transfer</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- 美化后的底部导航栏 -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow- border border-slate-100 z-50 overflow-x-auto w- sm:w-auto justify-center">
+      <button data-tab="dashboard" class="nav-btn active px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Overview</button>
+      <button data-tab="insights" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Insights</button>
+      <button data-tab="budget" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Budget</button>
+      <button data-tab="accounts" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 active:scale-95 active:opacity-70 whitespace-nowrap">Accounts</button>
+      <div class="w-px bg-slate-200 mx-1 my-2"></div>
+      <button id="exportCsvBtn" class="nav-btn px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 active:scale-95 active:opacity-70 whitespace-nowrap flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Export
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    const CONFIG = {
+      STORAGE_KEY: "pockethk-v4-eng",
+      SUPPORTED_CURRENCIES:,
+      FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
+      DEFAULT_EXPENSE_CATS:,
+      DEFAULT_INCOME_CATS:,
+      DEFAULT_QUICK_PRESETS:
+    };
+
+    const Store = {
+      state: null,
+      init() {
+        const fallback = {
+          selectedMonth: Utils.toMonthValue(new Date()),
+          settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: },
+          customExpenseCategories: [],
+          customIncomeCategories: [],
+          accounts:,
+          transactions: []
+        };
+        const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+        this.state = raw ? JSON.parse(raw) : fallback;
+        if (!this.state.selectedMonth) this.state.selectedMonth = fallback.selectedMonth;
+        if (!this.state.settings.quickPresets) this.state.settings.quickPresets =;
+      },
+      persist() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.state)); },
+      addTransaction(tx) { this.state.transactions.push({ id: Utils.uid(), ...tx }); this.persist(); },
+      deleteTransaction(id) { this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.persist(); }
+    };
+
+    const Logic = {
+      getFilteredTransactions(month, search = "") {
+        return Store.state.transactions
+          .filter(t => t.date.startsWith(month))
+          .filter(t => !search || (t.note || "").toLowerCase().includes(search.toLowerCase()) || t.category.toLowerCase().includes(search.toLowerCase()));
+      },
+      computeSummary(txs) {
+        let income = 0, expense = 0;
+        const byCat = {};
+        txs.forEach(t => {
+          const val = Utils.toHKD(t.amount, t.currency);
+          if (t.type === "expense") { expense += val; byCat = (byCat || 0) + val; }
+          else if (t.type === "income") { income += val; }
+        });
+        return { income, expense, byCat };
+      },
+      computeAccountBalances() {
+        const balances = {};
+        Store.state.accounts.forEach(a => balances = Number(a.initialBalance || 0));
+        Store.state.transactions.forEach(t => {
+          if (balances === undefined) return;
+          if (t.type === "income") balances += Number(t.amount);
+          if (t.type === "expense") balances -= Number(t.amount);
+        });
+        return balances;
+      }
+    };
+
+    const Render = {
+      runtime: { selectedQuickCategory: "Food", pieChart: null, lineChart: null, isManagingPresets: false },
+      
+      all() {
+        this.dropdowns();
+        this.dashboard();
+        this.accounts();
+        this.budget();
+      },
+
+      dropdowns() {
+        const curOpts = CONFIG.SUPPORTED_CURRENCIES.map(c => `<option value="${c}">${c}</option>`).join("");
+       .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.innerHTML = curOpts;
+        });
+
+        const accOpts = Store.state.accounts.map(a => `<option value="${a.id}">${a.name} (${a.currency})</option>`).join("");
+       .forEach(id => { document.getElementById(id).innerHTML = accOpts; });
+
+        const catOpts = CONFIG.DEFAULT_EXPENSE_CATS.map(c => `<option value="${c}">${c}</option>`).join("");
+        document.getElementById("categoryInput").innerHTML = catOpts;
+        document.getElementById("categoryBudgetSelect").innerHTML = catOpts;
+        document.getElementById("newPresetCategory").innerHTML = catOpts; // 给 Preset 表单注入选项
+        
+        document.getElementById("monthPicker").value = Store.state.selectedMonth;
+      },
+
+      dashboard() {
+        const txs = Logic.getFilteredTransactions(Store.state.selectedMonth, document.getElementById("searchInput").value);
+        const { income, expense } = Logic.computeSummary(txs);
+        const balances = Logic.computeAccountBalances();
+        
+        let totalHKD = 0;
+        Store.state.accounts.forEach(a => { totalHKD += Utils.toHKD(balances, a.currency); });
+        document.getElementById("totalBalance").textContent = Utils.formatMoney(totalHKD, "HKD");
+
+        const netFlow = income - expense;
+        const flowEl = document.getElementById("netFlow");
+        flowEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
+        flowEl.className = `text-3xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+        const limit = Store.state.settings.monthlyBudget || 1;
+        const ratio = Math.round((expense / limit) * 100);
+        document.getElementById("monthlyBudgetUsage").textContent = `${ratio}%`;
+        
+        const pb = document.getElementById("monthProgressBar");
+        pb.style.width = `${Math.min(100, ratio)}%`;
+        pb.className = `h-full transition-all duration-500 ${ratio > 90 ? 'bg-rose-500' : ratio > 70 ? 'bg-amber-400' : 'bg-blue-500'}`;
+
+        this.history(txs);
+        this.quickSection();
+      },
+
+      history(txs) {
+        const list = document.getElementById("historyList");
+        if (txs.length === 0) { list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">No transactions found for this month.</p>`; return; }
+        list.innerHTML = txs.sort((a,b) => b.date.localeCompare(a.date)).map(t => `
+          <div class="flex justify-between items-center p-4 bg-white/60 rounded-2xl border border-slate-100 hover:shadow-sm transition-all group">
+            <div>
+              <p class="font-bold text-slate-700">${t.category} <span class="text-xs font-normal text-slate-400 ml-2">${t.date}</span></p>
+              <p class="text-xs text-slate-500 mt-0.5">${t.note || 'No notes'}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}">${t.type === 'income' ? '+' : '-'}${Utils.formatMoney(t.amount, t.currency)}</p>
+              <button data-action="delete-tx" data-id="${t.id}" class="text- text-slate-300 hover:text-rose-500 uppercase font-bold tracking-wider mt-1 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100">Delete</button>
+            </div>
+          </div>
+        `).join("");
+      },
+
+      quickSection() {
+        const catWrap = document.getElementById("quickCategoryWrap");
+        catWrap.innerHTML = CONFIG.DEFAULT_EXPENSE_CATS.slice(0, 5).map(c => `
+          <button data-action="set-quick-cat" data-cat="${c}" class="chip px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold transition-all active:scale-95 ${this.runtime.selectedQuickCategory === c ? 'active' : 'bg-white text-slate-500 hover:bg-slate-50'}">${c}</button>
+        `).join("");
+
+        const preWrap = document.getElementById("quickPresetWrap");
+        // 如果处于编辑模式，则显示删除按钮
+        preWrap.innerHTML = Store.state.settings.quickPresets.map((p, idx) => `
+          <div class="relative group h-full">
+            <button data-action="use-preset" data-idx="${idx}" class="w-full bg-white p-3 rounded-xl border border-slate-200 text-left hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between h-full active:scale-95">
+              <span class="text-2xl mb-1">${p.icon}</span>
+              <div>
+                <p class="text-xs font-bold text-slate-700 truncate">${p.label}</p>
+                <p class="text- font-semibold text-blue-500">$${p.amount}</p>
+              </div>
+            </button>
+            <button data-action="delete-preset" data-idx="${idx}" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center text- shadow-sm hover:scale-110 transition-all ${this.runtime.isManagingPresets ? '' : 'hidden'}">✕</button>
+          </div>
+        `).join("");
+      },
+
+      insights() {
+        const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
+        const { byCat, expense } = Logic.computeSummary(txs);
+        
+        const ctxPie = document.getElementById("pieChart").getContext("2d");
+        if (this.runtime.pieChart) this.runtime.pieChart.destroy();
+        this.runtime.pieChart = new Chart(ctxPie, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(byCat).length ? Object.keys(byCat) :,
+            datasets:, backgroundColor: Object.values(byCat).length ? :, borderWidth: 0 }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+        });
+
+        const daily = {};
+        txs.filter(t => t.type === 'expense').forEach(t => { daily = (daily || 0) + Utils.toHKD(t.amount, t.currency); });
+        const sortedDates = Object.keys(daily).sort();
+        
+        const ctxLine = document.getElementById("lineChart").getContext("2d");
+        if (this.runtime.lineChart) this.runtime.lineChart.destroy();
+        this.runtime.lineChart = new Chart(ctxLine, {
+          type: 'line',
+          data: {
+            labels: sortedDates.map(d => d.split('-')[cite: 2]),
+            datasets:), borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)', pointBackgroundColor: '#3b82f6' }]
+          },
+          options: { maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { border: { dash: } } } }
+        });
+
+        const listEl = document.getElementById("insightCategoryList");
+        if (Object.keys(byCat).length === 0) listEl.innerHTML = `<p class="text-sm text-slate-400 py-2">No expenses logged yet.</p>`;
+        else listEl.innerHTML = Object.entries(byCat).sort((a,b) => b[cite: 1] - a[cite: 1]).map(() => `
+            <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
+              <span class="text-slate-600 font-medium">${cat}</span>
+              <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/expense)*100).toFixed(1)}%)</span></span>
+            </div>
+          `).join("");
+      },
+
+      budget() {
+        document.getElementById("budgetLimitInput").value = Store.state.settings.monthlyBudget || '';
+        const { byCat } = Logic.computeSummary(Logic.getFilteredTransactions(Store.state.selectedMonth));
+        const wrap = document.getElementById("categoryBudgetProgressWrap");
+        const b = Store.state.settings.categoryBudgets;
+        
+        if (Object.keys(b).length === 0) wrap.innerHTML = `<p class="text-sm text-slate-400">No category budgets set.</p>`;
+        else wrap.innerHTML = Object.entries(b).map(() => {
+            const spent = byCat || 0;
+            const ratio = Math.min(100, (spent / limit) * 100);
+            return `
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="font-bold text-slate-700">${cat}</span>
+                  <span class="text-slate-500 font-medium">${spent.toFixed(0)} / ${limit}</span>
+                </div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full transition-all duration-500 ${ratio > 90 ? "bg-rose-500" : ratio > 75 ? "bg-amber-400" : "bg-emerald-500"}" style="width: ${ratio}%"></div>
+                </div>
+              </div>
+            `;
+          }).join("");
+      },
+
+      accounts() {
+        const bals = Logic.computeAccountBalances();
+        document.getElementById("accountCards").innerHTML = Store.state.accounts.map(a => `
+          <div class="glass-card p-5 rounded-3xl border-l-4 ${a.type === 'Card' ? 'border-l-rose-400' : a.type === 'E-Wallet' ? 'border-l-emerald-400' : 'border-l-blue-400'}">
+            <p class="text- font-bold text-slate-400 uppercase tracking-widest">${a.type}</p>
+            <h4 class="font-bold text-slate-700 text-lg mt-1">${a.name}</h4>
+            <p class="text-2xl font-black text-slate-800 mt-2">${Utils.formatMoney(bals, a.currency)}</p>
+          </div>
+        `).join("");
+      }
+    };
+
+    const Events = {
+      init() {
+        document.querySelectorAll(".nav-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const tab = btn.dataset.tab;
+            document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+            document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active", "text-slate-500"));
+            document.getElementById(`tab-${tab}`).classList.remove("hidden");
+            btn.classList.add("active");
+
+            if (tab === 'insights') Render.insights();
+            if (tab === 'budget') Render.budget();
+            if (tab === 'accounts') Render.accounts();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        });
+
+        document.getElementById("transactionForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          Store.addTransaction({
+            amount: document.getElementById("amountInput").value, currency: document.getElementById("currencyInput").value,
+            type: document.getElementById("typeInput").value, category: document.getElementById("categoryInput").value,
+            date: document.getElementById("dateInput").value || Utils.formatISO(new Date()), note: document.getElementById("noteInput").value,
+            accountId: document.getElementById("accountInput").value
+          });
+          e.target.reset(); document.getElementById("dateInput").value = Utils.formatISO(new Date()); Render.dashboard();
+        });
+
+        document.getElementById("typeInput").addEventListener("change", (e) => {
+           const type = e.target.value;
+           document.getElementById("categoryInput").innerHTML = (type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS).map(c => `<option value="${c}">${c}</option>`).join("");
+        });
+
+        document.getElementById("quickAddBtn").addEventListener("click", () => {
+          const amt = document.getElementById("quickAmount").value;
+          if (!amt) return;
+          Store.addTransaction({
+            amount: amt, currency: "HKD", type: "expense", category: Render.runtime.selectedQuickCategory,
+            date: Utils.formatISO(new Date()), accountId: document.getElementById("quickAccount").value
+          });
+          document.getElementById("quickAmount").value = ""; Render.dashboard();
+        });
+
+        // 切换 Preset 管理面板
+        document.getElementById("togglePresetBtn").addEventListener("click", () => {
+          Render.runtime.isManagingPresets = !Render.runtime.isManagingPresets;
+          document.getElementById("presetManageForm").classList.toggle("hidden");
+          const btn = document.getElementById("togglePresetBtn");
+          btn.innerHTML = Render.runtime.isManagingPresets ? "Done" : `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Manage`;
+          Render.quickSection();
+        });
+
+        // 提交新建 Preset
+        document.getElementById("presetManageForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          Store.state.settings.quickPresets.push({
+            label: document.getElementById("newPresetLabel").value,
+            icon: document.getElementById("newPresetIcon").value || "📝",
+            amount: Number(document.getElementById("newPresetAmount").value),
+            category: document.getElementById("newPresetCategory").value
+          });
+          Store.persist();
+          e.target.reset();
+          Render.quickSection();
+        });
+
+        document.getElementById("transferForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const amt = document.getElementById("transferAmount").value, from = document.getElementById("fromAccountInput").value, to = document.getElementById("toAccountInput").value;
+          if (from === to || !amt) { alert("Please select different accounts and enter a valid amount."); return; }
+          const date = Utils.formatISO(new Date());
+          const fromName = Store.state.accounts.find(a => a.id === from)?.name || "Account", toName = Store.state.accounts.find(a => a.id === to)?.name || "Account";
+          Store.addTransaction({ amount: amt, currency: "HKD", type: "expense", category: "Transfer", note: `Transfer to ${toName}`, accountId: from, date });
+          Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "Transfer", note: `Transfer from ${fromName}`, accountId: to, date });
+          e.target.reset(); Render.accounts(); Render.dashboard();
+        });
+
+        document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value); Store.persist(); Render.budget(); alert("Monthly limit updated successfully."); });
+        document.getElementById("categoryBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); const cat = document.getElementById("categoryBudgetSelect").value, amt = Number(document.getElementById("categoryBudgetAmount").value); if(amt <= 0) delete Store.state.settings.categoryBudgets; else Store.state.settings.categoryBudgets = amt; Store.persist(); Render.budget(); document.getElementById("categoryBudgetAmount").value = ""; });
+        document.getElementById("addAccountForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.accounts.push({ id: Utils.uid(), name: document.getElementById("newAccountName").value, type: document.getElementById("newAccountType").value, currency: document.getElementById("newAccountCurrency").value, initialBalance: Number(document.getElementById("newAccountBalance").value || 0) }); Store.persist(); e.target.reset(); Render.dropdowns(); Render.accounts(); });
+
+        document.addEventListener("click", (e) => {
+          const btn = e.target.closest("button");
+          if (!btn) return;
+          const act = btn.dataset.action;
+          
+          if (act === "delete-tx") {
+            if (confirm("Are you sure you want to delete this record?")) { Store.deleteTransaction(btn.dataset.id); Render.dashboard(); }
+          } else if (act === "set-quick-cat") { Render.runtime.selectedQuickCategory = btn.dataset.cat; Render.quickSection();
+          } else if (act === "use-preset") {
+            if (Render.runtime.isManagingPresets) return; // 编辑模式下点击不会记账
+            const p = Store.state.settings.quickPresets;
+            Store.addTransaction({ amount: p.amount, currency: "HKD", type: "expense", category: p.category, date: Utils.formatISO(new Date()), note: p.label, accountId: document.getElementById("quickAccount").value });
+            Render.dashboard();
+          } else if (act === "delete-preset") {
+            Store.state.settings.quickPresets.splice(btn.dataset.idx, 1); Store.persist(); Render.quickSection();
+          }
+        });
+
+        document.getElementById("searchInput").addEventListener("input", () => Render.dashboard());
+        document.getElementById("monthPicker").addEventListener("change", (e) => { Store.state.selectedMonth = e.target.value; Store.persist(); Render.dashboard(); if (!document.getElementById("tab-insights").classList.contains("hidden")) Render.insights(); if (!document.getElementById("tab-budget").classList.contains("hidden")) Render.budget(); });
+
+        document.getElementById("exportCsvBtn").addEventListener("click", () => {
+          const csv =;
+          Store.state.transactions.forEach(t => csv.push(`${t.date},${t.category},${t.type},${t.amount},${t.currency},"${t.note || ''}"`));
+          const blob = new Blob(, { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a"); a.href = url; a.download = `PocketHK_Backup_${Store.state.selectedMonth}.csv`;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        });
+      }
+    };
+
+    const Utils = {
+      uid: () => Date.now().toString(36) + Math.random().toString(36).substring(2, 7),
+      formatISO: (date) => { const offset = date.getTimezoneOffset() * 60000; return new Date(date.getTime() - offset).toISOString().split('T'); },
+      toMonthValue: (date) => { const offset = date.getTimezoneOffset() * 60000; return new Date(date.getTime() - offset).toISOString().slice(0, 7); },
+      toHKD: (amt, cur) => Number(amt || 0) * (CONFIG.FX_TO_HKD || 1),
+      formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val)
+    };
+
+    document.addEventListener("DOMContentLoaded", () => { Store.init(); Events.init(); Render.all(); document.getElementById("dateInput").value = Utils.formatISO(new Date()); });
+  </script>
+</body>
+</html>
