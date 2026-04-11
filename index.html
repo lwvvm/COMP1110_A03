@@ -167,10 +167,32 @@
           <div class="h-64"><canvas id="pieChart"></canvas></div>
         </div>
         <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">Expense Trend</h3>
+          <h3 class="font-bold text-slate-700 mb-4">Income vs Expense Trend</h3>
           <div class="h-64"><canvas id="lineChart"></canvas></div>
         </div>
       </div>
+
+      <div class="glass-card rounded-3xl p-6 bg-gradient-to-br from-indigo-50/50 to-blue-50/50 border border-indigo-100">
+        <h3 class="font-bold text-indigo-800 mb-4 flex items-center gap-2">
+          🔮 Next Week Forecast 
+          <span class="text-xs font-normal text-slate-500 bg-white px-2 py-1 rounded-full border border-slate-200">Based on past 7 days</span>
+        </h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Income</p>
+            <h4 id="predictIncome" class="text-lg sm:text-xl font-black text-emerald-600 mt-1">$0.00</h4>
+          </div>
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Expense</p>
+            <h4 id="predictExpense" class="text-lg sm:text-xl font-black text-rose-500 mt-1">$0.00</h4>
+          </div>
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Net Flow</p>
+            <h4 id="predictNet" class="text-lg sm:text-xl font-black text-indigo-600 mt-1">$0.00</h4>
+          </div>
+        </div>
+      </div>
+
       <div class="glass-card rounded-3xl p-6">
         <h3 class="font-bold text-slate-700 mb-4">Category Details</h3>
         <div id="insightCategoryList" class="space-y-2"></div>
