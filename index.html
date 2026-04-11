@@ -57,6 +57,38 @@
     
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .insight-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .insight-divider {
+      border-top: 1px dashed #dbe3ef;
+    }
+
+    .insight-note {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.65rem;
+    }
+
+    .insight-note strong {
+      color: #0f172a;
+      font-weight: 800;
+    }
+
+    .insight-note-kpi {
+      color: #0f766e;
+      background: #ccfbf1;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.4rem;
+      font-weight: 800;
+    }
   </style>
 </head>
 <body class="p-4 pb-28">
@@ -144,6 +176,11 @@
               <input type="date" id="dateInput" required class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
               <select id="accountInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
             </div>
+            <select id="moodInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
+              <option value="planned">Planned Purchase</option>
+              <option value="hesitant">Hesitant Purchase</option>
+              <option value="impulse">Impulse Purchase</option>
+            </select>
             <input type="text" id="noteInput" placeholder="Note (optional)" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500">
             <button type="submit" id="transactionSubmitBtn" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition-all mt-2">Save Transaction</button>
           </form>
@@ -161,53 +198,74 @@
     </main>
 
     <main id="tab-insights" class="tab-panel hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">Expense Breakdown</h3>
-          <div class="h-64"><canvas id="expensePieChart"></canvas></div>
-        </div>
-        <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">Income Breakdown</h3>
-          <div class="h-64"><canvas id="incomePieChart"></canvas></div>
-        </div>
-      </div>
-
-      <div class="glass-card rounded-3xl p-6">
-        <h3 class="font-bold text-slate-700 mb-4">Income vs Expense Trend</h3>
-        <div class="h-64"><canvas id="lineChart"></canvas></div>
-      </div>
-
-      <div class="glass-card rounded-3xl p-6 bg-gradient-to-br from-indigo-50/50 to-blue-50/50 border border-indigo-100">
-        <h3 class="font-bold text-indigo-800 mb-4 flex items-center gap-2">
-          🔮 Next Week Forecast 
-          <span class="text-xs font-normal text-slate-500 bg-white px-2 py-1 rounded-full border border-slate-200">Based on past 7 days</span>
-        </h3>
-        <div class="grid grid-cols-3 gap-4">
-          <div>
-            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Income</p>
-            <h4 id="predictIncome" class="text-lg sm:text-xl font-black text-emerald-600 mt-1">$0.00</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="glass-card rounded-3xl p-5">
+          <p class="insight-title mb-1">Composition</p>
+          <h3 class="font-bold text-slate-700 mb-3">Expense Breakdown</h3>
+          <div class="h-52"><canvas id="expensePieChart"></canvas></div>
+          <div class="insight-divider mt-3 pt-2.5">
+            <h4 class="font-semibold text-slate-700 mb-2">Expense Details</h4>
+            <div id="insightExpenseList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
           </div>
-          <div>
-            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Expense</p>
-            <h4 id="predictExpense" class="text-lg sm:text-xl font-black text-rose-500 mt-1">$0.00</h4>
-          </div>
-          <div>
-            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Net Flow</p>
-            <h4 id="predictNet" class="text-lg sm:text-xl font-black text-indigo-600 mt-1">$0.00</h4>
+        </div>
+        <div class="glass-card rounded-3xl p-5">
+          <p class="insight-title mb-1">Composition</p>
+          <h3 class="font-bold text-slate-700 mb-3">Income Breakdown</h3>
+          <div class="h-52"><canvas id="incomePieChart"></canvas></div>
+          <div class="insight-divider mt-3 pt-2.5">
+            <h4 class="font-semibold text-slate-700 mb-2">Income Details</h4>
+            <div id="insightIncomeList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">Expense Details</h3>
-          <div id="insightExpenseList" class="space-y-2"></div>
+      <div class="glass-card rounded-3xl p-5 space-y-4">
+        <div class="flex flex-col gap-1">
+          <p class="insight-title">Core Overview</p>
+          <h3 class="font-bold text-slate-800">Income, Expense, and Cashflow Trend</h3>
         </div>
-        <div class="glass-card rounded-3xl p-6">
-          <h3 class="font-bold text-slate-700 mb-4">Income Details</h3>
-          <div id="insightIncomeList" class="space-y-2"></div>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
+          <div class="md:col-span-3 h-48 md:h-52">
+            <canvas id="lineChart"></canvas>
+          </div>
+          <div class="md:col-span-2 insight-divider md:border-t-0 md:border-l border-dashed border-slate-200 pt-3 md:pt-0 md:pl-4 grid grid-cols-3 md:grid-cols-1 gap-3">
+            <div>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Income</p>
+              <h4 id="predictIncome" class="text-lg sm:text-xl font-black text-emerald-600 mt-1">$0.00</h4>
+            </div>
+            <div>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Expense</p>
+              <h4 id="predictExpense" class="text-lg sm:text-xl font-black text-rose-500 mt-1">$0.00</h4>
+            </div>
+            <div>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Net Flow</p>
+              <h4 id="predictNet" class="text-lg sm:text-xl font-black text-indigo-600 mt-1">$0.00</h4>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div class="glass-card rounded-3xl p-6 space-y-6">
+        <div>
+          <p class="insight-title mb-1">Behavior</p>
+          <h3 class="font-bold text-slate-800">Spending Mindset Analysis</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-semibold text-slate-700 mb-3">Spending Mindset Share</h4>
+            <div class="h-64"><canvas id="spendingMoodChart"></canvas></div>
+          </div>
+          <div>
+            <h4 class="font-semibold text-slate-700 mb-3">Category Mix by Mindset</h4>
+            <div class="h-64"><canvas id="moodCategoryChart"></canvas></div>
+          </div>
+        </div>
+        <div class="insight-divider pt-4">
+          <h4 class="font-semibold text-slate-700 mb-2">Behavior Insight Summary</h4>
+          <div id="behaviorInsightCard" class="space-y-2 text-sm text-slate-700"></div>
+        </div>
+      </div>
+
     </main>
 
     <main id="tab-budget" class="tab-panel hidden space-y-6">
@@ -287,6 +345,11 @@
       STORAGE_KEY: "pockethk-v3-eng",
       SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
+      SPENDING_MOODS: {
+        planned: "Planned",
+        hesitant: "Hesitant",
+        impulse: "Impulse"
+      },
       DEFAULT_EXPENSE_CATS: ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Rent", "Healthcare", "Other"],
       DEFAULT_INCOME_CATS: ["Salary", "Bonus", "Investment", "Gift", "Other"],
       DEFAULT_QUICK_PRESETS: [
@@ -370,6 +433,36 @@
           if (t.type === "expense") balances[t.accountId] -= Number(t.amount);
         });
         return balances;
+      },
+      computeMoodMetrics(txs) {
+        const moodTotals = {
+          planned: { amount: 0, count: 0 },
+          hesitant: { amount: 0, count: 0 },
+          impulse: { amount: 0, count: 0 }
+        };
+        const categoryMood = {};
+        const expenseTxs = txs.filter(t => t.type === "expense" && t.category !== "Transfer");
+
+        expenseTxs.forEach(t => {
+          const mood = t.mood || "planned";
+          const amountHKD = Utils.toHKD(t.amount, t.currency);
+          if (!moodTotals[mood]) return;
+          moodTotals[mood].amount += amountHKD;
+          moodTotals[mood].count += 1;
+
+          if (!categoryMood[t.category]) {
+            categoryMood[t.category] = { planned: 0, hesitant: 0, impulse: 0, total: 0 };
+          }
+          categoryMood[t.category][mood] += amountHKD;
+          categoryMood[t.category].total += amountHKD;
+        });
+
+        return {
+          moodTotals,
+          categoryMood,
+          totalAmount: expenseTxs.reduce((sum, t) => sum + Utils.toHKD(t.amount, t.currency), 0),
+          totalCount: expenseTxs.length
+        };
       }
     };
 
@@ -377,7 +470,14 @@
     // 3. Render Views
     // ==========================================
     const Render = {
-      runtime: { selectedQuickCategory: "Food", expensePieChart: null, incomePieChart: null, lineChart: null },
+      runtime: {
+        selectedQuickCategory: "Food",
+        expensePieChart: null,
+        incomePieChart: null,
+        lineChart: null,
+        spendingMoodChart: null,
+        moodCategoryChart: null
+      },
 
       all() {
         this.dropdowns();
@@ -446,7 +546,7 @@
           <div class="flex justify-between items-center p-4 bg-white/60 rounded-2xl border border-slate-100 hover:shadow-sm transition-all">
             <div>
               <p class="font-bold text-slate-700">${t.category} <span class="text-xs font-normal text-slate-400 ml-2">${t.date}</span></p>
-              <p class="text-xs text-slate-500 mt-0.5">${t.note || 'No notes'}</p>
+              <p class="text-xs text-slate-500 mt-0.5">${t.note || 'No notes'}${t.type === "expense" ? ` · ${CONFIG.SPENDING_MOODS[t.mood || "planned"]}` : ""}</p>
             </div>
             <div class="text-right flex flex-col items-end">
               <p class="font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}">
@@ -483,9 +583,10 @@
         `).join("");
       },
 
-     insights() {
+      insights() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
         const { byCat, incomeByCat, expense, income } = Logic.computeSummary(txs);
+        const { moodTotals, categoryMood, totalAmount, totalCount } = Logic.computeMoodMetrics(txs);
         
         // --- 1. Expense Pie Chart ---
         const ctxExpPie = document.getElementById("expensePieChart").getContext("2d");
@@ -500,7 +601,23 @@
               borderWidth: 0 
             }]
           },
-          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = Number(context.parsed || 0);
+                    const total = context.dataset.data.reduce((sum, item) => sum + Number(item || 0), 0);
+                    const percent = total > 0 ? (value / total) * 100 : 0;
+                    return `${Utils.formatMoney(value, "HKD")} (${percent.toFixed(1)}%)`;
+                  }
+                }
+              }
+            },
+            cutout: '70%'
+          }
         });
 
         // --- 2. NEW: Income Pie Chart ---
@@ -512,11 +629,27 @@
             labels: Object.keys(incomeByCat).length ? Object.keys(incomeByCat) : ["No Data"],
             datasets: [{ 
               data: Object.values(incomeByCat).length ? Object.values(incomeByCat) : [1], 
-              backgroundColor: Object.values(incomeByCat).length ? ['#10b981', '#34d399', '#059669', '#6ee7b7', '#047857'] : ['#e2e8f0'], // Emerald/Green palette for income
+              backgroundColor: Object.values(incomeByCat).length ? ['#16a34a', '#0ea5e9', '#14b8a6', '#84cc16', '#22c55e', '#0284c7'] : ['#e2e8f0'],
               borderWidth: 0 
             }]
           },
-          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = Number(context.parsed || 0);
+                    const total = context.dataset.data.reduce((sum, item) => sum + Number(item || 0), 0);
+                    const percent = total > 0 ? (value / total) * 100 : 0;
+                    return `${Utils.formatMoney(value, "HKD")} (${percent.toFixed(1)}%)`;
+                  }
+                }
+              }
+            },
+            cutout: '70%'
+          }
         });
 
         // --- 3. Income vs Expense Trend Line (Unchanged logic) ---
@@ -572,7 +705,7 @@
         predictNetEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
         predictNetEl.className = `text-lg sm:text-xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-600' : 'text-rose-500'}`;
 
-        // --- 5. UPDATED: Render Category Details Lists ---
+        // --- 5. Render Category Details Lists ---
         const renderList = (containerId, dataObj, totalAmt) => {
             const el = document.getElementById(containerId);
             if (Object.keys(dataObj).length === 0) {
@@ -589,112 +722,114 @@
 
         renderList("insightExpenseList", byCat, expense);
         renderList("insightIncomeList", incomeByCat, income);
-      },insights() {
-        const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
-        const { byCat, incomeByCat, expense, income } = Logic.computeSummary(txs);
-        
-        // --- 1. Expense Pie Chart ---
-        const ctxExpPie = document.getElementById("expensePieChart").getContext("2d");
-        if (this.runtime.expensePieChart) this.runtime.expensePieChart.destroy();
-        this.runtime.expensePieChart = new Chart(ctxExpPie, {
-          type: 'doughnut',
+
+        // --- 6. Spending mindset share chart ---
+        const moodLabels = ["planned", "hesitant", "impulse"];
+        const moodAmounts = moodLabels.map((m) => moodTotals[m].amount);
+        const moodChartCtx = document.getElementById("spendingMoodChart").getContext("2d");
+        if (this.runtime.spendingMoodChart) this.runtime.spendingMoodChart.destroy();
+        this.runtime.spendingMoodChart = new Chart(moodChartCtx, {
+          type: "doughnut",
           data: {
-            labels: Object.keys(byCat).length ? Object.keys(byCat) : ["No Data"],
-            datasets: [{ 
-              data: Object.values(byCat).length ? Object.values(byCat) : [1], 
-              backgroundColor: Object.values(byCat).length ? ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'] : ['#e2e8f0'], 
-              borderWidth: 0 
+            labels: moodLabels.map((m) => CONFIG.SPENDING_MOODS[m]),
+            datasets: [{
+              data: moodAmounts.some(v => v > 0) ? moodAmounts : [1, 0, 0],
+              backgroundColor: ["#22c55e", "#f59e0b", "#ef4444"],
+              borderWidth: 0
             }]
           },
-          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = Number(context.parsed || 0);
+                    const total = context.dataset.data.reduce((sum, item) => sum + Number(item || 0), 0);
+                    const percent = total > 0 ? (value / total) * 100 : 0;
+                    return `${Utils.formatMoney(value, "HKD")} (${percent.toFixed(1)}%)`;
+                  }
+                }
+              }
+            },
+            cutout: "68%"
+          }
         });
 
-        // --- 2. NEW: Income Pie Chart ---
-        const ctxIncPie = document.getElementById("incomePieChart").getContext("2d");
-        if (this.runtime.incomePieChart) this.runtime.incomePieChart.destroy();
-        this.runtime.incomePieChart = new Chart(ctxIncPie, {
-          type: 'doughnut',
+        // --- 7. Category mix by mindset stacked chart ---
+        const rankedCategories = Object.entries(categoryMood)
+          .sort((a, b) => b[1].total - a[1].total)
+          .slice(0, 7);
+        const moodAxis = ["planned", "hesitant", "impulse"];
+        const categoryPalette = ["#3b82f6", "#22c55e", "#a855f7", "#f97316", "#ec4899", "#06b6d4", "#64748b"];
+        const moodCatCtx = document.getElementById("moodCategoryChart").getContext("2d");
+        if (this.runtime.moodCategoryChart) this.runtime.moodCategoryChart.destroy();
+        this.runtime.moodCategoryChart = new Chart(moodCatCtx, {
+          type: "bar",
           data: {
-            labels: Object.keys(incomeByCat).length ? Object.keys(incomeByCat) : ["No Data"],
-            datasets: [{ 
-              data: Object.values(incomeByCat).length ? Object.values(incomeByCat) : [1], 
-              backgroundColor: Object.values(incomeByCat).length ? ['#10b981', '#34d399', '#059669', '#6ee7b7', '#047857'] : ['#e2e8f0'], // Emerald/Green palette for income
-              borderWidth: 0 
-            }]
+            labels: moodAxis.map((m) => CONFIG.SPENDING_MOODS[m]),
+            datasets: rankedCategories.length
+              ? rankedCategories.map(([category, values], index) => ({
+                  label: category,
+                  data: moodAxis.map((mood) => values[mood] || 0),
+                  backgroundColor: categoryPalette[index % categoryPalette.length],
+                  stack: "category"
+                }))
+              : [{
+                  label: "No Data",
+                  data: [0, 0, 0],
+                  backgroundColor: "#cbd5e1",
+                  stack: "category"
+                }]
           },
-          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
-        });
-
-        // --- 3. Income vs Expense Trend Line (Unchanged logic) ---
-        const dailyExpense = {};
-        const dailyIncome = {};
-        const allDates = new Set();
-
-        txs.forEach(t => {
-            const dateStr = t.date.split('-')[2];
-            allDates.add(dateStr);
-            const amt = Utils.toHKD(t.amount, t.currency);
-            if (t.type === 'expense') dailyExpense[dateStr] = (dailyExpense[dateStr] || 0) + amt;
-            else if (t.type === 'income') dailyIncome[dateStr] = (dailyIncome[dateStr] || 0) + amt;
-        });
-
-        const sortedDates = Array.from(allDates).sort();
-        const expenseData = sortedDates.map(d => dailyExpense[d] || 0);
-        const incomeData = sortedDates.map(d => dailyIncome[d] || 0);
-        
-        const ctxLine = document.getElementById("lineChart").getContext("2d");
-        if (this.runtime.lineChart) this.runtime.lineChart.destroy();
-        this.runtime.lineChart = new Chart(ctxLine, {
-          type: 'line',
-          data: {
-            labels: sortedDates,
-            datasets: [
-              { label: 'Expense', data: expenseData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4, fill: true },
-              { label: 'Income', data: incomeData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true }
-            ]
-          },
-          options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] } } } }
-        });
-
-        // --- 4. Next Week Forecast (Unchanged logic) ---
-        const today = new Date();
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        let pastWeekExpense = 0, pastWeekIncome = 0;
-
-        Store.state.transactions.forEach(t => {
-           const tDate = new Date(t.date);
-           if (tDate >= sevenDaysAgo && tDate <= today) {
-               const amt = Utils.toHKD(t.amount, t.currency);
-               if (t.type === 'expense') pastWeekExpense += amt;
-               if (t.type === 'income') pastWeekIncome += amt;
-           }
-        });
-
-        document.getElementById('predictExpense').textContent = Utils.formatMoney(pastWeekExpense, "HKD");
-        document.getElementById('predictIncome').textContent = Utils.formatMoney(pastWeekIncome, "HKD");
-        const netFlow = pastWeekIncome - pastWeekExpense;
-        const predictNetEl = document.getElementById('predictNet');
-        predictNetEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
-        predictNetEl.className = `text-lg sm:text-xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-600' : 'text-rose-500'}`;
-
-        // --- 5. UPDATED: Render Category Details Lists ---
-        const renderList = (containerId, dataObj, totalAmt) => {
-            const el = document.getElementById(containerId);
-            if (Object.keys(dataObj).length === 0) {
-              el.innerHTML = `<p class="text-sm text-slate-400 py-2">No records logged yet.</p>`;
-            } else {
-              el.innerHTML = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
-                <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
-                  <span class="text-slate-600 font-medium">${cat}</span>
-                  <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/totalAmt)*100).toFixed(1)}%)</span></span>
-                </div>
-              `).join("");
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = Number(context.parsed?.y ?? context.parsed ?? 0);
+                    const total = context.chart.data.datasets.reduce((sum, ds) => sum + Number(ds.data[context.dataIndex] || 0), 0);
+                    const percent = total > 0 ? (value / total) * 100 : 0;
+                    return `${context.dataset.label}: ${Utils.formatMoney(value, "HKD")} (${percent.toFixed(1)}%)`;
+                  }
+                }
+              }
+            },
+            responsive: true,
+            scales: {
+              x: { stacked: true, grid: { display: false } },
+              y: { stacked: true }
             }
-        };
+          }
+        });
 
-        renderList("insightExpenseList", byCat, expense);
-        renderList("insightIncomeList", incomeByCat, income);
+        // --- 8. Rule-based narrative insight card ---
+        const prevMonth = Utils.previousMonth(Store.state.selectedMonth);
+        const prevTxs = Logic.getFilteredTransactions(prevMonth);
+        const prevMood = Logic.computeMoodMetrics(prevTxs);
+        const impulseAmountShare = totalAmount > 0 ? (moodTotals.impulse.amount / totalAmount) * 100 : 0;
+        const impulseCountShare = totalCount > 0 ? (moodTotals.impulse.count / totalCount) * 100 : 0;
+        const prevImpulseAmountShare = prevMood.totalAmount > 0 ? (prevMood.moodTotals.impulse.amount / prevMood.totalAmount) * 100 : 0;
+        const diff = impulseAmountShare - prevImpulseAmountShare;
+        const topImpulse = Object.entries(categoryMood).sort((a, b) => b[1].impulse - a[1].impulse)[0];
+
+        const bullets = [];
+        bullets.push(`This month impulse spending is <span class="insight-note-kpi">${impulseAmountShare.toFixed(1)}%</span> by amount and <span class="insight-note-kpi">${impulseCountShare.toFixed(1)}%</span> by count.`);
+        if (topImpulse && topImpulse[1].impulse > 0) {
+          bullets.push(`Top impulse category is <strong>${topImpulse[0]}</strong> at <span class="insight-note-kpi">${Utils.formatMoney(topImpulse[1].impulse, "HKD")}</span>.`);
+        }
+        if (diff > 8) {
+          bullets.push(`Impulse ratio <strong>increased</strong> by <span class="insight-note-kpi">${diff.toFixed(1)}%</span> vs last month. Consider setting a stricter cap for non-essential categories.`);
+        } else if (diff < -8) {
+          bullets.push(`Impulse ratio <strong>dropped</strong> by <span class="insight-note-kpi">${Math.abs(diff).toFixed(1)}%</span> vs last month. Your spending discipline is improving.`);
+        } else {
+          bullets.push(`Impulse ratio is stable vs last month (<span class="insight-note-kpi">${diff >= 0 ? "+" : ""}${diff.toFixed(1)}%</span>). Keep tracking for a clearer trend.`);
+        }
+
+        document.getElementById("behaviorInsightCard").innerHTML = bullets.map((line) => `<p class="py-1">• ${line}</p>`).join("");
       },
 
       budget() {
@@ -745,6 +880,19 @@
     // ==========================================
     const Events = {
       init() {
+        const syncTransactionTypeUI = () => {
+          const type = document.getElementById("typeInput").value;
+          const cats = type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS;
+          document.getElementById("categoryInput").innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join("");
+          const moodInput = document.getElementById("moodInput");
+          const showMood = type === "expense";
+          moodInput.classList.toggle("hidden", !showMood);
+          moodInput.disabled = !showMood;
+          if (showMood && !moodInput.value) {
+            moodInput.value = "planned";
+          }
+        };
+
         document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
           btn.addEventListener("click", (e) => {
             const tab = btn.dataset.tab;
@@ -766,15 +914,17 @@
         document.getElementById("transactionForm").addEventListener("submit", (e) => {
           e.preventDefault();
           const form = e.target;
+          const type = document.getElementById("typeInput").value;
           
           const txData = {
             amount: document.getElementById("amountInput").value,
             currency: document.getElementById("currencyInput").value,
-            type: document.getElementById("typeInput").value,
+            type,
             category: document.getElementById("categoryInput").value,
             date: document.getElementById("dateInput").value || Utils.formatISO(new Date()),
             note: document.getElementById("noteInput").value,
-            accountId: document.getElementById("accountInput").value
+            accountId: document.getElementById("accountInput").value,
+            mood: type === "expense" ? document.getElementById("moodInput").value : "planned"
           };
 
           // Check if we are editing an existing item
@@ -788,7 +938,9 @@
           }
 
           form.reset();
+          document.getElementById("moodInput").value = "planned";
           document.getElementById("dateInput").value = Utils.formatISO(new Date()); 
+          syncTransactionTypeUI();
           Render.dashboard();
         });
 
@@ -798,15 +950,15 @@
            const form = document.getElementById("transactionForm");
            form.reset();
            delete form.dataset.editId;
+            document.getElementById("moodInput").value = "planned";
            document.getElementById("dateInput").value = Utils.formatISO(new Date()); 
            document.getElementById("transactionSubmitBtn").textContent = "Save Transaction";
            e.target.classList.add("hidden");
+            syncTransactionTypeUI();
         });
 
         document.getElementById("typeInput").addEventListener("change", (e) => {
-           const type = e.target.value;
-           const cats = type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS;
-           document.getElementById("categoryInput").innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join("");
+            syncTransactionTypeUI();
         });
 
         document.getElementById("quickAddBtn").addEventListener("click", () => {
@@ -816,7 +968,8 @@
             amount: amt, currency: "HKD", type: "expense",
             category: Render.runtime.selectedQuickCategory,
             date: Utils.formatISO(new Date()),
-            accountId: document.getElementById("quickAccount").value
+            accountId: document.getElementById("quickAccount").value,
+            mood: "impulse"
           });
           document.getElementById("quickAmount").value = "";
           Render.dashboard();
@@ -856,7 +1009,7 @@
           const toName = Store.state.accounts.find(a => a.id === to)?.name || "Account";
 
           Store.addTransaction({ amount: amt, currency: "HKD", type: "expense", category: "Transfer", note: `Transfer to ${toName}`, accountId: from, date });
-          Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "Transfer", note: `Transfer from ${fromName}`, accountId: to, date });
+          Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "Transfer", note: `Transfer from ${fromName}`, accountId: to, date, mood: "planned" });
           
           e.target.reset();
           Render.accounts();
@@ -924,6 +1077,7 @@
             document.getElementById("dateInput").value = tx.date;
             document.getElementById("accountInput").value = tx.accountId;
             document.getElementById("noteInput").value = tx.note || "";
+            document.getElementById("moodInput").value = tx.mood || "planned";
 
             // Change UI to reflect edit state
             const form = document.getElementById("transactionForm");
@@ -941,7 +1095,7 @@
             Store.addTransaction({
               amount: btn.dataset.amt, currency: "HKD", type: "expense",
               category: btn.dataset.cat, date: Utils.formatISO(new Date()),
-              note: btn.dataset.label, accountId: document.getElementById("quickAccount").value
+              note: btn.dataset.label, accountId: document.getElementById("quickAccount").value, mood: "planned"
             });
             Render.dashboard();
           } else if (act === "delete-preset") {
@@ -964,9 +1118,9 @@
         });
 
         document.getElementById("exportCsvBtn").addEventListener("click", () => {
-          const csv = ["Date,Category,Type,Amount,Currency,Note"];
+          const csv = ["Date,Category,Type,Mood,Amount,Currency,Note"];
           Store.state.transactions.forEach(t => {
-            csv.push(`${t.date},${t.category},${t.type},${t.amount},${t.currency},"${t.note || ''}"`);
+            csv.push(`${t.date},${t.category},${t.type},${t.mood || ""},${t.amount},${t.currency},"${t.note || ''}"`);
           });
           const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
           const url = URL.createObjectURL(blob);
@@ -977,6 +1131,8 @@
           a.click();
           document.body.removeChild(a);
         });
+
+        syncTransactionTypeUI();
       }
     };
 
@@ -993,6 +1149,12 @@
         const offset = date.getTimezoneOffset() * 60000;
         return new Date(date.getTime() - offset).toISOString().slice(0, 7);
       },
+      previousMonth: (monthValue) => {
+        const [year, month] = monthValue.split("-").map(Number);
+        const d = new Date(year, month - 1, 1);
+        d.setMonth(d.getMonth() - 1);
+        return Utils.toMonthValue(d);
+      },
       toHKD: (amt, cur) => Number(amt || 0) * (CONFIG.FX_TO_HKD[cur] || 1),
       formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val)
     };
@@ -1005,6 +1167,7 @@
       Events.init();
       Render.all();
       document.getElementById("dateInput").value = Utils.formatISO(new Date());
+      document.getElementById("moodInput").value = "planned";
     });
   </script>
 </body>
