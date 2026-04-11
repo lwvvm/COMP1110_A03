@@ -377,8 +377,8 @@
     // 3. Render Views
     // ==========================================
     const Render = {
-      runtime: { selectedQuickCategory: "Food", pieChart: null, lineChart: null },
-      
+      runtime: { selectedQuickCategory: "Food", expensePieChart: null, incomePieChart: null, lineChart: null },
+
       all() {
         this.dropdowns();
         this.dashboard();
@@ -485,26 +485,47 @@
 
      insights() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
-        const { byCat, expense } = Logic.computeSummary(txs);
-        const ctxPie = document.getElementById("pieChart").getContext("2d");
-        if (this.runtime.pieChart) this.runtime.pieChart.destroy();
-        this.runtime.pieChart = new Chart(ctxPie, {
+        const { byCat, incomeByCat, expense, income } = Logic.computeSummary(txs);
+        
+        // --- 1. Expense Pie Chart ---
+        const ctxExpPie = document.getElementById("expensePieChart").getContext("2d");
+        if (this.runtime.expensePieChart) this.runtime.expensePieChart.destroy();
+        this.runtime.expensePieChart = new Chart(ctxExpPie, {
           type: 'doughnut',
           data: {
             labels: Object.keys(byCat).length ? Object.keys(byCat) : ["No Data"],
             datasets: [{ 
               data: Object.values(byCat).length ? Object.values(byCat) : [1], 
-              backgroundColor: Object.values(byCat).length ? ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'] : ['#e2e8f0'], 
+              backgroundColor: Object.values(byCat).length ? ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'] : ['#e2e8f0'], 
               borderWidth: 0 
             }]
           },
           options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
         });
+
+        // --- 2. NEW: Income Pie Chart ---
+        const ctxIncPie = document.getElementById("incomePieChart").getContext("2d");
+        if (this.runtime.incomePieChart) this.runtime.incomePieChart.destroy();
+        this.runtime.incomePieChart = new Chart(ctxIncPie, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(incomeByCat).length ? Object.keys(incomeByCat) : ["No Data"],
+            datasets: [{ 
+              data: Object.values(incomeByCat).length ? Object.values(incomeByCat) : [1], 
+              backgroundColor: Object.values(incomeByCat).length ? ['#10b981', '#34d399', '#059669', '#6ee7b7', '#047857'] : ['#e2e8f0'], // Emerald/Green palette for income
+              borderWidth: 0 
+            }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+        });
+
+        // --- 3. Income vs Expense Trend Line (Unchanged logic) ---
         const dailyExpense = {};
         const dailyIncome = {};
         const allDates = new Set();
+
         txs.forEach(t => {
-            const dateStr = t.date.split('-')[2]; 
+            const dateStr = t.date.split('-')[2];
             allDates.add(dateStr);
             const amt = Utils.toHKD(t.amount, t.currency);
             if (t.type === 'expense') dailyExpense[dateStr] = (dailyExpense[dateStr] || 0) + amt;
@@ -522,37 +543,19 @@
           data: {
             labels: sortedDates,
             datasets: [
-              { 
-                label: 'Expense', 
-                data: expenseData, 
-                borderColor: '#ef4444', 
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                tension: 0.4, 
-                fill: true
-              },
-              { 
-                label: 'Income', 
-                data: incomeData, 
-                borderColor: '#10b981', 
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4, 
-                fill: true
-              }
+              { label: 'Expense', data: expenseData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4, fill: true },
+              { label: 'Income', data: incomeData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true }
             ]
           },
-          options: { 
-            maintainAspectRatio: false, 
-            interaction: { mode: 'index', intersect: false },
-            scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] } } } 
-          }
+          options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] } } } }
         });
 
+        // --- 4. Next Week Forecast (Unchanged logic) ---
         const today = new Date();
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
+        let pastWeekExpense = 0, pastWeekIncome = 0;
 
-        let pastWeekExpense = 0;
-        let pastWeekIncome = 0;
         Store.state.transactions.forEach(t => {
            const tDate = new Date(t.date);
            if (tDate >= sevenDaysAgo && tDate <= today) {
@@ -561,24 +564,137 @@
                if (t.type === 'income') pastWeekIncome += amt;
            }
         });
+
         document.getElementById('predictExpense').textContent = Utils.formatMoney(pastWeekExpense, "HKD");
         document.getElementById('predictIncome').textContent = Utils.formatMoney(pastWeekIncome, "HKD");
-        
         const netFlow = pastWeekIncome - pastWeekExpense;
         const predictNetEl = document.getElementById('predictNet');
         predictNetEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
         predictNetEl.className = `text-lg sm:text-xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-600' : 'text-rose-500'}`;
-        const listEl = document.getElementById("insightCategoryList");
-        if (Object.keys(byCat).length === 0) {
-          listEl.innerHTML = `<p class="text-sm text-slate-400 py-2">No expenses logged yet.</p>`;
-        } else {
-          listEl.innerHTML = Object.entries(byCat).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
-            <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
-              <span class="text-slate-600 font-medium">${cat}</span>
-              <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/expense)*100).toFixed(1)}%)</span></span>
-            </div>
-          `).join("");
-        }
+
+        // --- 5. UPDATED: Render Category Details Lists ---
+        const renderList = (containerId, dataObj, totalAmt) => {
+            const el = document.getElementById(containerId);
+            if (Object.keys(dataObj).length === 0) {
+              el.innerHTML = `<p class="text-sm text-slate-400 py-2">No records logged yet.</p>`;
+            } else {
+              el.innerHTML = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
+                <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
+                  <span class="text-slate-600 font-medium">${cat}</span>
+                  <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/totalAmt)*100).toFixed(1)}%)</span></span>
+                </div>
+              `).join("");
+            }
+        };
+
+        renderList("insightExpenseList", byCat, expense);
+        renderList("insightIncomeList", incomeByCat, income);
+      },insights() {
+        const txs = Logic.getFilteredTransactions(Store.state.selectedMonth);
+        const { byCat, incomeByCat, expense, income } = Logic.computeSummary(txs);
+        
+        // --- 1. Expense Pie Chart ---
+        const ctxExpPie = document.getElementById("expensePieChart").getContext("2d");
+        if (this.runtime.expensePieChart) this.runtime.expensePieChart.destroy();
+        this.runtime.expensePieChart = new Chart(ctxExpPie, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(byCat).length ? Object.keys(byCat) : ["No Data"],
+            datasets: [{ 
+              data: Object.values(byCat).length ? Object.values(byCat) : [1], 
+              backgroundColor: Object.values(byCat).length ? ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'] : ['#e2e8f0'], 
+              borderWidth: 0 
+            }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+        });
+
+        // --- 2. NEW: Income Pie Chart ---
+        const ctxIncPie = document.getElementById("incomePieChart").getContext("2d");
+        if (this.runtime.incomePieChart) this.runtime.incomePieChart.destroy();
+        this.runtime.incomePieChart = new Chart(ctxIncPie, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(incomeByCat).length ? Object.keys(incomeByCat) : ["No Data"],
+            datasets: [{ 
+              data: Object.values(incomeByCat).length ? Object.values(incomeByCat) : [1], 
+              backgroundColor: Object.values(incomeByCat).length ? ['#10b981', '#34d399', '#059669', '#6ee7b7', '#047857'] : ['#e2e8f0'], // Emerald/Green palette for income
+              borderWidth: 0 
+            }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+        });
+
+        // --- 3. Income vs Expense Trend Line (Unchanged logic) ---
+        const dailyExpense = {};
+        const dailyIncome = {};
+        const allDates = new Set();
+
+        txs.forEach(t => {
+            const dateStr = t.date.split('-')[2];
+            allDates.add(dateStr);
+            const amt = Utils.toHKD(t.amount, t.currency);
+            if (t.type === 'expense') dailyExpense[dateStr] = (dailyExpense[dateStr] || 0) + amt;
+            else if (t.type === 'income') dailyIncome[dateStr] = (dailyIncome[dateStr] || 0) + amt;
+        });
+
+        const sortedDates = Array.from(allDates).sort();
+        const expenseData = sortedDates.map(d => dailyExpense[d] || 0);
+        const incomeData = sortedDates.map(d => dailyIncome[d] || 0);
+        
+        const ctxLine = document.getElementById("lineChart").getContext("2d");
+        if (this.runtime.lineChart) this.runtime.lineChart.destroy();
+        this.runtime.lineChart = new Chart(ctxLine, {
+          type: 'line',
+          data: {
+            labels: sortedDates,
+            datasets: [
+              { label: 'Expense', data: expenseData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4, fill: true },
+              { label: 'Income', data: incomeData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true }
+            ]
+          },
+          options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { grid: { display: false } }, y: { border: { dash: [4, 4] } } } }
+        });
+
+        // --- 4. Next Week Forecast (Unchanged logic) ---
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        let pastWeekExpense = 0, pastWeekIncome = 0;
+
+        Store.state.transactions.forEach(t => {
+           const tDate = new Date(t.date);
+           if (tDate >= sevenDaysAgo && tDate <= today) {
+               const amt = Utils.toHKD(t.amount, t.currency);
+               if (t.type === 'expense') pastWeekExpense += amt;
+               if (t.type === 'income') pastWeekIncome += amt;
+           }
+        });
+
+        document.getElementById('predictExpense').textContent = Utils.formatMoney(pastWeekExpense, "HKD");
+        document.getElementById('predictIncome').textContent = Utils.formatMoney(pastWeekIncome, "HKD");
+        const netFlow = pastWeekIncome - pastWeekExpense;
+        const predictNetEl = document.getElementById('predictNet');
+        predictNetEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
+        predictNetEl.className = `text-lg sm:text-xl font-black mt-1 ${netFlow >= 0 ? 'text-emerald-600' : 'text-rose-500'}`;
+
+        // --- 5. UPDATED: Render Category Details Lists ---
+        const renderList = (containerId, dataObj, totalAmt) => {
+            const el = document.getElementById(containerId);
+            if (Object.keys(dataObj).length === 0) {
+              el.innerHTML = `<p class="text-sm text-slate-400 py-2">No records logged yet.</p>`;
+            } else {
+              el.innerHTML = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
+                <div class="flex justify-between items-center text-sm py-3 border-b border-slate-100 last:border-0">
+                  <span class="text-slate-600 font-medium">${cat}</span>
+                  <span class="font-bold text-slate-800">${Utils.formatMoney(val, "HKD")} <span class="text-slate-400 font-normal text-xs ml-1">(${((val/totalAmt)*100).toFixed(1)}%)</span></span>
+                </div>
+              `).join("");
+            }
+        };
+
+        renderList("insightExpenseList", byCat, expense);
+        renderList("insightIncomeList", incomeByCat, income);
       },
 
       budget() {
