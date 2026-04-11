@@ -413,6 +413,7 @@
         const incomeByCat = {}; // NEW: For income
         
         txs.forEach(t => {
+          if (t.category === "Transfer") return;
           const val = Utils.toHKD(t.amount, t.currency);
           if (t.type === "expense") {
             expense += val;
