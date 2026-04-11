@@ -346,7 +346,9 @@
       },
       computeSummary(txs) {
         let income = 0, expense = 0;
-        const byCat = {};
+        const byCat = {};       // For expenses (kept name same to not break budget tab)
+        const incomeByCat = {}; // NEW: For income
+        
         txs.forEach(t => {
           const val = Utils.toHKD(t.amount, t.currency);
           if (t.type === "expense") {
@@ -354,9 +356,10 @@
             byCat[t.category] = (byCat[t.category] || 0) + val;
           } else if (t.type === "income") {
             income += val;
+            incomeByCat[t.category] = (incomeByCat[t.category] || 0) + val;
           }
         });
-        return { income, expense, byCat };
+        return { income, expense, byCat, incomeByCat };
       },
       computeAccountBalances() {
         const balances = {};
