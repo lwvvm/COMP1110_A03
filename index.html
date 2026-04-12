@@ -176,11 +176,14 @@
               <input type="date" id="dateInput" required class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
               <select id="accountInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none"></select>
             </div>
-            <select id="moodInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none">
-              <option value="planned">Planned Purchase</option>
-              <option value="hesitant">Hesitant Purchase</option>
-              <option value="impulse">Impulse Purchase</option>
-            </select>
+            <div id="moodWrap" class="grid grid-cols-[44px,1fr] gap-3 items-center">
+              <div id="moodEmojiBadge" class="h-11 w-11 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-xl">🤓</div>
+              <select id="moodInput" class="rounded-xl border border-slate-200 p-3 text-sm outline-none" style="font-family: 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;">
+                <option value="planned">🤓 Planned Purchase</option>
+                <option value="hesitant">😣 Hesitant Purchase</option>
+                <option value="impulse">🤯 Impulse Purchase</option>
+              </select>
+            </div>
             <input type="text" id="noteInput" placeholder="Note (optional)" class="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500">
             <button type="submit" id="transactionSubmitBtn" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition-all mt-2">Save Transaction</button>
           </form>
@@ -346,9 +349,9 @@
       SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
       FX_TO_HKD: { HKD: 1, USD: 7.82, CNY: 1.08, JPY: 0.052, EUR: 8.45, GBP: 9.92 },
       SPENDING_MOODS: {
-        planned: "Planned",
-        hesitant: "Hesitant",
-        impulse: "Impulse"
+        planned: "🤓 Planned",
+        hesitant: "😣 Hesitant",
+        impulse: "🤯 Impulse"
       },
       DEFAULT_EXPENSE_CATS: ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Rent", "Healthcare", "Other"],
       DEFAULT_INCOME_CATS: ["Salary", "Bonus", "Investment", "Gift", "Other"],
@@ -881,17 +884,27 @@
     // ==========================================
     const Events = {
       init() {
+        const syncMoodEmojiBadge = () => {
+          const mood = document.getElementById("moodInput").value;
+          const badge = document.getElementById("moodEmojiBadge");
+          const emojiMap = { planned: "🤓", hesitant: "😣", impulse: "🤯" };
+          badge.textContent = emojiMap[mood] || "🤓";
+        };
+
         const syncTransactionTypeUI = () => {
           const type = document.getElementById("typeInput").value;
           const cats = type === 'income' ? CONFIG.DEFAULT_INCOME_CATS : CONFIG.DEFAULT_EXPENSE_CATS;
           document.getElementById("categoryInput").innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join("");
           const moodInput = document.getElementById("moodInput");
+          const moodWrap = document.getElementById("moodWrap");
           const showMood = type === "expense";
           moodInput.classList.toggle("hidden", !showMood);
+          moodWrap.classList.toggle("hidden", !showMood);
           moodInput.disabled = !showMood;
           if (showMood && !moodInput.value) {
             moodInput.value = "planned";
           }
+          syncMoodEmojiBadge();
         };
 
         document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
@@ -961,6 +974,8 @@
         document.getElementById("typeInput").addEventListener("change", (e) => {
             syncTransactionTypeUI();
         });
+
+        document.getElementById("moodInput").addEventListener("change", syncMoodEmojiBadge);
 
         document.getElementById("quickAddBtn").addEventListener("click", () => {
           const amt = document.getElementById("quickAmount").value;
@@ -1079,6 +1094,7 @@
             document.getElementById("accountInput").value = tx.accountId;
             document.getElementById("noteInput").value = tx.note || "";
             document.getElementById("moodInput").value = tx.mood || "planned";
+            syncMoodEmojiBadge();
 
             // Change UI to reflect edit state
             const form = document.getElementById("transactionForm");
@@ -1134,6 +1150,7 @@
         });
 
         syncTransactionTypeUI();
+        syncMoodEmojiBadge();
       }
     };
 
