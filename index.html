@@ -89,6 +89,28 @@
       border-radius: 0.4rem;
       font-weight: 800;
     }
+
+    .budget-insight-item {
+      font-size: 0.875rem;
+      line-height: 1.45;
+      color: #334155;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.7rem;
+      padding: 0.4rem 0.55rem;
+    }
+
+    .budget-insight-item.alert {
+      color: #9f1239;
+      background: #fff1f2;
+      border-color: #fecdd3;
+      font-weight: 800;
+    }
+
+    .insight-note-kpi.alert {
+      color: #9f1239;
+      background: #ffe4e6;
+    }
   </style>
 </head>
 <body class="p-4 pb-28">
@@ -293,6 +315,48 @@
     </main>
 
     <main id="tab-budget" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-3xl p-6 space-y-5">
+        <div>
+          <p class="insight-title mb-1">Budget Overview</p>
+          <h3 class="font-bold text-slate-800">Total Budget Rules and Category Status</h3>
+        </div>
+        <div id="budgetOverviewLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div id="budgetLeftPanel" class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-slate-200 bg-white/70 p-3.5">
+              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Budget</p>
+              <p id="effectiveBudgetValue" class="text-lg font-black text-indigo-600 mt-1">$0.00</p>
+              <p id="budgetAppliedSource" class="text-[11px] text-slate-500 mt-1">Auto-derived from manual and category plans</p>
+            </div>
+            <div class="rounded-xl border-2 border-indigo-200 bg-indigo-50/60 p-3.5">
+              <p id="budgetUsedRemainLabel" class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Used / Remaining</p>
+              <p id="budgetUsedRemainValue" class="text-lg font-black text-slate-700 mt-1">$0.00 / $0.00</p>
+              <p id="budgetUsagePctValue" class="text-sm font-bold text-slate-600 mt-1">0%</p>
+            </div>
+            <div id="unbudgetedBudgetCard" class="hidden rounded-xl border border-slate-200 bg-amber-50/70 p-3.5 col-span-2">
+              <p class="text-[10px] sm:text-xs font-bold text-amber-700 uppercase tracking-wider">Unbudgeted</p>
+              <div class="flex items-center justify-between gap-3 mt-1">
+                <p id="unbudgetedBudgetValue" class="text-base font-black text-amber-700">$0.00</p>
+                <p id="unbudgetedBudgetPct" class="text-xs text-amber-700/80">0% of manual total</p>
+              </div>
+              <p id="unbudgetedSpendMeta" class="text-[11px] text-slate-600 mt-1">Spent without category budget: $0.00</p>
+              <p class="text-[11px] text-slate-500 mt-1">Shown only when Manual Total Budget is greater than Category Planned Total.</p>
+            </div>
+            <div id="budgetInsightBlockLeft" class="rounded-xl border border-slate-200 bg-white/70 p-3.5 col-span-2">
+              <p class="text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider">Budget Insight</p>
+              <div id="budgetInsightCard" class="mt-2.5 space-y-2"></div>
+            </div>
+          </div>
+          <div id="budgetInsightBlockRight" class="hidden rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4">
+            <p class="text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider">Budget Insight</p>
+            <div id="budgetInsightCardRight" class="space-y-2"></div>
+          </div>
+          <div id="budgetStatusCard" class="rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category Budget Status</p>
+            <div class="h-56"><canvas id="budgetCategoryStatusChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-3xl p-6 space-y-4">
           <h3 class="font-bold text-slate-700">💰 Set Total Budget</h3>
@@ -501,7 +565,8 @@
         incomePieChart: null,
         lineChart: null,
         spendingMoodChart: null,
-        moodCategoryChart: null
+        moodCategoryChart: null,
+        budgetCategoryStatusChart: null
       },
 
       all() {
@@ -547,12 +612,17 @@
         flowEl.textContent = `${netFlow >= 0 ? '+' : ''}${Utils.formatMoney(netFlow, "HKD")}`;
         flowEl.className = `text-3xl font-black mt-1 whitespace-nowrap ${netFlow >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
 
-        const limit = Store.state.settings.monthlyBudget || 1;
-        const ratio = Math.round((expense / limit) * 100);
+        const baseBudget = Number(Store.state.settings.monthlyBudget || 0);
+        const categoryBudgetSum = Object.values(Store.state.settings.categoryBudgets || {})
+          .map(v => Number(v || 0))
+          .filter(v => v > 0)
+          .reduce((sum, v) => sum + v, 0);
+        const effectiveBudget = Math.max(baseBudget, categoryBudgetSum);
+        const ratio = effectiveBudget > 0 ? Math.round((expense / effectiveBudget) * 100) : 0;
         document.getElementById("monthlyBudgetUsage").textContent = `${ratio}%`;
         
         const pb = document.getElementById("monthProgressBar");
-        pb.style.width = `${Math.min(100, ratio)}%`;
+        pb.style.width = `${Math.min(100, Math.max(0, ratio))}%`;
         if(ratio > 90) pb.className = "h-full transition-all duration-500 bg-rose-500";
         else if(ratio > 70) pb.className = "h-full transition-all duration-500 bg-amber-400";
         else pb.className = "h-full transition-all duration-500 bg-blue-500";
@@ -869,26 +939,194 @@
       budget() {
         document.getElementById("budgetLimitInput").value = Store.state.settings.monthlyBudget || '';
 
-        const { byCat } = Logic.computeSummary(Logic.getFilteredTransactions(Store.state.selectedMonth));
+        const { byCat, expense } = Logic.computeSummary(Logic.getFilteredTransactions(Store.state.selectedMonth));
         const wrap = document.getElementById("categoryBudgetProgressWrap");
         const b = Store.state.settings.categoryBudgets;
+        const categoryEntries = Object.entries(b).filter(([_, limit]) => Number(limit) > 0);
+        const baseBudget = Number(Store.state.settings.monthlyBudget || 0);
+        const categoryBudgetSum = categoryEntries.reduce((sum, [_, limit]) => sum + Number(limit || 0), 0);
+        const effectiveBudget = Math.max(baseBudget, categoryBudgetSum);
+
+        document.getElementById("effectiveBudgetValue").textContent = Utils.formatMoney(effectiveBudget, "HKD");
+
+        const used = expense;
+        const remaining = Math.max(0, effectiveBudget - used);
+        const overspent = Math.max(0, used - effectiveBudget);
+        const usagePct = effectiveBudget > 0 ? (used / effectiveBudget) * 100 : 0;
+        const unbudgetedBudget = Math.max(0, baseBudget - categoryBudgetSum);
+        const unbudgetedPctOfManual = baseBudget > 0 ? (unbudgetedBudget / baseBudget) * 100 : 0;
+        const budgetedCategorySet = new Set(categoryEntries.map(([cat]) => cat));
+        const unbudgetedSpent = Object.entries(byCat)
+          .filter(([cat]) => !budgetedCategorySet.has(cat))
+          .reduce((sum, [_, val]) => sum + Number(val || 0), 0);
+        const MONEY_EPSILON = 0.01;
+        const hasUnbudgeted = unbudgetedBudget > MONEY_EPSILON;
+        const usedRemainLabel = document.getElementById("budgetUsedRemainLabel");
+        const usedRemainValue = document.getElementById("budgetUsedRemainValue");
+        const usagePctValue = document.getElementById("budgetUsagePctValue");
+
+        if (overspent > 0) {
+          usedRemainLabel.textContent = "Used / Overspent";
+          usedRemainValue.textContent = `${Utils.formatMoney(used, "HKD")} / ${Utils.formatMoney(overspent, "HKD")}`;
+          usedRemainValue.className = "text-lg font-black text-rose-600 mt-1";
+          usagePctValue.textContent = `${usagePct.toFixed(1)}% used (over limit)`;
+          usagePctValue.className = "text-sm font-extrabold text-rose-600 mt-1";
+        } else {
+          usedRemainLabel.textContent = "Used / Remaining";
+          usedRemainValue.textContent = `${Utils.formatMoney(used, "HKD")} / ${Utils.formatMoney(remaining, "HKD")}`;
+          usedRemainValue.className = "text-lg font-black text-slate-700 mt-1";
+          usagePctValue.textContent = `${usagePct.toFixed(1)}% used`;
+          usagePctValue.className = "text-sm font-bold text-slate-600 mt-1";
+        }
+
+        document.getElementById("budgetAppliedSource").textContent = `Rule: max(Manual ${Utils.formatMoney(baseBudget, "HKD")}, Category Plan ${Utils.formatMoney(categoryBudgetSum, "HKD")})`;
+
+        const unbudgetedCard = document.getElementById("unbudgetedBudgetCard");
+        if (hasUnbudgeted) {
+          unbudgetedCard.classList.remove("hidden");
+          document.getElementById("unbudgetedBudgetValue").textContent = Utils.formatMoney(unbudgetedBudget, "HKD");
+          document.getElementById("unbudgetedBudgetPct").textContent = `${unbudgetedPctOfManual.toFixed(1)}% of manual total`;
+          document.getElementById("unbudgetedSpendMeta").textContent = `Spent without category budget: ${Utils.formatMoney(unbudgetedSpent, "HKD")}`;
+        } else {
+          unbudgetedCard.classList.add("hidden");
+        }
+
+        const budgetInsightLines = [];
+        const addInsight = (text, isAlert = false) => budgetInsightLines.push({ text, isAlert });
+
+        const overrunCats = categoryEntries
+          .map(([cat, limit]) => {
+            const limitNum = Number(limit || 0);
+            const spent = Number(byCat[cat] || 0);
+            const over = Math.max(0, spent - limitNum);
+            const overPct = limitNum > 0 ? (over / limitNum) * 100 : 0;
+            return { cat, over, overPct, spent };
+          })
+          .filter(item => item.over > 0)
+          .sort((a, b) => b.over - a.over);
+
+        if (effectiveBudget <= 0) {
+          addInsight("Set a total budget first to enable budget diagnostics.");
+        } else if (overspent > 0) {
+          const overPctOfBudget = (overspent / effectiveBudget) * 100;
+          addInsight(`OVER BUDGET: <span class="insight-note-kpi alert">${Utils.formatMoney(overspent, "HKD")}</span> over (<span class="insight-note-kpi alert">${overPctOfBudget.toFixed(1)}%</span> above budget), total used <span class="insight-note-kpi alert">${usagePct.toFixed(1)}%</span>.`, true);
+        } else {
+          addInsight(`Within budget: <span class="insight-note-kpi">${Utils.formatMoney(remaining, "HKD")}</span> remaining.`);
+        }
+
+        if (overspent > 0 && overrunCats.length > 0) {
+          const topOverrun = overrunCats[0];
+          const topOverrunShare = overspent > 0 ? (topOverrun.over / overspent) * 100 : 0;
+          addInsight(`Top overspend contributor: <span class="insight-note-kpi alert">${topOverrun.cat}</span> at <span class="insight-note-kpi alert">${Utils.formatMoney(topOverrun.over, "HKD")}</span> (<span class="insight-note-kpi alert">${topOverrunShare.toFixed(1)}%</span> of total overspend).`, true);
+        }
+
+        if (overrunCats.length > 0) {
+          const topOverrun = overrunCats[0];
+          const riskPrefix = overspent > 0 ? "Overspent categories" : "Category pressure";
+          addInsight(`${riskPrefix}: <span class="insight-note-kpi ${overspent > 0 ? "alert" : ""}">${overrunCats.length}</span> category(ies), highest is <span class="insight-note-kpi ${overspent > 0 ? "alert" : ""}">${topOverrun.cat}</span> (<span class="insight-note-kpi ${overspent > 0 ? "alert" : ""}">${topOverrun.overPct.toFixed(1)}%</span> over its cap).`, overspent > 0);
+        }
+
+        if (unbudgetedBudget > 0) {
+          const unbudgetedSentence = unbudgetedSpent > MONEY_EPSILON
+            ? `Unbudgeted pool: <span class="insight-note-kpi">${Utils.formatMoney(unbudgetedBudget, "HKD")}</span> (<span class="insight-note-kpi">${unbudgetedPctOfManual.toFixed(1)}%</span>), uncapped spend <span class="insight-note-kpi ${overspent > 0 ? "alert" : ""}">${Utils.formatMoney(unbudgetedSpent, "HKD")}</span>.`
+            : `Unbudgeted pool: <span class="insight-note-kpi">${Utils.formatMoney(unbudgetedBudget, "HKD")}</span> (<span class="insight-note-kpi">${unbudgetedPctOfManual.toFixed(1)}%</span> of manual budget).`;
+          addInsight(unbudgetedSentence, overspent > 0 && unbudgetedSpent > MONEY_EPSILON);
+        }
+        const budgetInsightHtml = budgetInsightLines
+          .map(item => `<p class="budget-insight-item${item.isAlert ? " alert" : ""}">• ${item.text}</p>`)
+          .join("");
+
+        document.getElementById("budgetInsightCard").innerHTML = budgetInsightHtml;
+        document.getElementById("budgetInsightCardRight").innerHTML = budgetInsightHtml;
+
+        const budgetOverviewLayout = document.getElementById("budgetOverviewLayout");
+        const budgetInsightBlockLeft = document.getElementById("budgetInsightBlockLeft");
+        const budgetInsightBlockRight = document.getElementById("budgetInsightBlockRight");
+        const budgetStatusCard = document.getElementById("budgetStatusCard");
+        if (hasUnbudgeted) {
+          budgetOverviewLayout.className = "grid grid-cols-1 lg:grid-cols-2 gap-4 items-start";
+          budgetInsightBlockLeft.classList.add("hidden");
+          budgetInsightBlockRight.classList.remove("hidden");
+          budgetStatusCard.className = "rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4 lg:col-span-2";
+        } else {
+          budgetOverviewLayout.className = "grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch";
+          budgetInsightBlockLeft.classList.remove("hidden");
+          budgetInsightBlockRight.classList.add("hidden");
+          budgetStatusCard.className = "rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4";
+        }
+
+        const chartCtx = document.getElementById("budgetCategoryStatusChart").getContext("2d");
+        if (this.runtime.budgetCategoryStatusChart) this.runtime.budgetCategoryStatusChart.destroy();
+        const chartItems = categoryEntries.map(([cat, limit]) => ({
+          cat,
+          limit: Number(limit || 0),
+          spent: Number(byCat[cat] || 0)
+        }));
+        if (hasUnbudgeted) {
+          chartItems.push({ cat: "Unbudgeted", limit: Math.max(unbudgetedBudget, unbudgetedSpent), spent: unbudgetedSpent });
+        }
+
+        const chartLabels = chartItems.length ? chartItems.map(item => item.cat) : ["No Category Budgets"];
+        const spentPctData = chartItems.length
+          ? chartItems.map((item) => {
+              const pct = item.limit > 0 ? (item.spent / item.limit) * 100 : 0;
+              return Math.max(0, pct);
+            })
+          : [0];
+        const remainingPctData = chartItems.length
+          ? spentPctData.map(pct => Math.max(0, 100 - pct))
+          : [100];
+        const maxSpentPct = spentPctData.length ? Math.max(...spentPctData) : 100;
+        const xAxisMax = Math.max(100, Math.ceil(maxSpentPct / 20) * 20);
+
+        this.runtime.budgetCategoryStatusChart = new Chart(chartCtx, {
+          type: "bar",
+          data: {
+            labels: chartLabels,
+            datasets: [
+              { label: "Spent %", data: spentPctData, backgroundColor: "#f87171", stack: "budget" },
+              { label: "Remaining %", data: remainingPctData, backgroundColor: "#86efac", stack: "budget" }
+            ]
+          },
+          options: {
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: (context) => `${context.dataset.label}: ${Number(context.parsed.x || 0).toFixed(1)}%`
+                }
+              }
+            },
+            scales: {
+              x: { stacked: true, min: 0, max: xAxisMax, ticks: { callback: (value) => `${value}%` } },
+              y: { stacked: true, grid: { display: false } }
+            }
+          }
+        });
         
-        if (Object.keys(b).length === 0) {
+        if (categoryEntries.length === 0) {
           wrap.innerHTML = `<p class="text-sm text-slate-400">No category budgets set.</p>`;
         } else {
-          wrap.innerHTML = Object.entries(b).map(([cat, limit]) => {
+          wrap.innerHTML = categoryEntries.map(([cat, limit]) => {
             const spent = byCat[cat] || 0;
-            const ratio = Math.min(100, (spent / limit) * 100);
+            const ratioRaw = (spent / limit) * 100;
+            const ratio = Math.max(0, ratioRaw);
+            const barRatio = Math.min(100, ratio);
+            const remainingAmt = Math.max(0, limit - spent);
+            const remainingPct = Math.max(0, 100 - ratio);
             const colorClass = ratio > 90 ? "bg-rose-500" : ratio > 75 ? "bg-amber-400" : "bg-emerald-500";
             return `
               <div>
                 <div class="flex justify-between text-xs mb-1.5">
                   <span class="font-bold text-slate-700">${cat}</span>
-                  <span class="text-slate-500 font-medium">${spent.toFixed(0)} / ${limit}</span>
+                  <span class="text-slate-500 font-medium">${spent.toFixed(0)} / ${limit} (${ratio.toFixed(1)}% used, ${remainingPct.toFixed(1)}% left)</span>
                 </div>
                 <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div class="h-full ${colorClass} transition-all duration-500" style="width: ${ratio}%"></div>
+                  <div class="h-full ${colorClass} transition-all duration-500" style="width: ${barRatio}%"></div>
                 </div>
+                <p class="text-[11px] text-slate-400 mt-1">Remaining: ${remainingAmt.toFixed(0)}</p>
               </div>
             `;
           }).join("");
