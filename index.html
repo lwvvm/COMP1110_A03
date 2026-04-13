@@ -150,34 +150,9 @@
         </div>
       </div>
 
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-bold text-slate-700 flex items-center gap-2">⚡ Quick Add</h3>
-          <div id="quickCategoryWrap" class="flex flex-wrap gap-2"></div>
-          
-          <div class="flex flex-col sm:flex-row gap-3 items-stretch">
-            <input type="number" id="quickAmount" placeholder="Amount" class="flex-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
-            <select id="quickAccount" class="flex-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 outline-none"></select>
-            <button id="quickAddBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all w-full sm:w-auto shrink-0">Add</button>
-          </div>
-          
-          <div class="flex justify-between items-center mt-6">
-             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Presets</p>
-             <button id="togglePresetFormBtn" class="text-xs font-bold text-blue-600 hover:text-blue-800">+ New Preset</button>
-          </div>
+      <section class="grid grid-cols-1 gap-6">
 
-          <form id="addPresetForm" class="hidden grid grid-cols-2 gap-3 mt-2 p-4 bg-white/60 rounded-xl border border-slate-200">
-             <input type="text" id="presetIcon" placeholder="Icon (e.g. 🍔)" maxlength="3" required class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500">
-             <input type="text" id="presetLabel" placeholder="Label name" required class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500">
-             <input type="number" id="presetAmount" placeholder="Amount" required class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500">
-             <select id="presetCategory" required class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none"></select>
-             <button type="submit" class="col-span-2 bg-slate-800 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-slate-900 transition-colors">Save Preset</button>
-          </form>
-
-          <div id="quickPresetWrap" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-        </div>
-
-        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between" id="recordTransactionSection">
+        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between w-full max-w-3xl mx-auto" id="recordTransactionSection">
           <div class="flex justify-between items-center mb-4">
              <h3 class="font-bold text-slate-700">📝 Record Transaction</h3>
              <button id="cancelEditBtn" class="hidden text-xs font-bold text-slate-500 hover:text-slate-700 underline">Cancel Edit</button>
@@ -247,9 +222,9 @@
       <div class="glass-card rounded-3xl p-5 space-y-4">
         <div class="flex flex-col gap-1">
           <p class="insight-title">Core Overview</p>
-          <h3 class="font-bold text-slate-800">Income, Expense, and Cashflow Trend</h3>
+          <h3 class="font-bold text-slate-800">Total Budget Rules and Status</h3>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+        <div id="budgetOverviewLayout" class="grid grid-cols-1 gap-6 items-stretch">
           <div class="md:col-span-6 h-56 md:h-64">
             <canvas id="lineChart"></canvas>
           </div>
@@ -318,9 +293,9 @@
       <div class="glass-card rounded-3xl p-6 space-y-5">
         <div>
           <p class="insight-title mb-1">Budget Overview</p>
-          <h3 class="font-bold text-slate-800">Total Budget Rules and Category Status</h3>
+          <h3 class="font-bold text-slate-800">Total Budget Rules and Status</h3>
         </div>
-        <div id="budgetOverviewLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <div id="budgetOverviewLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           <div id="budgetLeftPanel" class="grid grid-cols-2 gap-3">
             <div class="rounded-xl border border-slate-200 bg-white/70 p-3.5">
               <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Budget</p>
@@ -341,18 +316,14 @@
               <p id="unbudgetedSpendMeta" class="text-[11px] text-slate-600 mt-1">Spent without category budget: $0.00</p>
               <p class="text-[11px] text-slate-500 mt-1">Shown only when Manual Total Budget is greater than Category Planned Total.</p>
             </div>
-            <div id="budgetInsightBlockLeft" class="rounded-xl border border-slate-200 bg-white/70 p-3.5 col-span-2">
-              <p class="text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider">Budget Insight</p>
-              <div id="budgetInsightCard" class="mt-2.5 space-y-2"></div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white/80 p-4 lg:p-5 space-y-3 min-h-[220px]">
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider">Key Insight</p>
+              <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Live</span>
             </div>
-          </div>
-          <div id="budgetInsightBlockRight" class="hidden rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4">
-            <p class="text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider">Budget Insight</p>
-            <div id="budgetInsightCardRight" class="space-y-2"></div>
-          </div>
-          <div id="budgetStatusCard" class="rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4">
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category Budget Status</p>
-            <div class="h-56"><canvas id="budgetCategoryStatusChart"></canvas></div>
+            <div id="budgetInsightCard" class="space-y-2"></div>
           </div>
         </div>
       </div>
@@ -360,6 +331,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-3xl p-6 space-y-4">
           <h3 class="font-bold text-slate-700">💰 Set Total Budget</h3>
+          <p class="text-sm text-slate-500">Save your monthly cap, then review each category with clear spent and remaining breakdowns.</p>
           <form id="monthlyBudgetForm" class="flex gap-2">
             <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" class="flex-1 rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-blue-500">
             <button class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700">Save</button>
@@ -585,13 +557,15 @@
 
         const accOpts = Store.state.accounts.map(a => `<option value="${a.id}">${a.name} (${a.currency})</option>`).join("");
         ["accountInput", "quickAccount", "fromAccountInput", "toAccountInput"].forEach(id => {
-          document.getElementById(id).innerHTML = accOpts;
+          const el = document.getElementById(id);
+          if (el) el.innerHTML = accOpts;
         });
 
         const catOpts = CONFIG.DEFAULT_EXPENSE_CATS.map(c => `<option value="${c}">${c}</option>`).join("");
         document.getElementById("categoryInput").innerHTML = catOpts;
         document.getElementById("categoryBudgetSelect").innerHTML = catOpts;
-        document.getElementById("presetCategory").innerHTML = catOpts;
+        const presetCategory = document.getElementById("presetCategory");
+        if (presetCategory) presetCategory.innerHTML = catOpts;
 
         document.getElementById("monthPicker").value = Store.state.selectedMonth;
       },
@@ -658,11 +632,11 @@
 
       quickSection() {
         const catWrap = document.getElementById("quickCategoryWrap");
+        const preWrap = document.getElementById("quickPresetWrap");
+        if (!catWrap || !preWrap) return;
         catWrap.innerHTML = CONFIG.DEFAULT_EXPENSE_CATS.slice(0, 5).map(c => `
           <button data-action="set-quick-cat" data-cat="${c}" class="chip px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold transition-all ${this.runtime.selectedQuickCategory === c ? 'active' : 'bg-white text-slate-500 hover:bg-slate-50'}">${c}</button>
         `).join("");
-
-        const preWrap = document.getElementById("quickPresetWrap");
         
         preWrap.innerHTML = Store.state.settings.quickPresets.map((p, idx) => `
           <div class="relative group h-full">
@@ -1037,74 +1011,6 @@
           .join("");
 
         document.getElementById("budgetInsightCard").innerHTML = budgetInsightHtml;
-        document.getElementById("budgetInsightCardRight").innerHTML = budgetInsightHtml;
-
-        const budgetOverviewLayout = document.getElementById("budgetOverviewLayout");
-        const budgetInsightBlockLeft = document.getElementById("budgetInsightBlockLeft");
-        const budgetInsightBlockRight = document.getElementById("budgetInsightBlockRight");
-        const budgetStatusCard = document.getElementById("budgetStatusCard");
-        if (hasUnbudgeted) {
-          budgetOverviewLayout.className = "grid grid-cols-1 lg:grid-cols-2 gap-4 items-start";
-          budgetInsightBlockLeft.classList.add("hidden");
-          budgetInsightBlockRight.classList.remove("hidden");
-          budgetStatusCard.className = "rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4 lg:col-span-2";
-        } else {
-          budgetOverviewLayout.className = "grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch";
-          budgetInsightBlockLeft.classList.remove("hidden");
-          budgetInsightBlockRight.classList.add("hidden");
-          budgetStatusCard.className = "rounded-2xl border border-slate-200 bg-white/70 p-3.5 space-y-4";
-        }
-
-        const chartCtx = document.getElementById("budgetCategoryStatusChart").getContext("2d");
-        if (this.runtime.budgetCategoryStatusChart) this.runtime.budgetCategoryStatusChart.destroy();
-        const chartItems = categoryEntries.map(([cat, limit]) => ({
-          cat,
-          limit: Number(limit || 0),
-          spent: Number(byCat[cat] || 0)
-        }));
-        if (hasUnbudgeted) {
-          chartItems.push({ cat: "Unbudgeted", limit: Math.max(unbudgetedBudget, unbudgetedSpent), spent: unbudgetedSpent });
-        }
-
-        const chartLabels = chartItems.length ? chartItems.map(item => item.cat) : ["No Category Budgets"];
-        const spentPctData = chartItems.length
-          ? chartItems.map((item) => {
-              const pct = item.limit > 0 ? (item.spent / item.limit) * 100 : 0;
-              return Math.max(0, pct);
-            })
-          : [0];
-        const remainingPctData = chartItems.length
-          ? spentPctData.map(pct => Math.max(0, 100 - pct))
-          : [100];
-        const maxSpentPct = spentPctData.length ? Math.max(...spentPctData) : 100;
-        const xAxisMax = Math.max(100, Math.ceil(maxSpentPct / 20) * 20);
-
-        this.runtime.budgetCategoryStatusChart = new Chart(chartCtx, {
-          type: "bar",
-          data: {
-            labels: chartLabels,
-            datasets: [
-              { label: "Spent %", data: spentPctData, backgroundColor: "#f87171", stack: "budget" },
-              { label: "Remaining %", data: remainingPctData, backgroundColor: "#86efac", stack: "budget" }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            indexAxis: "y",
-            plugins: {
-              legend: { position: "bottom" },
-              tooltip: {
-                callbacks: {
-                  label: (context) => `${context.dataset.label}: ${Number(context.parsed.x || 0).toFixed(1)}%`
-                }
-              }
-            },
-            scales: {
-              x: { stacked: true, min: 0, max: xAxisMax, ticks: { callback: (value) => `${value}%` } },
-              y: { stacked: true, grid: { display: false } }
-            }
-          }
-        });
         
         if (categoryEntries.length === 0) {
           wrap.innerHTML = `<p class="text-sm text-slate-400">No category budgets set.</p>`;
@@ -1116,17 +1022,32 @@
             const barRatio = Math.min(100, ratio);
             const remainingAmt = Math.max(0, limit - spent);
             const remainingPct = Math.max(0, 100 - ratio);
-            const colorClass = ratio > 90 ? "bg-rose-500" : ratio > 75 ? "bg-amber-400" : "bg-emerald-500";
+            const overspentAmt = Math.max(0, spent - limit);
+            const statusLabel = ratio > 100 ? "Over" : ratio > 85 ? "High" : "Good";
+            const statusClass = ratio > 100
+              ? "bg-rose-100 text-rose-700 border border-rose-200"
+              : ratio > 85
+                ? "bg-amber-100 text-amber-700 border border-amber-200"
+                : "bg-emerald-100 text-emerald-700 border border-emerald-200";
+            const colorClass = ratio > 100 ? "bg-rose-500" : ratio > 85 ? "bg-amber-400" : "bg-emerald-500";
             return `
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="font-bold text-slate-700">${cat}</span>
-                  <span class="text-slate-500 font-medium">${spent.toFixed(0)} / ${limit} (${ratio.toFixed(1)}% used, ${remainingPct.toFixed(1)}% left)</span>
+              <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-2.5">
+                <div class="flex justify-between items-start gap-3">
+                  <div>
+                    <p class="font-bold text-slate-700 text-sm">${cat}</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Limit ${Utils.formatMoney(limit, "HKD")}</p>
+                  </div>
+                  <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${statusClass}">${statusLabel}</span>
                 </div>
                 <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                   <div class="h-full ${colorClass} transition-all duration-500" style="width: ${barRatio}%"></div>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-1">Remaining: ${remainingAmt.toFixed(0)}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-[11px] text-slate-600">
+                  <p class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-400 inline-block"></span>Spent: <strong class="text-slate-700">${Utils.formatMoney(spent, "HKD")}</strong></p>
+                  <p class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>Remaining: <strong class="text-slate-700">${Utils.formatMoney(remainingAmt, "HKD")}</strong></p>
+                  <p class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>Usage: <strong class="text-slate-700">${ratio.toFixed(1)}%</strong></p>
+                </div>
+                ${overspentAmt > 0 ? `<p class="text-[11px] font-semibold text-rose-600">Over limit by ${Utils.formatMoney(overspentAmt, "HKD")}</p>` : ""}
               </div>
             `;
           }).join("");
@@ -1245,38 +1166,55 @@
 
         document.getElementById("moodInput").addEventListener("change", syncMoodEmojiBadge);
 
-        document.getElementById("quickAddBtn").addEventListener("click", () => {
-          const amt = document.getElementById("quickAmount").value;
-          if (!amt) return;
-          Store.addTransaction({
-            amount: amt, currency: "HKD", type: "expense",
-            category: Render.runtime.selectedQuickCategory,
-            date: Utils.formatISO(new Date()),
-            accountId: document.getElementById("quickAccount").value,
-            mood: "impulse"
-          });
-          document.getElementById("quickAmount").value = "";
-          Render.dashboard();
-        });
-        
-        document.getElementById("togglePresetFormBtn").addEventListener("click", (e) => {
-            e.preventDefault();
-            document.getElementById("addPresetForm").classList.toggle("hidden");
-        });
-        
-        document.getElementById("addPresetForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            Store.state.settings.quickPresets.push({
-                icon: document.getElementById("presetIcon").value,
-                label: document.getElementById("presetLabel").value,
-                amount: Number(document.getElementById("presetAmount").value),
-                category: document.getElementById("presetCategory").value
+        const quickAddBtn = document.getElementById("quickAddBtn");
+        if (quickAddBtn) {
+          quickAddBtn.addEventListener("click", () => {
+            const quickAmount = document.getElementById("quickAmount");
+            const quickAccount = document.getElementById("quickAccount");
+            const amt = quickAmount?.value;
+            if (!amt || !quickAccount) return;
+            Store.addTransaction({
+              amount: amt, currency: "HKD", type: "expense",
+              category: Render.runtime.selectedQuickCategory,
+              date: Utils.formatISO(new Date()),
+              accountId: quickAccount.value,
+              mood: "impulse"
             });
-            Store.persist();
-            Render.quickSection();
-            e.target.reset();
-            e.target.classList.add("hidden");
-        });
+            quickAmount.value = "";
+            Render.dashboard();
+          });
+        }
+
+        const togglePresetFormBtn = document.getElementById("togglePresetFormBtn");
+        if (togglePresetFormBtn) {
+          togglePresetFormBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              document.getElementById("addPresetForm")?.classList.toggle("hidden");
+          });
+        }
+
+        const addPresetForm = document.getElementById("addPresetForm");
+        if (addPresetForm) {
+          addPresetForm.addEventListener("submit", (e) => {
+              e.preventDefault();
+              const presetIcon = document.getElementById("presetIcon");
+              const presetLabel = document.getElementById("presetLabel");
+              const presetAmount = document.getElementById("presetAmount");
+              const presetCategory = document.getElementById("presetCategory");
+              if (!presetIcon || !presetLabel || !presetAmount || !presetCategory) return;
+
+              Store.state.settings.quickPresets.push({
+                  icon: presetIcon.value,
+                  label: presetLabel.value,
+                  amount: Number(presetAmount.value),
+                  category: presetCategory.value
+              });
+              Store.persist();
+              Render.quickSection();
+              e.target.reset();
+              e.target.classList.add("hidden");
+          });
+        }
 
         document.getElementById("transferForm").addEventListener("submit", (e) => {
           e.preventDefault();
