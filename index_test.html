@@ -208,8 +208,7 @@
           <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">📜</span> Transaction History</h3>
           <input type="text" id="searchInput" placeholder="Search notes or categories... 🔍" class="text-sm font-medium border-2 border-white bg-white/60 px-5 py-2.5 rounded-full outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 w-full sm:w-72 shadow-sm text-slate-600">
         </div>
-        <div id="historyList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-          </div>
+        <div id="historyList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
       </section>
     </main>
 
@@ -366,11 +365,8 @@
     <main id="tab-accounts" class="tab-panel hidden space-y-6">
       <div id="accountCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="glass-card rounded-[2.5rem] p-6 space-y-5" id="accountFormSection">
-          <div class="flex justify-between items-center mb-1">
-             <h3 id="accountFormTitle" class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">🏦</span> Add Account</h3>
-             <button id="cancelAccountEditBtn" class="hidden text-xs font-bold text-slate-400 hover:text-slate-600 underline">Cancel Edit</button>
-          </div>
+        <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">🏦</span> Add Account</h3>
           <form id="addAccountForm" class="space-y-4">
             <input type="text" id="newAccountName" placeholder="Account Name (e.g., Octopus)" required class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
             <select id="newAccountType" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 font-medium text-slate-600 shadow-sm">
@@ -382,7 +378,7 @@
               <select id="newAccountCurrency" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 font-medium text-slate-600 shadow-sm"></select>
               <input type="number" id="newAccountBalance" placeholder="Initial Balance" step="0.01" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
             </div>
-            <button id="accountSubmitBtn" class="w-full bg-blue-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-500 shadow-md shadow-blue-200 transition-all transform active:scale-[0.98] mt-2">Create Account</button>
+            <button class="w-full bg-blue-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-500 shadow-md shadow-blue-200 transition-all transform active:scale-[0.98] mt-2">Create Account</button>
           </form>
         </div>
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
@@ -415,10 +411,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. Config & Store 
-    // ==========================================
-
     const CONFIG = {
       STORAGE_KEY: "pockethk-v3-eng",
       SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
@@ -456,15 +448,7 @@
         const index = this.state.transactions.findIndex(t => t.id === id);
         if (index !== -1) { this.state.transactions[index] = { id, ...updatedTx }; this.persist(); }
       },
-      deleteTransaction(id) { this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.persist(); },
-      updateAccount(id, updatedAcc) {
-        const index = this.state.accounts.findIndex(a => a.id === id);
-        if (index !== -1) { this.state.accounts[index] = { id, ...updatedAcc }; this.persist(); }
-      },
-      deleteAccount(id) {
-        this.state.accounts = this.state.accounts.filter(a => a.id !== id);
-        this.persist();
-      }
+      deleteTransaction(id) { this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.persist(); }
     };
 
     const Logic = {
@@ -728,19 +712,14 @@
       accounts() {
         const bals = Logic.computeAccountBalances();
         document.getElementById("accountCards").innerHTML = Store.state.accounts.map(a => `
-          <div class="glass-card p-6 rounded-[2rem] border-l-[6px] ${a.type === 'Card' ? 'border-l-rose-300' : a.type === 'E-Wallet' ? 'border-l-emerald-300' : 'border-l-blue-300'} flex flex-col justify-between">
-            <div>
-              <div class="flex justify-between items-start">
-                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 inline-block px-2 py-1 rounded-md">${a.type}</p>
-                 <div class="flex gap-2">
-                    <button data-action="edit-account" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-blue-100 hover:text-blue-600 font-bold transition-colors">Edit</button>
-                    <button data-action="delete-account" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition-colors">Delete</button>
-                 </div>
-              </div>
-              <h4 class="font-bold text-slate-700 text-xl mt-3">${a.name}</h4>
-              <div class="overflow-x-auto no-scrollbar pb-1">
-                  <p class="text-3xl font-bold text-slate-800 mt-1 whitespace-nowrap">${Utils.formatMoney(bals[a.id], a.currency)}</p>
-              </div>
+          <div class="glass-card p-6 rounded-[2rem] border-l-[6px] ${a.type === 'Card' ? 'border-l-rose-300' : a.type === 'E-Wallet' ? 'border-l-emerald-300' : 'border-l-blue-300'}">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 inline-block px-2 py-1 rounded-md">${a.type}</p>
+              <button data-action="edit-account-balance" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-purple-100 hover:text-purple-600 font-bold transition-colors">Edit Balance</button>
+            </div>
+            <h4 class="font-bold text-slate-700 text-xl mt-3">${a.name}</h4>
+            <div class="overflow-x-auto no-scrollbar pb-1">
+                <p class="text-3xl font-bold text-slate-800 mt-1 whitespace-nowrap">${Utils.formatMoney(bals[a.id], a.currency)}</p>
             </div>
           </div>
         `).join("");
@@ -761,15 +740,6 @@
           moodInput.disabled = type !== "expense";
           if (type === "expense" && !moodInput.value) moodInput.value = "planned";
           syncMoodEmojiBadge();
-        };
-
-        const resetAccountForm = () => {
-          const form = document.getElementById("addAccountForm");
-          form.reset();
-          delete form.dataset.editId;
-          document.getElementById("accountFormTitle").innerHTML = `<span class="bg-blue-100 p-2 rounded-xl text-blue-500">🏦</span> Add Account`;
-          document.getElementById("accountSubmitBtn").textContent = "Create Account";
-          document.getElementById("cancelAccountEditBtn").classList.add("hidden");
         };
 
         document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
@@ -806,41 +776,11 @@
 
         document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value); Store.persist(); Render.budget(); alert("Limit updated."); });
         document.getElementById("categoryBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); const cat = document.getElementById("categoryBudgetSelect").value, amt = Number(document.getElementById("categoryBudgetAmount").value); if(amt <= 0) delete Store.state.settings.categoryBudgets[cat]; else Store.state.settings.categoryBudgets[cat] = amt; Store.persist(); Render.budget(); document.getElementById("categoryBudgetAmount").value = ""; });
-        
-        document.getElementById("addAccountForm").addEventListener("submit", (e) => { 
-          e.preventDefault(); 
-          const form = e.target;
-          const accData = {
-            name: document.getElementById("newAccountName").value,
-            type: document.getElementById("newAccountType").value,
-            currency: document.getElementById("newAccountCurrency").value,
-            initialBalance: Number(document.getElementById("newAccountBalance").value || 0)
-          };
-
-          if (form.dataset.editId) {
-            Store.updateAccount(form.dataset.editId, accData);
-          } else {
-            Store.state.accounts.push({ id: Utils.uid(), ...accData });
-            Store.persist();
-          }
-          
-          resetAccountForm(); 
-          Render.dropdowns(); 
-          Render.accounts(); 
-          Render.dashboard();
-        });
-
-        document.getElementById("cancelAccountEditBtn").addEventListener("click", (e) => {
-          e.preventDefault();
-          resetAccountForm();
-        });
+        document.getElementById("addAccountForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.accounts.push({ id: Utils.uid(), name: document.getElementById("newAccountName").value, type: document.getElementById("newAccountType").value, currency: document.getElementById("newAccountCurrency").value, initialBalance: Number(document.getElementById("newAccountBalance").value || 0) }); Store.persist(); e.target.reset(); Render.dropdowns(); Render.accounts(); });
 
         document.addEventListener("click", (e) => {
           const btn = e.target.closest("button[data-action]"); if (!btn) return; const act = btn.dataset.action;
-          
-          if (act === "delete-tx" && confirm("Delete record?")) { 
-            Store.deleteTransaction(btn.dataset.id); Render.dashboard(); 
-          }
+          if (act === "delete-tx" && confirm("Delete record?")) { Store.deleteTransaction(btn.dataset.id); Render.dashboard(); }
           else if (act === "edit-tx") {
             const tx = Store.state.transactions.find(t => t.id === btn.dataset.id); if (!tx) return;
             document.getElementById("amountInput").value = tx.amount; document.getElementById("currencyInput").value = tx.currency; document.getElementById("typeInput").value = tx.type; document.getElementById("typeInput").dispatchEvent(new Event('change'));
@@ -848,25 +788,24 @@
             const form = document.getElementById("transactionForm"); form.dataset.editId = tx.id; document.getElementById("transactionSubmitBtn").textContent = "Update Transaction"; document.getElementById("cancelEditBtn").classList.remove("hidden");
             document.getElementById("recordTransactionSection").scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-          else if (act === "delete-account" && confirm("Delete this account? (Warning: Existing transactions will lose their account link)")) {
-            Store.deleteAccount(btn.dataset.id);
-            Render.dropdowns();
-            Render.accounts();
-            Render.dashboard();
-          }
-          else if (act === "edit-account") {
-            const acc = Store.state.accounts.find(a => a.id === btn.dataset.id); if (!acc) return;
-            document.getElementById("newAccountName").value = acc.name;
-            document.getElementById("newAccountType").value = acc.type;
-            document.getElementById("newAccountCurrency").value = acc.currency;
-            document.getElementById("newAccountBalance").value = acc.initialBalance;
-
-            const form = document.getElementById("addAccountForm");
-            form.dataset.editId = acc.id;
-            document.getElementById("accountFormTitle").innerHTML = `<span class="bg-blue-100 p-2 rounded-xl text-blue-500">✏️</span> Edit Account`;
-            document.getElementById("accountSubmitBtn").textContent = "Update Account";
-            document.getElementById("cancelAccountEditBtn").classList.remove("hidden");
-            document.getElementById("accountFormSection").scrollIntoView({ behavior: 'smooth', block: 'center' });
+          else if (act === "edit-account-balance") {
+            const acc = Store.state.accounts.find(a => a.id === btn.dataset.id);
+            if (!acc) return;
+            
+            const currentBals = Logic.computeAccountBalances();
+            const currentBal = currentBals[acc.id];
+            
+            const newBalStr = prompt(`Edit current balance for ${acc.name} (${acc.currency}):`, currentBal);
+            
+            if (newBalStr !== null && newBalStr.trim() !== "" && !isNaN(newBalStr)) {
+              const desiredCurrentBalance = Number(newBalStr);
+              const netTransactions = currentBal - acc.initialBalance;
+              acc.initialBalance = desiredCurrentBalance - netTransactions;
+              
+              Store.persist();
+              Render.accounts();
+              Render.dashboard(); 
+            }
           }
         });
 
