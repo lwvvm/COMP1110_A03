@@ -6,6 +6,7 @@
   <title>PocketHK - Interactive Budget App</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.v.tuangouai.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -60,6 +61,121 @@
       background-color: #ede9fe;
       border-color: #8b5cf6;
       color: #6d28d9;
+    }
+
+    .mobile-app-nav {
+      position: fixed;
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: max(0.6rem, env(safe-area-inset-bottom));
+      z-index: 60;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.25rem;
+      padding: 0.45rem;
+      border-radius: 1.35rem;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1.8px solid rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 14px 38px rgba(139, 92, 246, 0.18);
+    }
+
+    .mobile-nav-btn {
+      border: 0;
+      border-radius: 1rem;
+      min-height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-nav-btn .mobile-nav-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-nav-btn .mobile-nav-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .mobile-nav-btn.active {
+      background: #8b5cf6;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(139, 92, 246, 0.32);
+    }
+
+    .mobile-nav-btn.export-btn {
+      color: #0d9488;
+    }
+
+    .mobile-nav-btn.export-btn.active {
+      background: #14b8a6;
+      color: #ffffff;
+      box-shadow: 0 8px 16px rgba(20, 184, 166, 0.32);
+    }
+
+    .month-popover {
+      width: min(22rem, calc(100vw - 2rem));
+      background: rgba(255, 255, 255, 0.94);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 18px 42px rgba(99, 102, 241, 0.2);
+    }
+
+    .month-cell {
+      border: 2px solid #ede9fe;
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #6b7280;
+      background: #faf5ff;
+      transition: all 0.2s ease;
+    }
+
+    .month-cell:hover {
+      border-color: #c4b5fd;
+      color: #5b21b6;
+      background: #f3e8ff;
+    }
+
+    .month-cell.active {
+      border-color: #8b5cf6;
+      color: #ffffff;
+      background: #8b5cf6;
+      box-shadow: 0 8px 18px rgba(139, 92, 246, 0.3);
+    }
+
+    .ocr-progress-track {
+      width: 100%;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .ocr-progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #a78bfa 0%, #34d399 100%);
+      transition: width 0.25s ease;
     }
 
     /* Custom Scrollbar */
@@ -128,6 +244,67 @@
     input, select {
       transition: all 0.2s ease;
     }
+
+    @media (max-width: 767px) {
+      body {
+        padding-bottom: calc(8.6rem + env(safe-area-inset-bottom));
+      }
+
+      .mobile-app-nav {
+        display: grid;
+      }
+
+      #monthPicker {
+        width: 100%;
+      }
+
+      #totalBalance,
+      #monthlyBudgetUsage,
+      #netFlow {
+        font-size: clamp(1.75rem, 7.5vw, 2.25rem);
+      }
+
+      #recordTransactionSection {
+        padding: 1.25rem;
+      }
+
+      #tab-insights .h-64 {
+        height: 13.5rem;
+      }
+
+      #monthPopover {
+        right: auto;
+        left: 0;
+      }
+
+      .glass-nav {
+        bottom: max(1rem, env(safe-area-inset-bottom));
+      }
+
+      .desktop-nav {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .mobile-app-nav {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+      #recordTransactionSection {
+        max-width: 100%;
+      }
+
+      #historyList {
+        max-height: 460px;
+      }
+
+      #tab-insights .h-52 {
+        height: 15.5rem;
+      }
+    }
   </style>
 </head>
 <body class="p-4 pb-28">
@@ -137,7 +314,22 @@
         <h1 class="text-3xl font-bold tracking-tight text-slate-800">PocketHK <span class="text-xl">🌸</span></h1>
         <p class="text-sm text-slate-500 font-medium">Smart Budgeting · Local First</p>
       </div>
-      <input type="month" id="monthPicker" class="rounded-full border-2 border-white bg-white/80 px-5 py-2 text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all text-slate-600">
+      <div class="relative w-full sm:w-auto">
+        <button type="button" id="monthPickerBtn" class="w-full sm:w-auto inline-flex items-center justify-between gap-2 rounded-full border-2 border-white bg-white/80 px-5 py-2 text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all text-slate-600">
+          <span id="monthPickerLabel">Month</span>
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+        <div id="monthPopover" class="month-popover hidden absolute right-0 top-full mt-2 rounded-2xl p-4 z-40">
+          <div class="flex items-center justify-between mb-3">
+            <button type="button" id="monthPrevYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&lt;</button>
+            <p id="monthYearLabel" class="text-sm font-bold text-slate-700">2026</p>
+            <button type="button" id="monthNextYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&gt;</button>
+          </div>
+          <div id="monthGrid" class="grid grid-cols-3 gap-2"></div>
+        </div>
+      </div>
     </header>
 
     <main id="tab-dashboard" class="tab-panel space-y-6">
@@ -173,19 +365,36 @@
              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-purple-100 p-2 rounded-xl">✨</span> Record Transaction</h3>
              <button id="cancelEditBtn" class="hidden text-xs font-bold text-slate-400 hover:text-slate-600 underline">Cancel Edit</button>
           </div>
+          <div class="mb-4 rounded-2xl border-2 border-purple-100 bg-purple-50/60 p-3.5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p class="text-xs sm:text-sm font-bold text-purple-700">Receipt OCR Auto Entry</p>
+              <button type="button" id="receiptScanBtn" class="rounded-xl bg-purple-500 px-3.5 py-2 text-xs font-bold text-white hover:bg-purple-600 transition-colors w-full sm:w-auto">Scan Receipt</button>
+            </div>
+            <input type="file" id="receiptImageInput" accept="image/*" capture="environment" class="hidden">
+            <p id="receiptScanStatus" class="mt-2 text-xs font-medium text-slate-500">Upload a receipt photo to prefill amount, date, note, and category.</p>
+            <div class="mt-3 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                <span id="ocrStageText">Idle</span>
+                <span id="ocrProgressText">0%</span>
+              </div>
+              <div class="ocr-progress-track">
+                <div id="ocrProgressBar" class="ocr-progress-bar"></div>
+              </div>
+            </div>
+          </div>
           <form id="transactionForm" class="space-y-4 h-full flex flex-col justify-center">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input type="number" id="amountInput" placeholder="Amount" step="0.01" required class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none shadow-sm">
               <select id="currencyInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <select id="typeInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600">
                 <option value="expense">📉 Expense</option>
                 <option value="income">📈 Income</option>
               </select>
               <select id="categoryInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input type="date" id="dateInput" required class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600">
               <select id="accountInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
             </div>
@@ -243,7 +452,7 @@
           <div class="md:col-span-6 h-56 md:h-64">
             <canvas id="lineChart"></canvas>
           </div>
-          <div class="md:col-span-3 insight-divider md:border-t-0 md:border-l border-dashed border-slate-200 pt-3 md:pt-0 md:pl-4 grid grid-cols-3 md:grid-cols-1 gap-3">
+          <div class="md:col-span-3 insight-divider md:border-t-0 md:border-l border-dashed border-slate-200 pt-3 md:pt-0 md:pl-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-3">
             <div>
               <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Est. Income</p>
               <h4 id="predictIncome" class="text-xl sm:text-2xl font-bold text-emerald-500 mt-1">$0.00</h4>
@@ -310,7 +519,7 @@
           <h3 class="font-bold text-slate-800 text-lg">Rules and Status</h3>
         </div>
         <div id="budgetOverviewLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          <div id="budgetLeftPanel" class="grid grid-cols-2 gap-4">
+          <div id="budgetLeftPanel" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="rounded-2xl border-2 border-white bg-white/70 p-4 shadow-sm">
               <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Total Budget</p>
               <p id="effectiveBudgetValue" class="text-2xl font-bold text-purple-500 mt-1">$0.00</p>
@@ -345,7 +554,7 @@
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
           <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-green-100 p-2 rounded-xl">💰</span> Set Total Budget</h3>
           <p class="text-sm text-slate-500 font-medium">Save your monthly cap, then review breakdowns below.</p>
-          <form id="monthlyBudgetForm" class="flex gap-3">
+          <form id="monthlyBudgetForm" class="flex flex-col sm:flex-row gap-3">
             <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" class="flex-1 rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-green-400 focus:ring-4 focus:ring-green-100 shadow-sm text-slate-700 font-medium">
             <button class="bg-green-400 text-white px-6 py-3 rounded-2xl font-bold text-lg hover:bg-green-500 shadow-md shadow-green-200 transition-all transform active:scale-95">Save</button>
           </form>
@@ -374,7 +583,7 @@
               <option value="Card">💳 Bank/Credit Card</option>
               <option value="E-Wallet">📱 E-Wallet</option>
             </select>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <select id="newAccountCurrency" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 font-medium text-slate-600 shadow-sm"></select>
               <input type="number" id="newAccountBalance" placeholder="Initial Balance" step="0.01" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
             </div>
@@ -384,7 +593,7 @@
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
           <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-indigo-100 p-2 rounded-xl text-indigo-500">🔄</span> Transfer Funds</h3>
           <form id="transferForm" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="space-y-1.5">
                 <label class="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">From</label>
                 <select id="fromAccountInput" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-indigo-400 shadow-sm text-slate-600"></select>
@@ -401,12 +610,62 @@
       </div>
     </main>
 
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 glass-nav p-3 rounded-[2rem] shadow-2xl shadow-purple-200/50 z-50 overflow-x-auto w-[92%] sm:w-auto justify-center">
+    <nav class="desktop-nav fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 glass-nav p-3 rounded-[2rem] shadow-2xl shadow-purple-200/50 z-50 overflow-x-auto w-[92%] sm:w-auto justify-center">
       <button data-tab="dashboard" class="tab-btn active px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all whitespace-nowrap">Overview</button>
       <button data-tab="insights" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Insights</button>
       <button data-tab="budget" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Budget</button>
       <button data-tab="accounts" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Accounts</button>
       <button id="exportCsvBtn" class="px-5 sm:px-6 py-3 rounded-full font-bold text-sm text-teal-500 hover:bg-teal-50 transition-all whitespace-nowrap border-2 border-teal-100 ml-1">Export</button>
+    </nav>
+
+    <nav class="mobile-app-nav" aria-label="Primary">
+      <button data-tab="dashboard" class="tab-btn mobile-nav-btn active" aria-label="Overview">
+        <span class="mobile-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10.5L12 3l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+        </span>
+        <span>Overview</span>
+      </button>
+      <button data-tab="insights" class="tab-btn mobile-nav-btn" aria-label="Insights">
+        <span class="mobile-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19h16"></path>
+            <path d="M6 16l4-4 3 3 5-6"></path>
+          </svg>
+        </span>
+        <span>Insights</span>
+      </button>
+      <button data-tab="budget" class="tab-btn mobile-nav-btn" aria-label="Budget">
+        <span class="mobile-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+            <circle cx="12" cy="12" r="2.5"></circle>
+          </svg>
+        </span>
+        <span>Budget</span>
+      </button>
+      <button data-tab="accounts" class="tab-btn mobile-nav-btn" aria-label="Accounts">
+        <span class="mobile-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9a2 2 0 0 1 2-2h12a4 4 0 0 1 4 4v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"></path>
+            <path d="M16 13h5"></path>
+            <circle cx="16" cy="13" r="0.8" fill="currentColor" stroke="none"></circle>
+          </svg>
+        </span>
+        <span>Accounts</span>
+      </button>
+      <button id="exportCsvBtnMobile" class="mobile-nav-btn export-btn" aria-label="Export CSV">
+        <span class="mobile-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 4v10"></path>
+            <path d="M8 10l4 4 4-4"></path>
+            <path d="M4 20h16"></path>
+          </svg>
+        </span>
+        <span>Export</span>
+      </button>
     </nav>
   </div>
 
@@ -433,14 +692,18 @@
           settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS] },
           customExpenseCategories: [], customIncomeCategories: [],
           accounts: [
-            { id: "acc-cash", name: "Wallet Cash", type: "Cash", currency: "HKD", initialBalance: 1000 },
-            { id: "acc-card", name: "Credit Card", type: "Card", currency: "HKD", initialBalance: 0 }
+            { id: "acc-cash", name: "Wallet Cash", type: "Cash", currency: "HKD", initialBalance: 1000, pin: null },
+            { id: "acc-card", name: "Credit Card", type: "Card", currency: "HKD", initialBalance: 0, pin: null }
           ],
           transactions: []
         };
         const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
         this.state = raw ? JSON.parse(raw) : fallback;
         if (!this.state.selectedMonth) this.state.selectedMonth = fallback.selectedMonth;
+        this.state.accounts = (this.state.accounts || []).map(a => ({
+          ...a,
+          pin: typeof a.pin === "string" && /^\d{4,6}$/.test(a.pin) ? a.pin : null
+        }));
       },
       persist() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.state)); },
       addTransaction(tx) { this.state.transactions.push({ id: Utils.uid(), ...tx }); this.persist(); },
@@ -508,7 +771,10 @@
         const catOpts = CONFIG.DEFAULT_EXPENSE_CATS.map(c => `<option value="${c}">${c}</option>`).join("");
         document.getElementById("categoryInput").innerHTML = catOpts;
         document.getElementById("categoryBudgetSelect").innerHTML = catOpts;
-        document.getElementById("monthPicker").value = Store.state.selectedMonth;
+      },
+      monthPicker() {
+        const label = document.getElementById("monthPickerLabel");
+        if (label) label.textContent = Utils.formatMonthLabel(Store.state.selectedMonth);
       },
       dashboard() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth, document.getElementById("searchInput").value);
@@ -542,12 +808,12 @@
           list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm font-medium">No transactions found for this month.</p>`; return;
         }
         list.innerHTML = txs.sort((a,b) => b.date.localeCompare(a.date)).map(t => `
-          <div class="flex justify-between items-center p-4 bg-white/80 rounded-[1.5rem] border-2 border-slate-50 hover:shadow-md hover:border-purple-100 transition-all">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 p-4 bg-white/80 rounded-[1.5rem] border-2 border-slate-50 hover:shadow-md hover:border-purple-100 transition-all">
             <div>
               <p class="font-bold text-slate-700">${t.category} <span class="text-xs font-semibold text-slate-400 ml-2 bg-slate-100 px-2 py-0.5 rounded-md">${t.date}</span></p>
               <p class="text-sm font-medium text-slate-500 mt-1">${t.note || 'No notes'}${t.type === "expense" ? ` <span class="text-purple-300">•</span> ${CONFIG.SPENDING_MOODS[t.mood || "planned"]}` : ""}</p>
             </div>
-            <div class="text-right flex flex-col items-end">
+            <div class="sm:text-right flex flex-col sm:items-end">
               <p class="font-bold text-lg ${t.type === 'income' ? 'text-emerald-500' : 'text-slate-800'}">
                 ${t.type === 'income' ? '+' : '-'}${Utils.formatMoney(t.amount, t.currency)}
               </p>
@@ -715,12 +981,16 @@
           <div class="glass-card p-6 rounded-[2rem] border-l-[6px] ${a.type === 'Card' ? 'border-l-rose-300' : a.type === 'E-Wallet' ? 'border-l-emerald-300' : 'border-l-blue-300'}">
             <div class="flex justify-between items-start">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 inline-block px-2 py-1 rounded-md">${a.type}</p>
-              <button data-action="edit-account-balance" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-purple-100 hover:text-purple-600 font-bold transition-colors">Edit Balance</button>
+              <div class="flex gap-2">
+                <button data-action="set-account-pin" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 font-bold transition-colors">${a.pin ? "Change PIN" : "Set PIN"}</button>
+                <button data-action="edit-account-balance" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-purple-100 hover:text-purple-600 font-bold transition-colors">Edit Balance</button>
+              </div>
             </div>
             <h4 class="font-bold text-slate-700 text-xl mt-3">${a.name}</h4>
             <div class="overflow-x-auto no-scrollbar pb-1">
                 <p class="text-3xl font-bold text-slate-800 mt-1 whitespace-nowrap">${Utils.formatMoney(bals[a.id], a.currency)}</p>
             </div>
+            <p class="mt-2 text-xs font-bold ${a.pin ? "text-emerald-600" : "text-slate-400"}">PIN: ${a.pin ? "Set" : "Not set"}</p>
           </div>
         `).join("");
       }
@@ -728,6 +998,170 @@
 
     const Events = {
       init() {
+        const ocrStatusEl = document.getElementById("receiptScanStatus");
+        const ocrProgressText = document.getElementById("ocrProgressText");
+        const ocrStageText = document.getElementById("ocrStageText");
+        const ocrProgressBar = document.getElementById("ocrProgressBar");
+        const setOCRStatus = (msg, tone = "neutral") => {
+          if (!ocrStatusEl) return;
+          const toneClass = tone === "error" ? "text-rose-500" : tone === "good" ? "text-emerald-600" : "text-slate-500";
+          ocrStatusEl.className = `mt-2 text-xs font-medium ${toneClass}`;
+          ocrStatusEl.textContent = msg;
+        };
+
+        const setOCRProgress = (pct, stage = "Idle") => {
+          const safePct = Math.max(0, Math.min(100, Number(pct || 0)));
+          if (ocrProgressText) ocrProgressText.textContent = `${Math.round(safePct)}%`;
+          if (ocrStageText) ocrStageText.textContent = stage;
+          if (ocrProgressBar) ocrProgressBar.style.width = `${safePct}%`;
+        };
+
+        const monthPopover = document.getElementById("monthPopover");
+        const monthPickerBtn = document.getElementById("monthPickerBtn");
+        const monthYearLabel = document.getElementById("monthYearLabel");
+        const monthGrid = document.getElementById("monthGrid");
+        const monthPrevYearBtn = document.getElementById("monthPrevYearBtn");
+        const monthNextYearBtn = document.getElementById("monthNextYearBtn");
+        let monthCursorYear = Number((Store.state.selectedMonth || Utils.toMonthValue(new Date())).split("-")[0]);
+
+        const renderMonthGrid = () => {
+          if (!monthGrid || !monthYearLabel) return;
+          monthYearLabel.textContent = `${monthCursorYear}`;
+          monthGrid.innerHTML = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            .map((m, idx) => {
+              const monthNo = String(idx + 1).padStart(2, "0");
+              const value = `${monthCursorYear}-${monthNo}`;
+              const isActive = value === Store.state.selectedMonth;
+              return `<button type="button" data-month-value="${value}" class="month-cell ${isActive ? "active" : ""}">${m}</button>`;
+            })
+            .join("");
+        };
+
+        const closeMonthPopover = () => {
+          if (!monthPopover) return;
+          monthPopover.classList.add("hidden");
+        };
+
+        const openMonthPopover = () => {
+          if (!monthPopover) return;
+          monthCursorYear = Number((Store.state.selectedMonth || Utils.toMonthValue(new Date())).split("-")[0]);
+          renderMonthGrid();
+          monthPopover.classList.remove("hidden");
+        };
+
+        const parseReceiptOCR = (rawText) => {
+          const cleaned = (rawText || "").replace(/\s+/g, " ").trim();
+          const upper = cleaned.toUpperCase();
+
+          const amountCandidates = [];
+          const amountRegexes = [
+            /(?:TOTAL|AMOUNT|HK\$|USD|\$)\s*[:=]?\s*(\d{1,6}(?:[.,]\d{2})?)/gi,
+            /(\d{1,6}(?:[.,]\d{2}))/g
+          ];
+          amountRegexes.forEach((regex, idx) => {
+            let m;
+            while ((m = regex.exec(cleaned)) !== null) {
+              const n = Number((m[1] || "").replace(/,/g, ""));
+              if (!Number.isNaN(n) && n > 0 && n < 1000000) {
+                amountCandidates.push({ value: n, priority: idx === 0 ? 2 : 1 });
+              }
+            }
+          });
+          amountCandidates.sort((a, b) => b.priority - a.priority || b.value - a.value);
+
+          const dateMatch = cleaned.match(/(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})/) || cleaned.match(/(\d{1,2})[-/.](\d{1,2})[-/.](20\d{2})/);
+          let parsedDate = "";
+          if (dateMatch) {
+            if (dateMatch[1].length === 4) {
+              const y = dateMatch[1];
+              const m = dateMatch[2].padStart(2, "0");
+              const d = dateMatch[3].padStart(2, "0");
+              parsedDate = `${y}-${m}-${d}`;
+            } else {
+              const d = dateMatch[1].padStart(2, "0");
+              const m = dateMatch[2].padStart(2, "0");
+              const y = dateMatch[3];
+              parsedDate = `${y}-${m}-${d}`;
+            }
+          }
+
+          const categoryKeywords = {
+            Food: ["RESTAURANT", "CAFE", "TEA", "LUNCH", "DINNER", "FOOD", "BAKERY", "UBER EATS", "DELIVEROO"],
+            Transport: ["MTR", "TAXI", "UBER", "BUS", "TRAIN", "FERRY", "TRANSPORT"],
+            Shopping: ["MARKET", "STORE", "MALL", "SHOP", "SUPERMARKET", "WATSONS", "PARKNSHOP", "WELLCOME"],
+            Entertainment: ["MOVIE", "CINEMA", "NETFLIX", "SPOTIFY", "GAME"],
+            Bills: ["UTILITY", "BILL", "ELECTRIC", "WATER", "GAS", "PHONE", "INTERNET"],
+            Healthcare: ["CLINIC", "HOSPITAL", "PHARMACY", "MEDICAL", "DENTAL"]
+          };
+
+          let guessedCategory = "Other";
+          Object.entries(categoryKeywords).some(([category, keywords]) => {
+            const matched = keywords.some(keyword => upper.includes(keyword));
+            if (matched) guessedCategory = category;
+            return matched;
+          });
+
+          const firstLine = (rawText || "").split("\n").map(v => v.trim()).find(v => v.length > 2) || "";
+
+          return {
+            amount: amountCandidates[0]?.value || null,
+            date: parsedDate,
+            note: firstLine,
+            category: guessedCategory
+          };
+        };
+
+        const handleReceiptOCR = async (file) => {
+          if (!file) return;
+          if (typeof Tesseract === "undefined") {
+            setOCRStatus("OCR library failed to load. Please refresh and try again.", "error");
+            setOCRProgress(0, "Unavailable");
+            return;
+          }
+
+          setOCRStatus("Scanning receipt... this may take a few seconds.");
+          setOCRProgress(5, "Preparing");
+          try {
+            const result = await Tesseract.recognize(file, "eng", {
+              logger: ({ status, progress }) => {
+                const pct = Math.round((progress || 0) * 100);
+                const stageMap = {
+                  loading: "Loading",
+                  initializing: "Initializing",
+                  "recognizing text": "Recognizing"
+                };
+                setOCRProgress(pct, stageMap[status] || "Processing");
+                if (status === "recognizing text") setOCRStatus(`Scanning receipt... ${pct}%`);
+              }
+            });
+
+            const parsed = parseReceiptOCR(result?.data?.text || "");
+            const amountInput = document.getElementById("amountInput");
+            const dateInput = document.getElementById("dateInput");
+            const noteInput = document.getElementById("noteInput");
+            const categoryInput = document.getElementById("categoryInput");
+            const typeInput = document.getElementById("typeInput");
+
+            typeInput.value = "expense";
+            typeInput.dispatchEvent(new Event("change"));
+
+            if (parsed.amount) amountInput.value = parsed.amount.toFixed(2);
+            if (parsed.date) dateInput.value = parsed.date;
+            if (parsed.note) noteInput.value = parsed.note;
+
+            const categoryOptions = Array.from(categoryInput.options).map(o => o.value);
+            categoryInput.value = categoryOptions.includes(parsed.category) ? parsed.category : "Other";
+
+            const filledCount = [parsed.amount, parsed.date, parsed.note].filter(Boolean).length;
+            if (filledCount === 0) setOCRStatus("Scan complete, but no reliable fields were found. You can still enter manually.", "error");
+            else setOCRStatus("Scan complete. Fields were prefilled, please review before saving.", "good");
+            setOCRProgress(100, "Complete");
+          } catch (err) {
+            setOCRStatus("OCR failed for this image. Try a clearer, well-lit receipt photo.", "error");
+            setOCRProgress(0, "Failed");
+          }
+        };
+
         const syncMoodEmojiBadge = () => {
           const mood = document.getElementById("moodInput").value;
           document.getElementById("moodEmojiBadge").textContent = { planned: "🤓", hesitant: "😣", impulse: "🤯" }[mood] || "🤓";
@@ -746,9 +1180,9 @@
           btn.addEventListener("click", () => {
             const tab = btn.dataset.tab;
             document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
-            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-btn[data-tab]").forEach(b => b.classList.remove("active"));
             document.getElementById(`tab-${tab}`).classList.remove("hidden");
-            btn.classList.add("active");
+            document.querySelectorAll(`.tab-btn[data-tab="${tab}"]`).forEach(b => b.classList.add("active"));
             if (tab === 'insights') Render.insights(); if (tab === 'budget') Render.budget(); if (tab === 'accounts') Render.accounts();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           });
@@ -764,6 +1198,36 @@
         document.getElementById("cancelEditBtn").addEventListener("click", (e) => { e.preventDefault(); const form = document.getElementById("transactionForm"); form.reset(); delete form.dataset.editId; document.getElementById("moodInput").value = "planned"; document.getElementById("dateInput").value = Utils.formatISO(new Date()); document.getElementById("transactionSubmitBtn").textContent = "Save Transaction"; e.target.classList.add("hidden"); syncTransactionTypeUI(); });
         document.getElementById("typeInput").addEventListener("change", syncTransactionTypeUI);
         document.getElementById("moodInput").addEventListener("change", syncMoodEmojiBadge);
+        document.getElementById("receiptScanBtn").addEventListener("click", () => document.getElementById("receiptImageInput").click());
+        document.getElementById("receiptImageInput").addEventListener("change", async (e) => {
+          const file = e.target.files?.[0];
+          await handleReceiptOCR(file);
+          e.target.value = "";
+        });
+        if (monthPickerBtn) monthPickerBtn.addEventListener("click", () => {
+          if (monthPopover?.classList.contains("hidden")) openMonthPopover();
+          else closeMonthPopover();
+        });
+        if (monthPrevYearBtn) monthPrevYearBtn.addEventListener("click", () => { monthCursorYear -= 1; renderMonthGrid(); });
+        if (monthNextYearBtn) monthNextYearBtn.addEventListener("click", () => { monthCursorYear += 1; renderMonthGrid(); });
+        if (monthGrid) {
+          monthGrid.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-month-value]");
+            if (!btn) return;
+            Store.state.selectedMonth = btn.dataset.monthValue;
+            Store.persist();
+            Render.monthPicker();
+            Render.dashboard();
+            if (!document.getElementById("tab-insights").classList.contains("hidden")) Render.insights();
+            if (!document.getElementById("tab-budget").classList.contains("hidden")) Render.budget();
+            closeMonthPopover();
+          });
+        }
+        document.addEventListener("click", (e) => {
+          if (!monthPopover || monthPopover.classList.contains("hidden")) return;
+          if (monthPopover.contains(e.target) || monthPickerBtn?.contains(e.target)) return;
+          closeMonthPopover();
+        });
         
         document.getElementById("transferForm").addEventListener("submit", (e) => {
           e.preventDefault(); const amt = document.getElementById("transferAmount").value, from = document.getElementById("fromAccountInput").value, to = document.getElementById("toAccountInput").value;
@@ -776,7 +1240,7 @@
 
         document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value); Store.persist(); Render.budget(); alert("Limit updated."); });
         document.getElementById("categoryBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); const cat = document.getElementById("categoryBudgetSelect").value, amt = Number(document.getElementById("categoryBudgetAmount").value); if(amt <= 0) delete Store.state.settings.categoryBudgets[cat]; else Store.state.settings.categoryBudgets[cat] = amt; Store.persist(); Render.budget(); document.getElementById("categoryBudgetAmount").value = ""; });
-        document.getElementById("addAccountForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.accounts.push({ id: Utils.uid(), name: document.getElementById("newAccountName").value, type: document.getElementById("newAccountType").value, currency: document.getElementById("newAccountCurrency").value, initialBalance: Number(document.getElementById("newAccountBalance").value || 0) }); Store.persist(); e.target.reset(); Render.dropdowns(); Render.accounts(); });
+        document.getElementById("addAccountForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.accounts.push({ id: Utils.uid(), name: document.getElementById("newAccountName").value, type: document.getElementById("newAccountType").value, currency: document.getElementById("newAccountCurrency").value, initialBalance: Number(document.getElementById("newAccountBalance").value || 0), pin: null }); Store.persist(); e.target.reset(); Render.dropdowns(); Render.accounts(); });
 
         document.addEventListener("click", (e) => {
           const btn = e.target.closest("button[data-action]"); if (!btn) return; const act = btn.dataset.action;
@@ -807,15 +1271,50 @@
               Render.dashboard(); 
             }
           }
+          else if (act === "set-account-pin") {
+            const acc = Store.state.accounts.find(a => a.id === btn.dataset.id);
+            if (!acc) return;
+
+            const input = prompt(
+              acc.pin
+                ? `Set a new PIN for ${acc.name} (4-6 digits). Type CLEAR to remove PIN.`
+                : `Create a PIN for ${acc.name} (4-6 digits).`,
+              ""
+            );
+            if (input === null) return;
+            const value = input.trim();
+            if (!value) return;
+
+            if (value.toUpperCase() === "CLEAR") {
+              acc.pin = null;
+              Store.persist();
+              Render.accounts();
+              alert("PIN removed.");
+              return;
+            }
+
+            if (!/^\d{4,6}$/.test(value)) {
+              alert("PIN must be 4 to 6 digits.");
+              return;
+            }
+
+            acc.pin = value;
+            Store.persist();
+            Render.accounts();
+            alert("PIN saved.");
+          }
         });
 
         document.getElementById("searchInput").addEventListener("input", () => Render.dashboard());
-        document.getElementById("monthPicker").addEventListener("change", (e) => { Store.state.selectedMonth = e.target.value; Store.persist(); Render.dashboard(); if (!document.getElementById("tab-insights").classList.contains("hidden")) Render.insights(); if (!document.getElementById("tab-budget").classList.contains("hidden")) Render.budget(); });
-        document.getElementById("exportCsvBtn").addEventListener("click", () => {
+        const exportCsv = () => {
           const csv = ["Date,Category,Type,Mood,Amount,Currency,Note"];
           Store.state.transactions.forEach(t => csv.push(`${t.date},${t.category},${t.type},${t.mood || ""},${t.amount},${t.currency},"${t.note || ''}"`));
           const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" })); a.download = `PocketHK_${Store.state.selectedMonth}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        });
+        };
+        const exportDesktopBtn = document.getElementById("exportCsvBtn");
+        const exportMobileBtn = document.getElementById("exportCsvBtnMobile");
+        if (exportDesktopBtn) exportDesktopBtn.addEventListener("click", exportCsv);
+        if (exportMobileBtn) exportMobileBtn.addEventListener("click", exportCsv);
 
         syncTransactionTypeUI(); syncMoodEmojiBadge();
       }
@@ -827,11 +1326,17 @@
       toMonthValue: (date) => { const offset = date.getTimezoneOffset() * 60000; return new Date(date.getTime() - offset).toISOString().slice(0, 7); },
       previousMonth: (monthValue) => { const [year, month] = monthValue.split("-").map(Number); const d = new Date(year, month - 1, 1); d.setMonth(d.getMonth() - 1); return Utils.toMonthValue(d); },
       toHKD: (amt, cur) => Number(amt || 0) * (CONFIG.FX_TO_HKD[cur] || 1),
-      formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val)
+      formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val),
+      formatMonthLabel: (monthValue) => {
+        const [y, m] = (monthValue || Utils.toMonthValue(new Date())).split("-").map(Number);
+        const d = new Date(y, (m || 1) - 1, 1);
+        return d.toLocaleDateString("en-HK", { month: "short", year: "numeric" });
+      }
     };
 
     document.addEventListener("DOMContentLoaded", () => {
       Store.init(); Events.init(); Render.all();
+      Render.monthPicker();
       document.getElementById("dateInput").value = Utils.formatISO(new Date()); document.getElementById("moodInput").value = "planned";
     });
   </script>
