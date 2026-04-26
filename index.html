@@ -205,6 +205,227 @@
       padding: 1rem;
     }
 
+    .notify-panel {
+      position: absolute;
+      top: calc(100% + 0.55rem);
+      right: 0;
+      width: min(24rem, calc(100vw - 2rem));
+      max-height: 22rem;
+      overflow: auto;
+      background: rgba(255, 255, 255, 0.96);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 1rem;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+      padding: 0.75rem;
+      z-index: 70;
+    }
+
+    .notify-item {
+      border: 2px solid #f1f5f9;
+      background: #ffffff;
+      border-radius: 0.9rem;
+      padding: 0.6rem 0.7rem;
+    }
+
+    .todo-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.55rem;
+      border: 2px solid #eef2ff;
+      border-radius: 0.8rem;
+      padding: 0.5rem 0.55rem;
+      background: #fafaff;
+    }
+
+    .todo-row.done .todo-text {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .wizard-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .wizard-step {
+      border: 2px solid #e2e8f0;
+      border-radius: 0.8rem;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.45rem 0.5rem;
+      text-align: center;
+    }
+
+    .wizard-step.active {
+      border-color: #8b5cf6;
+      background: #f3e8ff;
+      color: #6d28d9;
+    }
+
+    .wizard-step.done {
+      border-color: #34d399;
+      background: #ecfdf5;
+      color: #0f766e;
+    }
+
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.55rem;
+    }
+
+    .wizard-nav button {
+      border-radius: 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.55rem 0.8rem;
+      border: 2px solid #e2e8f0;
+      background: #ffffff;
+      color: #475569;
+    }
+
+    .wizard-nav button.primary {
+      border-color: #8b5cf6;
+      background: #8b5cf6;
+      color: #ffffff;
+    }
+
+    .entry-shell {
+      border: 2px solid #efe9ff;
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(243, 232, 255, 0.72));
+      border-radius: 2rem;
+      padding: clamp(1rem, 2vw, 1.35rem);
+      box-shadow: 0 14px 34px rgba(76, 29, 149, 0.08);
+    }
+
+    .entry-panel {
+      border: 2px solid #ede9fe;
+      border-radius: 1.4rem;
+      background: #ffffff;
+      padding: 0.95rem;
+    }
+
+    .entry-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7c3aed;
+    }
+
+    .entry-form-wrap {
+      border: 2px solid #f1f5f9;
+      border-radius: 1.4rem;
+      background: #ffffff;
+      padding: 0.95rem;
+    }
+
+    .entry-field {
+      border: 2px solid #e2e8f0;
+      border-radius: 0.95rem;
+      background: #ffffff;
+      padding: 0.78rem 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #475569;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .entry-field:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.14);
+    }
+
+    .entry-submit {
+      width: 100%;
+      border-radius: 1rem;
+      border: 2px solid #7c3aed;
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 0.82rem 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .entry-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(124, 58, 237, 0.28);
+    }
+
+    .entry-submit:active {
+      transform: scale(0.99);
+    }
+
+    .ocr-magic {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.55rem 0.65rem;
+      border: 2px solid #ddd6fe;
+      border-radius: 0.95rem;
+      background: #f5f3ff;
+      margin-top: 0.55rem;
+    }
+
+    .ocr-orb {
+      position: relative;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #c4b5fd, #8b5cf6);
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.35);
+      animation: ocrPulse 1.8s ease-out infinite;
+      flex-shrink: 0;
+    }
+
+    .ocr-orb::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes ocrPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.35);
+      }
+      100% {
+        box-shadow: 0 0 0 11px rgba(139, 92, 246, 0);
+      }
+    }
+
+    .template-chip {
+      border: 2px solid #ddd6fe;
+      background: #faf5ff;
+      color: #6d28d9;
+      border-radius: 999px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .template-chip:hover {
+      background: #ede9fe;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ocr-orb {
+        animation: none;
+      }
+    }
+
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -297,7 +518,27 @@
       }
 
       #recordTransactionSection {
-        padding: 1.25rem;
+        padding: 1rem;
+      }
+
+      .entry-shell {
+        border-radius: 1.35rem;
+        padding: 0.75rem;
+      }
+
+      .entry-panel,
+      .entry-form-wrap {
+        border-radius: 1rem;
+        padding: 0.72rem;
+      }
+
+      .wizard-steps {
+        gap: 0.35rem;
+      }
+
+      .wizard-step {
+        font-size: 0.68rem;
+        padding: 0.42rem 0.34rem;
       }
 
       #tab-insights .h-64 {
@@ -336,6 +577,10 @@
       #tab-insights .h-52 {
         height: 15.5rem;
       }
+
+      .entry-shell {
+        padding: 0.95rem;
+      }
     }
   </style>
 </head>
@@ -346,20 +591,50 @@
         <h1 class="text-3xl font-bold tracking-tight text-slate-800">PocketHK <span class="text-xl">🌸</span></h1>
         <p id="appTagline" class="text-sm text-slate-500 font-medium" data-i18n-key="tagline">Smart Budgeting · Local First</p>
       </div>
-      <div class="relative w-full sm:w-auto">
-        <button type="button" id="monthPickerBtn" class="w-full sm:w-auto inline-flex items-center justify-between gap-2 rounded-full border-2 border-white bg-white/80 px-5 py-2 text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all text-slate-600">
-          <span id="monthPickerLabel">Month</span>
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 9l6 6 6-6"></path>
-          </svg>
-        </button>
-        <div id="monthPopover" class="month-popover hidden absolute right-0 top-full mt-2 rounded-2xl p-4 z-40">
-          <div class="flex items-center justify-between mb-3">
-            <button type="button" id="monthPrevYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&lt;</button>
-            <p id="monthYearLabel" class="text-sm font-bold text-slate-700">2026</p>
-            <button type="button" id="monthNextYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&gt;</button>
+      <div class="flex w-full sm:w-auto items-center gap-2">
+        <div class="relative w-full sm:w-auto">
+          <button type="button" id="monthPickerBtn" class="w-full sm:w-auto inline-flex items-center justify-between gap-2 rounded-full border-2 border-white bg-white/80 px-5 py-2 text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all text-slate-600">
+            <span id="monthPickerLabel">Month</span>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6"></path>
+            </svg>
+          </button>
+          <div id="monthPopover" class="month-popover hidden absolute right-0 top-full mt-2 rounded-2xl p-4 z-40">
+            <div class="flex items-center justify-between mb-3">
+              <button type="button" id="monthPrevYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&lt;</button>
+              <p id="monthYearLabel" class="text-sm font-bold text-slate-700">2026</p>
+              <button type="button" id="monthNextYearBtn" class="h-8 w-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold">&gt;</button>
+            </div>
+            <div id="monthGrid" class="grid grid-cols-3 gap-2"></div>
           </div>
-          <div id="monthGrid" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <div class="relative shrink-0">
+          <button type="button" id="notifyBtn" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-white/80 text-slate-600 shadow-sm transition-all hover:text-purple-600" aria-label="Notifications">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+              <path d="M10 17a2 2 0 0 0 4 0"></path>
+            </svg>
+            <span id="notifyCount" class="absolute -right-1 -top-1 min-w-[1.2rem] rounded-full bg-rose-500 px-1 py-0.5 text-[10px] font-bold leading-none text-white hidden">0</span>
+          </button>
+          <div id="notifyPanel" class="notify-panel hidden">
+            <div class="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+              <p class="text-xs font-bold uppercase tracking-widest text-slate-500" data-i18n-key="notify_title">Alerts & To-Do</p>
+              <span id="notifySummary" class="text-[11px] font-bold text-slate-400">0</span>
+            </div>
+            <form id="todoQuickForm" class="mb-2 flex items-center gap-2">
+              <input id="todoQuickInput" type="text" maxlength="120" data-i18n-placeholder-key="todo_input_placeholder" placeholder="Add a to-do..." class="flex-1 rounded-xl border-2 border-slate-100 bg-white px-3 py-2 text-xs font-bold text-slate-600 outline-none focus:border-purple-400">
+              <button id="todoQuickAddBtn" type="submit" class="rounded-xl bg-purple-500 px-3 py-2 text-xs font-bold text-white hover:bg-purple-600" data-i18n-key="todo_add_btn">Add</button>
+            </form>
+            <div class="mb-2">
+              <p class="mb-1 text-[11px] font-bold uppercase tracking-widest text-rose-500" data-i18n-key="notify_auto_alerts">Auto Alerts</p>
+              <div id="notifyList" class="space-y-2"></div>
+            </div>
+            <div>
+              <p class="mb-1 text-[11px] font-bold uppercase tracking-widest text-indigo-500" data-i18n-key="notify_my_todos">My To-Do</p>
+              <div id="todoList" class="space-y-2"></div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -367,87 +642,120 @@
     <main id="tab-dashboard" class="tab-panel space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="glass-card rounded-[2rem] p-6 overflow-hidden">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Net Worth</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="dash_total_net_worth">Total Net Worth</p>
           <div class="overflow-x-auto no-scrollbar pb-1">
              <h2 id="totalBalance" class="text-4xl font-bold text-slate-800 mt-2 whitespace-nowrap">$0.00</h2>
           </div>
         </div>
         <div class="glass-card rounded-[2rem] p-6 overflow-hidden">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Monthly Budget</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="dash_monthly_budget">Monthly Budget</p>
           <div class="flex items-end gap-2 mt-2">
             <h2 id="monthlyBudgetUsage" class="text-4xl font-bold text-slate-800">0%</h2>
-            <p id="budgetStatusText" class="text-xs text-slate-400 mb-2 font-medium">of limit</p>
+            <p id="budgetStatusText" class="text-xs text-slate-400 mb-2 font-medium" data-i18n-key="dash_of_limit">of limit</p>
           </div>
           <div class="w-full h-3 bg-slate-100 rounded-full mt-3 overflow-hidden shadow-inner">
             <div id="monthProgressBar" class="h-full bg-purple-400 transition-all duration-500 rounded-full" style="width: 0%"></div>
           </div>
         </div>
         <div class="glass-card rounded-[2rem] p-6 overflow-hidden">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Net Flow (This Month)</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="dash_net_flow_month">Net Flow (This Month)</p>
           <div class="overflow-x-auto no-scrollbar pb-1">
              <h2 id="netFlow" class="text-4xl font-bold text-slate-800 mt-2 whitespace-nowrap">$0.00</h2>
           </div>
-          <p id="netFlowSub" class="text-xs text-slate-400 mt-1 font-medium">Income vs Expense</p>
+          <p id="netFlowSub" class="text-xs text-slate-400 mt-1 font-medium" data-i18n-key="dash_income_vs_expense">Income vs Expense</p>
         </div>
       </div>
 
       <section class="grid grid-cols-1 gap-6">
-        <div class="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between w-full max-w-3xl mx-auto shadow-lg shadow-purple-100/50" id="recordTransactionSection">
-          <div class="flex justify-between items-center mb-6">
-             <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-purple-100 p-2 rounded-xl">✨</span> Record Transaction</h3>
-             <button id="cancelEditBtn" class="hidden text-xs font-bold text-slate-400 hover:text-slate-600 underline">Cancel Edit</button>
-          </div>
-          <div class="mb-4 rounded-2xl border-2 border-purple-100 bg-purple-50/60 p-3.5">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <p class="text-xs sm:text-sm font-bold text-purple-700">Receipt OCR Auto Entry</p>
-              <button type="button" id="receiptScanBtn" class="rounded-xl bg-purple-500 px-3.5 py-2 text-xs font-bold text-white hover:bg-purple-600 transition-colors w-full sm:w-auto">Scan Receipt</button>
-            </div>
-            <input type="file" id="receiptImageInput" accept="image/*" capture="environment" class="hidden">
-            <p id="receiptScanStatus" class="mt-2 text-xs font-medium text-slate-500">Upload a receipt photo to prefill amount, date, note, and category.</p>
-            <div class="mt-3 space-y-1.5">
-              <div class="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                <span id="ocrStageText">Idle</span>
-                <span id="ocrProgressText">0%</span>
+        <div class="glass-card rounded-[2.5rem] p-6 sm:p-7 w-full max-w-4xl mx-auto shadow-lg shadow-purple-100/50" id="recordTransactionSection">
+          <div class="entry-shell grid grid-cols-1 lg:grid-cols-[300px,1fr] gap-4">
+            <aside class="entry-panel space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <p class="entry-kicker" data-i18n-key="entry_fast_lane">Record with AI</p>
+                  <h3 class="text-base font-bold text-slate-700" data-i18n-key="ocr_title">Auto Mode</h3>
+                </div>
               </div>
-              <div class="ocr-progress-track">
-                <div id="ocrProgressBar" class="ocr-progress-bar"></div>
+              <button type="button" id="receiptScanBtn" class="w-full rounded-xl bg-purple-500 px-3.5 py-2.5 text-sm font-bold text-white hover:bg-purple-600 transition-colors" data-i18n-key="ocr_scan_btn">Scan Receipt</button>
+              <input type="file" id="receiptImageInput" accept="image/*" capture="environment" class="hidden">
+
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                  <span id="ocrStageText">Idle</span>
+                  <span id="ocrProgressText">0%</span>
+                </div>
+                <div class="ocr-progress-track">
+                  <div id="ocrProgressBar" class="ocr-progress-bar"></div>
+                </div>
               </div>
+            </aside>
+
+            <div class="entry-form-wrap">
+              <div class="flex items-center justify-between gap-3 mb-3">
+                <div>
+                  <p class="entry-kicker" data-i18n-key="entry_manual_lane">Manual Entry</p>
+                  <h3 class="text-lg font-bold text-slate-700" data-i18n-key="dash_record_transaction">Record Transaction</h3>
+                </div>
+                <button id="cancelEditBtn" class="hidden text-xs font-bold text-slate-400 hover:text-slate-600 underline" data-i18n-key="dash_cancel_edit">Cancel Edit</button>
+              </div>
+
+              <div class="mb-3 rounded-xl border-2 border-indigo-100 bg-indigo-50/60 p-2.5" data-form-step="1">
+                <p class="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-indigo-500" data-i18n-key="smart_templates_title">Smart Templates</p>
+                <div id="smartTemplateChips" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+              </div>
+
+              <form id="transactionForm" class="space-y-3">
+                <div id="transactionWizardSteps" class="wizard-steps" aria-label="Transaction wizard">
+                  <div class="wizard-step active" data-step="1" data-i18n-key="wizard_step_1">1. Type</div>
+                  <div class="wizard-step" data-step="2" data-i18n-key="wizard_step_2">2. Amount</div>
+                  <div class="wizard-step" data-step="3" data-i18n-key="wizard_step_3">3. Review</div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-form-step="1">
+                  <select id="typeInput" class="entry-field">
+                    <option value="expense">📉 Expense</option>
+                    <option value="income">📈 Income</option>
+                  </select>
+                  <select id="categoryInput" class="entry-field"></select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-form-step="2">
+                  <input type="number" id="amountInput" placeholder="Amount" data-i18n-placeholder-key="input_amount" step="0.01" required class="entry-field">
+                  <select id="currencyInput" class="entry-field"></select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-form-step="3">
+                  <input type="date" id="dateInput" required class="entry-field">
+                  <select id="accountInput" class="entry-field"></select>
+                </div>
+
+                <div id="moodWrap" class="grid grid-cols-[54px,1fr] gap-3 items-center" data-form-step="3">
+                  <div id="moodEmojiBadge" class="h-12 w-12 rounded-xl border-2 border-slate-100 bg-white flex items-center justify-center text-2xl">🤓</div>
+                  <select id="moodInput" class="entry-field">
+                    <option value="planned">🤓 Planned Purchase</option>
+                    <option value="hesitant">😣 Hesitant Purchase</option>
+                    <option value="impulse">🤯 Impulse Purchase</option>
+                  </select>
+                </div>
+
+                <input type="text" id="noteInput" data-form-step="3" placeholder="Note (optional) 💭" data-i18n-placeholder-key="input_note_optional" class="entry-field">
+
+                <div class="wizard-nav">
+                  <button type="button" id="wizardPrevBtn" data-i18n-key="wizard_prev">Back</button>
+                  <button type="button" id="wizardNextBtn" class="primary" data-i18n-key="wizard_next">Next</button>
+                </div>
+
+                <button type="submit" id="transactionSubmitBtn" class="hidden entry-submit" data-i18n-key="btn_save_transaction">Save Transaction</button>
+              </form>
             </div>
           </div>
-          <form id="transactionForm" class="space-y-4 h-full flex flex-col justify-center">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input type="number" id="amountInput" placeholder="Amount" step="0.01" required class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none shadow-sm">
-              <select id="currencyInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <select id="typeInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600">
-                <option value="expense">📉 Expense</option>
-                <option value="income">📈 Income</option>
-              </select>
-              <select id="categoryInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input type="date" id="dateInput" required class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600">
-              <select id="accountInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600"></select>
-            </div>
-            <div id="moodWrap" class="grid grid-cols-[54px,1fr] gap-4 items-center">
-              <div id="moodEmojiBadge" class="h-12 w-12 rounded-2xl border-2 border-slate-100 bg-white flex items-center justify-center text-2xl shadow-sm">🤓</div>
-              <select id="moodInput" class="rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 shadow-sm text-slate-600">
-                <option value="planned">🤓 Planned Purchase</option>
-                <option value="hesitant">😣 Hesitant Purchase</option>
-                <option value="impulse">🤯 Impulse Purchase</option>
-              </select>
-            </div>
-            <input type="text" id="noteInput" placeholder="Note (optional) 💭" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 shadow-sm">
-            <button type="submit" id="transactionSubmitBtn" class="w-full py-4 bg-purple-500 text-white rounded-2xl font-bold text-lg hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-200 transition-all mt-4 transform active:scale-[0.98]">Save Transaction</button>
-          </form>
         </div>
       </section>
 
       <section class="glass-card rounded-[2.5rem] p-6">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
-          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">📜</span> Transaction History</h3>
-          <input type="text" id="searchInput" placeholder="Search notes or categories... 🔍" class="text-sm font-medium border-2 border-white bg-white/60 px-5 py-2.5 rounded-full outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 w-full sm:w-72 shadow-sm text-slate-600">
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">📜</span> <span data-i18n-key="dash_transaction_history">Transaction History</span></h3>
+          <input type="text" id="searchInput" placeholder="Search notes or categories... 🔍" data-i18n-placeholder-key="search_notes_or_categories" class="text-sm font-medium border-2 border-white bg-white/60 px-5 py-2.5 rounded-full outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 w-full sm:w-72 shadow-sm text-slate-600">
         </div>
         <div id="historyList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
       </section>
@@ -456,20 +764,20 @@
     <main id="tab-insights" class="tab-panel hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="glass-card rounded-[2rem] p-6">
-          <p class="insight-title mb-1">Composition</p>
-          <h3 class="font-bold text-slate-700 mb-4 text-lg">Expense Breakdown</h3>
+          <p class="insight-title mb-1" data-i18n-key="ins_composition">Composition</p>
+          <h3 class="font-bold text-slate-700 mb-4 text-lg" data-i18n-key="ins_expense_breakdown">Expense Breakdown</h3>
           <div class="h-52"><canvas id="expensePieChart"></canvas></div>
           <div class="insight-divider mt-4 pt-4">
-            <h4 class="font-bold text-slate-600 mb-2">Details</h4>
+            <h4 class="font-bold text-slate-600 mb-2" data-i18n-key="ins_details">Details</h4>
             <div id="insightExpenseList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
           </div>
         </div>
         <div class="glass-card rounded-[2rem] p-6">
-          <p class="insight-title mb-1">Composition</p>
-          <h3 class="font-bold text-slate-700 mb-4 text-lg">Income Breakdown</h3>
+          <p class="insight-title mb-1" data-i18n-key="ins_composition">Composition</p>
+          <h3 class="font-bold text-slate-700 mb-4 text-lg" data-i18n-key="ins_income_breakdown">Income Breakdown</h3>
           <div class="h-52"><canvas id="incomePieChart"></canvas></div>
           <div class="insight-divider mt-4 pt-4">
-            <h4 class="font-bold text-slate-600 mb-2">Details</h4>
+            <h4 class="font-bold text-slate-600 mb-2" data-i18n-key="ins_details">Details</h4>
             <div id="insightIncomeList" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
           </div>
         </div>
@@ -477,8 +785,8 @@
 
       <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
         <div class="flex flex-col gap-1">
-          <p class="insight-title">Core Overview</p>
-          <h3 class="font-bold text-slate-800 text-lg">Trend Forecast</h3>
+          <p class="insight-title" data-i18n-key="ins_core_overview">Core Overview</p>
+          <h3 class="font-bold text-slate-800 text-lg" data-i18n-key="ins_trend_forecast">Trend Forecast</h3>
         </div>
         <div id="budgetOverviewLayout" class="grid grid-cols-1 gap-6 items-stretch">
           <div class="md:col-span-6 h-56 md:h-64">
@@ -486,35 +794,35 @@
           </div>
           <div class="md:col-span-3 insight-divider md:border-t-0 md:border-l border-dashed border-slate-200 pt-3 md:pt-0 md:pl-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-3">
             <div>
-              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Est. Income</p>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="ins_est_income">Est. Income</p>
               <h4 id="predictIncome" class="text-xl sm:text-2xl font-bold text-emerald-500 mt-1">$0.00</h4>
             </div>
             <div>
-              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Est. Expense</p>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="ins_est_expense">Est. Expense</p>
               <h4 id="predictExpense" class="text-xl sm:text-2xl font-bold text-rose-400 mt-1">$0.00</h4>
             </div>
             <div>
-              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Est. Net Flow</p>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="ins_est_net_flow">Est. Net Flow</p>
               <h4 id="predictNet" class="text-xl sm:text-2xl font-bold text-purple-500 mt-1">$0.00</h4>
             </div>
           </div>
           <div class="md:col-span-3 rounded-2xl border-2 border-slate-100 bg-white/50 px-4 py-3 md:py-4 overflow-hidden min-w-0 shadow-sm">
-            <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">This Week Forecast</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="ins_week_forecast">This Week Forecast</p>
             <div class="mt-3 space-y-2 text-sm font-medium">
               <div class="flex justify-between items-center gap-2">
-                <span class="text-slate-500">Basis</span>
-                <span id="forecastBasis" class="font-bold text-slate-700 text-right bg-slate-100 px-2 py-0.5 rounded-md">Rolling 7 days</span>
+                <span class="text-slate-500" data-i18n-key="ins_basis">Basis</span>
+                <span id="forecastBasis" class="font-bold text-slate-700 text-right bg-slate-100 px-2 py-0.5 rounded-md" data-i18n-key="ins_rolling_7_days">Rolling 7 days</span>
               </div>
               <div class="flex justify-between items-center gap-2">
-                <span class="text-slate-500">Expense</span>
+                <span class="text-slate-500" data-i18n-key="ins_expense">Expense</span>
                 <span id="forecastExpenseData" class="font-bold text-rose-400 text-right whitespace-nowrap">$0.00</span>
               </div>
               <div class="flex justify-between items-center gap-2">
-                <span class="text-slate-500">Income</span>
+                <span class="text-slate-500" data-i18n-key="ins_income">Income</span>
                 <span id="forecastIncomeData" class="font-bold text-emerald-500 text-right whitespace-nowrap">$0.00</span>
               </div>
               <div class="flex justify-between items-center gap-2">
-                <span class="text-slate-500">Net</span>
+                <span class="text-slate-500" data-i18n-key="ins_net">Net</span>
                 <span id="forecastNetData" class="font-bold text-purple-500 text-right whitespace-nowrap">$0.00</span>
               </div>
             </div>
@@ -524,21 +832,21 @@
       
       <div class="glass-card rounded-[2.5rem] p-6 space-y-6">
         <div>
-          <p class="insight-title mb-1">Behavior</p>
-          <h3 class="font-bold text-slate-800 text-lg">Spending Mindset Analysis</h3>
+          <p class="insight-title mb-1" data-i18n-key="ins_behavior">Behavior</p>
+          <h3 class="font-bold text-slate-800 text-lg" data-i18n-key="ins_spending_mindset_analysis">Spending Mindset Analysis</h3>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 class="font-bold text-slate-600 mb-3">Mindset Share</h4>
+            <h4 class="font-bold text-slate-600 mb-3" data-i18n-key="ins_mindset_share">Mindset Share</h4>
             <div class="h-64"><canvas id="spendingMoodChart"></canvas></div>
           </div>
           <div>
-            <h4 class="font-bold text-slate-600 mb-3">Category Mix</h4>
+            <h4 class="font-bold text-slate-600 mb-3" data-i18n-key="ins_category_mix">Category Mix</h4>
             <div class="h-64"><canvas id="moodCategoryChart"></canvas></div>
           </div>
         </div>
         <div class="insight-divider pt-4">
-          <h4 class="font-bold text-slate-600 mb-3">Summary</h4>
+          <h4 class="font-bold text-slate-600 mb-3" data-i18n-key="ins_summary">Summary</h4>
           <div id="behaviorInsightCard" class="space-y-3 text-sm text-slate-600 font-medium"></div>
         </div>
       </div>
@@ -547,15 +855,15 @@
     <main id="tab-budget" class="tab-panel hidden space-y-6">
       <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
         <div>
-          <p class="insight-title mb-1">Budget Overview</p>
-          <h3 class="font-bold text-slate-800 text-lg">Rules and Status</h3>
+          <p class="insight-title mb-1" data-i18n-key="bud_overview">Budget Overview</p>
+          <h3 class="font-bold text-slate-800 text-lg" data-i18n-key="bud_rules_status">Rules and Status</h3>
         </div>
         <div id="budgetOverviewLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           <div id="budgetLeftPanel" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="rounded-2xl border-2 border-white bg-white/70 p-4 shadow-sm">
-              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Total Budget</p>
+              <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n-key="bud_total_budget">Total Budget</p>
               <p id="effectiveBudgetValue" class="text-2xl font-bold text-purple-500 mt-1">$0.00</p>
-              <p id="budgetAppliedSource" class="text-[11px] text-slate-400 mt-2 font-medium">Auto-derived</p>
+              <p id="budgetAppliedSource" class="text-[11px] text-slate-400 mt-2 font-medium" data-i18n-key="bud_auto_derived">Auto-derived</p>
             </div>
             <div class="rounded-2xl border-2 border-purple-200 bg-purple-50/50 p-4 shadow-sm">
               <p id="budgetUsedRemainLabel" class="text-[10px] sm:text-xs font-bold text-purple-400 uppercase tracking-widest">Used / Remaining</p>
@@ -563,7 +871,7 @@
               <p id="budgetUsagePctValue" class="text-sm font-bold text-purple-600 mt-1 bg-purple-100 inline-block px-2 py-0.5 rounded-lg">0%</p>
             </div>
             <div id="unbudgetedBudgetCard" class="hidden rounded-2xl border-2 border-amber-100 bg-amber-50/70 p-4 col-span-2 shadow-sm">
-              <p class="text-[10px] sm:text-xs font-bold text-amber-500 uppercase tracking-widest">Unbudgeted</p>
+              <p class="text-[10px] sm:text-xs font-bold text-amber-500 uppercase tracking-widest" data-i18n-key="bud_unbudgeted">Unbudgeted</p>
               <div class="flex items-center justify-between gap-3 mt-1">
                 <p id="unbudgetedBudgetValue" class="text-xl font-bold text-amber-600">$0.00</p>
                 <p id="unbudgetedBudgetPct" class="text-xs font-bold text-amber-600/80 bg-amber-100 px-2 py-1 rounded-lg">0% of total</p>
@@ -574,7 +882,7 @@
 
           <div class="rounded-[2rem] border-2 border-white bg-white/80 p-5 lg:p-6 space-y-4 shadow-sm min-h-[220px]">
             <div class="flex items-center justify-between gap-2 border-b-2 border-slate-50 pb-3">
-              <p class="text-sm font-bold text-slate-600 uppercase tracking-widest">Insights</p>
+              <p class="text-sm font-bold text-slate-600 uppercase tracking-widest" data-i18n-key="bud_insights">Insights</p>
               <span class="text-[11px] font-bold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">Live</span>
             </div>
             <div id="budgetInsightCard" class="space-y-3 pt-1"></div>
@@ -584,20 +892,20 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
-          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-green-100 p-2 rounded-xl">💰</span> Set Total Budget</h3>
-          <p class="text-sm text-slate-500 font-medium">Save your monthly cap, then review breakdowns below.</p>
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-green-100 p-2 rounded-xl">💰</span> <span data-i18n-key="bud_set_total_budget">Set Total Budget</span></h3>
+          <p class="text-sm text-slate-500 font-medium" data-i18n-key="bud_set_total_budget_desc">Save your monthly cap, then review breakdowns below.</p>
           <form id="monthlyBudgetForm" class="flex flex-col sm:flex-row gap-3">
-            <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" class="flex-1 rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-green-400 focus:ring-4 focus:ring-green-100 shadow-sm text-slate-700 font-medium">
-            <button class="bg-green-400 text-white px-6 py-3 rounded-2xl font-bold text-lg hover:bg-green-500 shadow-md shadow-green-200 transition-all transform active:scale-95">Save</button>
+            <input type="number" id="budgetLimitInput" placeholder="Monthly Limit" data-i18n-placeholder-key="input_monthly_limit" class="flex-1 rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-green-400 focus:ring-4 focus:ring-green-100 shadow-sm text-slate-700 font-medium">
+            <button class="bg-green-400 text-white px-6 py-3 rounded-2xl font-bold text-lg hover:bg-green-500 shadow-md shadow-green-200 transition-all transform active:scale-95" data-i18n-key="common_save">Save</button>
           </form>
           <div id="categoryBudgetProgressWrap" class="space-y-4 pt-5 border-t-2 border-slate-100"></div>
         </div>
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
-          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-orange-100 p-2 rounded-xl text-orange-500">🏷️</span> Category Budgets</h3>
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-orange-100 p-2 rounded-xl text-orange-500">🏷️</span> <span data-i18n-key="bud_category_budgets">Category Budgets</span></h3>
           <form id="categoryBudgetForm" class="space-y-4">
             <select id="categoryBudgetSelect" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none font-medium text-slate-600 focus:border-orange-400 shadow-sm"></select>
-            <input type="number" id="categoryBudgetAmount" placeholder="Budget Limit" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 shadow-sm font-medium">
-            <button class="w-full bg-orange-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-500 shadow-md shadow-orange-200 transition-all transform active:scale-[0.98]">Set Category</button>
+            <input type="number" id="categoryBudgetAmount" placeholder="Budget Limit" data-i18n-placeholder-key="input_budget_limit" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 shadow-sm font-medium">
+            <button class="w-full bg-orange-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-500 shadow-md shadow-orange-200 transition-all transform active:scale-[0.98]" data-i18n-key="bud_set_category">Set Category</button>
           </form>
         </div>
       </div>
@@ -607,9 +915,9 @@
       <div id="accountCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
-          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">🏦</span> Add Account</h3>
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-blue-100 p-2 rounded-xl text-blue-500">🏦</span> <span data-i18n-key="acc_add_account">Add Account</span></h3>
           <form id="addAccountForm" class="space-y-4">
-            <input type="text" id="newAccountName" placeholder="Account Name (e.g., Octopus)" required class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
+            <input type="text" id="newAccountName" placeholder="Account Name (e.g., Octopus)" data-i18n-placeholder-key="acc_name_placeholder" required class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
             <select id="newAccountType" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 font-medium text-slate-600 shadow-sm">
               <option value="Cash">💵 Cash</option>
               <option value="Card">💳 Bank/Credit Card</option>
@@ -619,24 +927,24 @@
               <select id="newAccountCurrency" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 font-medium text-slate-600 shadow-sm"></select>
               <input type="number" id="newAccountBalance" placeholder="Initial Balance" step="0.01" class="rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium shadow-sm">
             </div>
-            <button class="w-full bg-blue-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-500 shadow-md shadow-blue-200 transition-all transform active:scale-[0.98] mt-2">Create Account</button>
+            <button class="w-full bg-blue-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-500 shadow-md shadow-blue-200 transition-all transform active:scale-[0.98] mt-2" data-i18n-key="acc_create_account">Create Account</button>
           </form>
         </div>
         <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
-          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-indigo-100 p-2 rounded-xl text-indigo-500">🔄</span> Transfer Funds</h3>
+          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2"><span class="bg-indigo-100 p-2 rounded-xl text-indigo-500">🔄</span> <span data-i18n-key="acc_transfer_funds">Transfer Funds</span></h3>
           <form id="transferForm" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="space-y-1.5">
-                <label class="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">From</label>
+                <label class="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest" data-i18n-key="acc_from">From</label>
                 <select id="fromAccountInput" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-indigo-400 shadow-sm text-slate-600"></select>
               </div>
               <div class="space-y-1.5">
-                <label class="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">To</label>
+                <label class="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest" data-i18n-key="acc_to">To</label>
                 <select id="toAccountInput" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-medium outline-none focus:border-indigo-400 shadow-sm text-slate-600"></select>
               </div>
             </div>
-            <input type="number" id="transferAmount" placeholder="Transfer Amount" step="0.01" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 font-medium shadow-sm mt-2">
-            <button class="w-full bg-indigo-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-500 shadow-md shadow-indigo-200 transition-all transform active:scale-[0.98] mt-2">Confirm Transfer</button>
+            <input type="number" id="transferAmount" placeholder="Transfer Amount" data-i18n-placeholder-key="input_transfer_amount" step="0.01" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 font-medium shadow-sm mt-2">
+            <button class="w-full bg-indigo-400 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-500 shadow-md shadow-indigo-200 transition-all transform active:scale-[0.98] mt-2" data-i18n-key="acc_confirm_transfer">Confirm Transfer</button>
           </form>
         </div>
       </div>
@@ -668,7 +976,7 @@
               <span id="appPinStatus" class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-500">Not set</span>
             </div>
             <form id="appPinForm" class="flex gap-2">
-              <input id="appPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="4-6 digits" class="flex-1 rounded-xl border-2 border-slate-100 px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:border-purple-400">
+              <input id="appPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="4-6 digits" data-i18n-placeholder-key="input_pin_digits" class="flex-1 rounded-xl border-2 border-slate-100 px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:border-purple-400">
               <button class="rounded-xl bg-purple-500 text-white px-4 py-2 text-sm font-bold hover:bg-purple-600" data-i18n-key="settings_save_pin">Save</button>
             </form>
             <button id="clearAppPinBtn" class="text-xs font-bold text-rose-500 hover:text-rose-600 underline text-left" data-i18n-key="settings_clear_pin">Clear app PIN</button>
@@ -795,6 +1103,8 @@
         ocr_scanning_pct: "Scanning receipt... {pct}%",
         ocr_empty_result: "Scan complete, but no reliable fields were found. You can still enter manually.",
         ocr_prefilled: "Scan complete. Fields were prefilled, please review before saving.",
+        ocr_template_applied: "Template applied: {label}",
+        ocr_auto_assist: "Auto assist on",
         ocr_failed: "OCR failed for this image. Try a clearer, well-lit receipt photo.",
         ocr_stage_idle: "Idle",
         ocr_stage_unavailable: "Unavailable",
@@ -804,7 +1114,118 @@
         ocr_stage_recognizing: "Recognizing",
         ocr_stage_processing: "Processing",
         ocr_stage_complete: "Complete",
-        ocr_stage_failed: "Failed"
+        ocr_stage_failed: "Failed",
+        notify_title: "Alerts & To-Do",
+        notify_auto_alerts: "Auto Alerts",
+        notify_my_todos: "My To-Do",
+        notify_empty: "All clear. No alerts right now.",
+        notify_overdrawn: "{count} overdrawn account(s)",
+        notify_overdrawn_msg: "{name} is below zero ({amount}).",
+        notify_todo_title: "To-Do",
+        todo_set_budget: "Set your monthly budget for better tracking.",
+        todo_add_income: "Log at least one income this month.",
+        todo_review_ocr: "Review OCR-prefilled entries before saving.",
+        todo_secure_accounts: "Set PIN on important accounts for extra security.",
+        todo_add_btn: "Add",
+        todo_input_placeholder: "Add a to-do...",
+        todo_empty_hint: "No personal to-do items yet.",
+        todo_delete: "Delete",
+        wizard_step_1: "1. Type",
+        wizard_step_2: "2. Amount",
+        wizard_step_3: "3. Review",
+        wizard_prev: "Back",
+        wizard_next: "Next",
+        dash_total_net_worth: "Total Net Worth",
+        dash_monthly_budget: "Monthly Budget",
+        dash_of_limit: "of limit",
+        dash_net_flow_month: "Net Flow (This Month)",
+        dash_income_vs_expense: "Income vs Expense",
+        dash_record_transaction: "Record Transaction",
+        dash_cancel_edit: "Cancel Edit",
+        dash_transaction_history: "Transaction History",
+        ocr_title: "Receipt OCR Auto Entry",
+        ocr_scan_btn: "Scan Receipt",
+        entry_fast_lane: "Capture Lane",
+        entry_manual_lane: "Manual Lane",
+        smart_templates_title: "Smart Templates",
+        smart_template_empty: "No templates yet",
+        input_note_optional: "Note (optional) 💭",
+        btn_save_transaction: "Save Transaction",
+        search_notes_or_categories: "Search notes or categories... 🔍",
+        ins_composition: "Composition",
+        ins_expense_breakdown: "Expense Breakdown",
+        ins_income_breakdown: "Income Breakdown",
+        ins_details: "Details",
+        ins_core_overview: "Core Overview",
+        ins_trend_forecast: "Trend Forecast",
+        ins_est_income: "Est. Income",
+        ins_est_expense: "Est. Expense",
+        ins_est_net_flow: "Est. Net Flow",
+        ins_week_forecast: "This Week Forecast",
+        ins_basis: "Basis",
+        ins_rolling_7_days: "Rolling 7 days",
+        ins_expense: "Expense",
+        ins_income: "Income",
+        ins_net: "Net",
+        ins_behavior: "Behavior",
+        ins_spending_mindset_analysis: "Spending Mindset Analysis",
+        ins_mindset_share: "Mindset Share",
+        ins_category_mix: "Category Mix",
+        ins_summary: "Summary",
+        bud_overview: "Budget Overview",
+        bud_rules_status: "Rules and Status",
+        bud_total_budget: "Total Budget",
+        bud_auto_derived: "Auto-derived",
+        bud_unbudgeted: "Unbudgeted",
+        bud_insights: "Insights",
+        bud_set_total_budget: "Set Total Budget",
+        bud_set_total_budget_desc: "Save your monthly cap, then review breakdowns below.",
+        bud_category_budgets: "Category Budgets",
+        bud_set_category: "Set Category",
+        common_save: "Save",
+        acc_add_account: "Add Account",
+        acc_name_placeholder: "Account Name (e.g., Octopus)",
+        acc_create_account: "Create Account",
+        acc_transfer_funds: "Transfer Funds",
+        acc_from: "From",
+        acc_to: "To",
+        acc_confirm_transfer: "Confirm Transfer",
+        history_no_transactions: "No transactions found for this month.",
+        history_no_notes: "No notes",
+        history_edit: "Edit",
+        history_delete: "Delete",
+        history_save_transaction: "Save Transaction",
+        history_update_transaction: "Update Transaction",
+        insights_no_records: "No records logged yet.",
+        insights_impulse_rate: "Impulse spending is at {pct}%.",
+        budget_keep_tracking: "Keep tracking! Your total usage is {pct}%.",
+        budget_no_category: "No category budgets set.",
+        budget_limit: "Limit {amount}",
+        budget_state_over: "Over",
+        budget_state_good: "Good",
+        budget_spent: "Spent: {amount}",
+        budget_left: "Left: {amount}",
+        budget_used_remaining: "Used / Remaining",
+        budget_used_overspent: "Used / Overspent",
+        budget_used_suffix: "{pct}% used",
+        budget_over_suffix: "{pct}% (over)",
+        budget_unbudgeted_meta: "Spent without category: {amount}",
+        account_change_pin: "Change PIN",
+        account_set_pin: "Set PIN",
+        account_edit_balance: "Edit Balance",
+        account_pin_status: "PIN: {status}",
+        account_create_pin_prompt: "Create a PIN for {name} (4-6 digits).",
+        account_change_pin_prompt: "Set a new PIN for {name} (4-6 digits). Type CLEAR to remove PIN.",
+        account_pin_removed: "PIN removed.",
+        account_pin_saved: "PIN saved.",
+        account_edit_balance_prompt: "Edit current balance for {name} ({currency}):",
+        tx_delete_confirm: "Delete record?",
+        budget_limit_updated: "Limit updated.",
+        input_amount: "Amount",
+        input_monthly_limit: "Monthly Limit",
+        input_budget_limit: "Budget Limit",
+        input_transfer_amount: "Transfer Amount",
+        input_pin_digits: "4-6 digits"
       },
       "zh-HK": {
         tagline: "智能理財 · 本地儲存",
@@ -842,6 +1263,8 @@
         ocr_scanning_pct: "正在掃描單據... {pct}%",
         ocr_empty_result: "掃描完成，但未找到可靠欄位。你仍可手動輸入。",
         ocr_prefilled: "掃描完成，已預填部分欄位，請儲存前再次確認。",
+        ocr_template_applied: "已套用範本：{label}",
+        ocr_auto_assist: "已啟用自動輔助",
         ocr_failed: "OCR 失敗，請嘗試更清晰、光線更好的單據照片。",
         ocr_stage_idle: "閒置",
         ocr_stage_unavailable: "不可用",
@@ -851,7 +1274,118 @@
         ocr_stage_recognizing: "辨識中",
         ocr_stage_processing: "處理中",
         ocr_stage_complete: "完成",
-        ocr_stage_failed: "失敗"
+        ocr_stage_failed: "失敗",
+        notify_title: "提醒與待辦",
+        notify_auto_alerts: "系統提醒",
+        notify_my_todos: "我的待辦",
+        notify_empty: "目前沒有提醒。",
+        notify_overdrawn: "有 {count} 個帳戶透支",
+        notify_overdrawn_msg: "{name} 已變為負數（{amount}）。",
+        notify_todo_title: "待辦",
+        todo_set_budget: "設定本月總預算，追蹤會更完整。",
+        todo_add_income: "本月至少記錄一筆收入。",
+        todo_review_ocr: "儲存前請檢查 OCR 預填欄位。",
+        todo_secure_accounts: "為重要帳戶設定 PIN 提升安全性。",
+        todo_add_btn: "新增",
+        todo_input_placeholder: "新增待辦事項...",
+        todo_empty_hint: "尚未有個人待辦事項。",
+        todo_delete: "刪除",
+        wizard_step_1: "1. 類型",
+        wizard_step_2: "2. 金額",
+        wizard_step_3: "3. 確認",
+        wizard_prev: "返回",
+        wizard_next: "下一步",
+        dash_total_net_worth: "總資產淨值",
+        dash_monthly_budget: "月度預算",
+        dash_of_limit: "佔上限",
+        dash_net_flow_month: "本月淨流量",
+        dash_income_vs_expense: "收入對比支出",
+        dash_record_transaction: "記錄交易",
+        dash_cancel_edit: "取消編輯",
+        dash_transaction_history: "交易紀錄",
+        ocr_title: "收據 OCR 自動填寫",
+        ocr_scan_btn: "掃描收據",
+        entry_fast_lane: "掃描通道",
+        entry_manual_lane: "手動通道",
+        smart_templates_title: "智慧範本",
+        smart_template_empty: "尚無範本",
+        input_note_optional: "備註（可選）💭",
+        btn_save_transaction: "儲存交易",
+        search_notes_or_categories: "搜尋備註或分類... 🔍",
+        ins_composition: "組成",
+        ins_expense_breakdown: "支出分解",
+        ins_income_breakdown: "收入分解",
+        ins_details: "明細",
+        ins_core_overview: "核心概覽",
+        ins_trend_forecast: "趨勢預測",
+        ins_est_income: "預估收入",
+        ins_est_expense: "預估支出",
+        ins_est_net_flow: "預估淨流",
+        ins_week_forecast: "本週預測",
+        ins_basis: "基準",
+        ins_rolling_7_days: "最近 7 天",
+        ins_expense: "支出",
+        ins_income: "收入",
+        ins_net: "淨額",
+        ins_behavior: "行為",
+        ins_spending_mindset_analysis: "消費心態分析",
+        ins_mindset_share: "心態佔比",
+        ins_category_mix: "分類組合",
+        ins_summary: "摘要",
+        bud_overview: "預算概覽",
+        bud_rules_status: "規則與狀態",
+        bud_total_budget: "總預算",
+        bud_auto_derived: "自動推算",
+        bud_unbudgeted: "未分配預算",
+        bud_insights: "洞察",
+        bud_set_total_budget: "設定總預算",
+        bud_set_total_budget_desc: "先儲存每月上限，再查看下方分解。",
+        bud_category_budgets: "分類預算",
+        bud_set_category: "設定分類",
+        common_save: "儲存",
+        acc_add_account: "新增帳戶",
+        acc_name_placeholder: "帳戶名稱（例如 Octopus）",
+        acc_create_account: "建立帳戶",
+        acc_transfer_funds: "轉帳",
+        acc_from: "從",
+        acc_to: "到",
+        acc_confirm_transfer: "確認轉帳",
+        history_no_transactions: "本月尚無交易紀錄。",
+        history_no_notes: "無備註",
+        history_edit: "編輯",
+        history_delete: "刪除",
+        history_save_transaction: "儲存交易",
+        history_update_transaction: "更新交易",
+        insights_no_records: "尚無資料。",
+        insights_impulse_rate: "衝動消費佔比為 {pct}%。",
+        budget_keep_tracking: "持續追蹤中！目前使用率為 {pct}%。",
+        budget_no_category: "尚未設定分類預算。",
+        budget_limit: "上限 {amount}",
+        budget_state_over: "超支",
+        budget_state_good: "正常",
+        budget_spent: "已用：{amount}",
+        budget_left: "剩餘：{amount}",
+        budget_used_remaining: "已用 / 剩餘",
+        budget_used_overspent: "已用 / 超支",
+        budget_used_suffix: "已用 {pct}%",
+        budget_over_suffix: "超支 {pct}%",
+        budget_unbudgeted_meta: "未分類支出：{amount}",
+        account_change_pin: "更改 PIN",
+        account_set_pin: "設定 PIN",
+        account_edit_balance: "編輯餘額",
+        account_pin_status: "PIN：{status}",
+        account_create_pin_prompt: "為 {name} 建立 PIN（4-6 位數）。",
+        account_change_pin_prompt: "為 {name} 設定新 PIN（4-6 位數），輸入 CLEAR 可清除。",
+        account_pin_removed: "PIN 已移除。",
+        account_pin_saved: "PIN 已儲存。",
+        account_edit_balance_prompt: "編輯 {name}（{currency}）目前餘額：",
+        tx_delete_confirm: "確定刪除這筆紀錄？",
+        budget_limit_updated: "預算上限已更新。",
+        input_amount: "金額",
+        input_monthly_limit: "每月上限",
+        input_budget_limit: "預算上限",
+        input_transfer_amount: "轉帳金額",
+        input_pin_digits: "4-6 位數"
       },
       "zh-CN": {
         tagline: "智能理财 · 本地存储",
@@ -889,6 +1423,8 @@
         ocr_scanning_pct: "正在扫描小票... {pct}%",
         ocr_empty_result: "扫描完成，但未找到可靠字段。你仍可手动输入。",
         ocr_prefilled: "扫描完成，已预填部分字段，请保存前确认。",
+        ocr_template_applied: "已应用模板：{label}",
+        ocr_auto_assist: "自动辅助已开启",
         ocr_failed: "OCR 失败，请尝试更清晰、光线更好的小票照片。",
         ocr_stage_idle: "空闲",
         ocr_stage_unavailable: "不可用",
@@ -898,7 +1434,120 @@
         ocr_stage_recognizing: "识别中",
         ocr_stage_processing: "处理中",
         ocr_stage_complete: "完成",
-        ocr_stage_failed: "失败"
+        ocr_stage_failed: "失败",
+        notify_title: "提醒与待办",
+        notify_auto_alerts: "系统提醒",
+        notify_my_todos: "我的待办",
+        notify_empty: "当前没有提醒。",
+        notify_overdrawn: "有 {count} 个账户透支",
+        notify_overdrawn_msg: "{name} 已为负数（{amount}）。",
+        notify_todo_title: "待办",
+        todo_set_budget: "设置本月总预算，追踪更完整。",
+        todo_add_income: "本月至少记录一笔收入。",
+        todo_review_ocr: "保存前请检查 OCR 预填字段。",
+        todo_secure_accounts: "为重要账户设置 PIN 提升安全性。",
+        todo_add_btn: "新增",
+        todo_input_placeholder: "新增待办事项...",
+        todo_empty_hint: "还没有个人待办事项。",
+        todo_delete: "删除",
+        wizard_step_1: "1. 类型",
+        wizard_step_2: "2. 金额",
+        wizard_step_3: "3. 确认",
+        wizard_prev: "返回",
+        wizard_next: "下一步",
+        dash_total_net_worth: "总资产净值",
+        dash_monthly_budget: "月度预算",
+        dash_of_limit: "占上限",
+        dash_net_flow_month: "本月净流",
+        dash_income_vs_expense: "收入对比支出",
+        dash_record_transaction: "记录交易",
+        dash_cancel_edit: "取消编辑",
+        dash_transaction_history: "交易记录",
+        ocr_title: "小票 OCR 自动录入",
+        ocr_scan_btn: "扫描小票",
+        ocr_upload_hint: "点一下开始扫描",
+        entry_fast_lane: "扫描通道",
+        entry_manual_lane: "手动通道",
+        entry_scan_hint: "扫描可自动填入金额、分类与备注，再快速确认。",
+        smart_templates_title: "智能模板",
+        smart_template_empty: "暂无模板",
+        input_note_optional: "备注（可选）💭",
+        btn_save_transaction: "保存交易",
+        search_notes_or_categories: "搜索备注或分类... 🔍",
+        ins_composition: "构成",
+        ins_expense_breakdown: "支出拆分",
+        ins_income_breakdown: "收入拆分",
+        ins_details: "明细",
+        ins_core_overview: "核心概览",
+        ins_trend_forecast: "趋势预测",
+        ins_est_income: "预计收入",
+        ins_est_expense: "预计支出",
+        ins_est_net_flow: "预计净流",
+        ins_week_forecast: "本周预测",
+        ins_basis: "基准",
+        ins_rolling_7_days: "最近 7 天",
+        ins_expense: "支出",
+        ins_income: "收入",
+        ins_net: "净额",
+        ins_behavior: "行为",
+        ins_spending_mindset_analysis: "消费心态分析",
+        ins_mindset_share: "心态占比",
+        ins_category_mix: "分类组合",
+        ins_summary: "摘要",
+        bud_overview: "预算概览",
+        bud_rules_status: "规则与状态",
+        bud_total_budget: "总预算",
+        bud_auto_derived: "自动推算",
+        bud_unbudgeted: "未分配预算",
+        bud_insights: "洞察",
+        bud_set_total_budget: "设置总预算",
+        bud_set_total_budget_desc: "先保存每月上限，再查看下方拆分。",
+        bud_category_budgets: "分类预算",
+        bud_set_category: "设置分类",
+        common_save: "保存",
+        acc_add_account: "添加账户",
+        acc_name_placeholder: "账户名称（例如 Octopus）",
+        acc_create_account: "创建账户",
+        acc_transfer_funds: "转账",
+        acc_from: "从",
+        acc_to: "到",
+        acc_confirm_transfer: "确认转账",
+        history_no_transactions: "本月暂无交易记录。",
+        history_no_notes: "无备注",
+        history_edit: "编辑",
+        history_delete: "删除",
+        history_save_transaction: "保存交易",
+        history_update_transaction: "更新交易",
+        insights_no_records: "暂无记录。",
+        insights_impulse_rate: "冲动消费占比为 {pct}%。",
+        budget_keep_tracking: "持续追踪中！当前使用率为 {pct}%。",
+        budget_no_category: "尚未设置分类预算。",
+        budget_limit: "上限 {amount}",
+        budget_state_over: "超支",
+        budget_state_good: "正常",
+        budget_spent: "已用：{amount}",
+        budget_left: "剩余：{amount}",
+        budget_used_remaining: "已用 / 剩余",
+        budget_used_overspent: "已用 / 超支",
+        budget_used_suffix: "已用 {pct}%",
+        budget_over_suffix: "超支 {pct}%",
+        budget_unbudgeted_meta: "未分类支出：{amount}",
+        account_change_pin: "修改 PIN",
+        account_set_pin: "设置 PIN",
+        account_edit_balance: "编辑余额",
+        account_pin_status: "PIN：{status}",
+        account_create_pin_prompt: "为 {name} 创建 PIN（4-6 位数字）。",
+        account_change_pin_prompt: "为 {name} 设置新 PIN（4-6 位数字），输入 CLEAR 可清除。",
+        account_pin_removed: "PIN 已移除。",
+        account_pin_saved: "PIN 已保存。",
+        account_edit_balance_prompt: "编辑 {name}（{currency}）当前余额：",
+        tx_delete_confirm: "确定删除这条记录？",
+        budget_limit_updated: "预算上限已更新。",
+        input_amount: "金额",
+        input_monthly_limit: "每月上限",
+        input_budget_limit: "预算上限",
+        input_transfer_amount: "转账金额",
+        input_pin_digits: "4-6 位数字"
       }
     };
 
@@ -930,7 +1579,7 @@
       init() {
         const fallback = {
           selectedMonth: Utils.toMonthValue(new Date()),
-          settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS], language: "en", appPin: null },
+          settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS], language: "en", appPin: null, todoItems: [] },
           customExpenseCategories: [], customIncomeCategories: [],
           accounts: [
             { id: "acc-cash", name: "Wallet Cash", type: "Cash", currency: "HKD", initialBalance: 1000, pin: null },
@@ -946,7 +1595,15 @@
           categoryBudgets: this.state.settings?.categoryBudgets || {},
           quickPresets: this.state.settings?.quickPresets || [...CONFIG.DEFAULT_QUICK_PRESETS],
           language: ["en", "zh-HK", "zh-CN"].includes(this.state.settings?.language) ? this.state.settings.language : "en",
-          appPin: typeof this.state.settings?.appPin === "string" && /^\d{4,6}$/.test(this.state.settings.appPin) ? this.state.settings.appPin : null
+          appPin: typeof this.state.settings?.appPin === "string" && /^\d{4,6}$/.test(this.state.settings.appPin) ? this.state.settings.appPin : null,
+          todoItems: Array.isArray(this.state.settings?.todoItems)
+            ? this.state.settings.todoItems.filter(item => item && typeof item.text === "string").map(item => ({
+                id: String(item.id || Utils.uid()),
+                text: item.text.trim().slice(0, 120),
+                done: !!item.done,
+                createdAt: Number(item.createdAt || Date.now())
+              })).filter(item => item.text.length > 0)
+            : []
         };
         this.state.accounts = (this.state.accounts || []).map(a => ({
           ...a,
@@ -1010,7 +1667,7 @@
 
     const Render = {
       runtime: { selectedQuickCategory: "Food", expensePieChart: null, incomePieChart: null, lineChart: null, spendingMoodChart: null, moodCategoryChart: null, budgetCategoryStatusChart: null },
-      all() { this.dropdowns(); this.dashboard(); this.accounts(); this.budget(); this.settings(); },
+      all() { this.dropdowns(); this.dashboard(); this.accounts(); this.budget(); this.settings(); this.notifications(); },
       dropdowns() {
         const curOpts = CONFIG.SUPPORTED_CURRENCIES.map(c => `<option value="${c}">${c}</option>`).join("");
         ["currencyInput", "newAccountCurrency"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = curOpts; });
@@ -1019,6 +1676,7 @@
         const catOpts = CONFIG.DEFAULT_EXPENSE_CATS.map(c => `<option value="${c}">${c}</option>`).join("");
         document.getElementById("categoryInput").innerHTML = catOpts;
         document.getElementById("categoryBudgetSelect").innerHTML = catOpts;
+        this.smartTemplates();
       },
       monthPicker() {
         const label = document.getElementById("monthPickerLabel");
@@ -1032,6 +1690,38 @@
           const key = el.dataset.i18nKey;
           if (dict[key]) el.textContent = dict[key];
         });
+        document.querySelectorAll("[data-i18n-placeholder-key]").forEach(el => {
+          const key = el.dataset.i18nPlaceholderKey;
+          if (dict[key]) el.placeholder = dict[key];
+        });
+
+        const typeInput = document.getElementById("typeInput");
+        if (typeInput) {
+          const expenseOption = typeInput.querySelector('option[value="expense"]');
+          const incomeOption = typeInput.querySelector('option[value="income"]');
+          if (expenseOption) expenseOption.textContent = `${lang === "en" ? "📉 Expense" : lang === "zh-HK" ? "📉 支出" : "📉 支出"}`;
+          if (incomeOption) incomeOption.textContent = `${lang === "en" ? "📈 Income" : lang === "zh-HK" ? "📈 收入" : "📈 收入"}`;
+        }
+
+        const moodInput = document.getElementById("moodInput");
+        if (moodInput) {
+          const planned = moodInput.querySelector('option[value="planned"]');
+          const hesitant = moodInput.querySelector('option[value="hesitant"]');
+          const impulse = moodInput.querySelector('option[value="impulse"]');
+          if (planned) planned.textContent = `${lang === "en" ? "🤓 Planned Purchase" : lang === "zh-HK" ? "🤓 計劃消費" : "🤓 计划消费"}`;
+          if (hesitant) hesitant.textContent = `${lang === "en" ? "😣 Hesitant Purchase" : lang === "zh-HK" ? "😣 猶豫消費" : "😣 犹豫消费"}`;
+          if (impulse) impulse.textContent = `${lang === "en" ? "🤯 Impulse Purchase" : lang === "zh-HK" ? "🤯 衝動消費" : "🤯 冲动消费"}`;
+        }
+
+        const accTypeSelect = document.getElementById("newAccountType");
+        if (accTypeSelect) {
+          const cash = accTypeSelect.querySelector('option[value="Cash"]');
+          const card = accTypeSelect.querySelector('option[value="Card"]');
+          const wallet = accTypeSelect.querySelector('option[value="E-Wallet"]');
+          if (cash) cash.textContent = `${lang === "en" ? "💵 Cash" : lang === "zh-HK" ? "💵 現金" : "💵 现金"}`;
+          if (card) card.textContent = `${lang === "en" ? "💳 Bank/Credit Card" : lang === "zh-HK" ? "💳 銀行卡/信用卡" : "💳 银行卡/信用卡"}`;
+          if (wallet) wallet.textContent = `${lang === "en" ? "📱 E-Wallet" : lang === "zh-HK" ? "📱 電子錢包" : "📱 电子钱包"}`;
+        }
       },
       dashboard() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth, document.getElementById("searchInput").value);
@@ -1058,25 +1748,60 @@
         else pb.className = "h-full transition-all duration-500 bg-purple-400 rounded-full";
 
         this.history(txs);
+        this.smartTemplates();
+        this.notifications();
+      },
+      smartTemplates() {
+        const container = document.getElementById("smartTemplateChips");
+        if (!container) return;
+
+        const txs = Store.state.transactions
+          .filter(tx => tx.type !== "income" && tx.category !== "Transfer" && Number(tx.amount || 0) > 0)
+          .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+        const map = new Map();
+        txs.forEach(tx => {
+          const key = `${tx.category}|${tx.accountId}|${tx.currency}`;
+          const score = map.get(key)?.score || 0;
+          map.set(key, {
+            tx,
+            score: score + 1
+          });
+        });
+
+        const templates = Array.from(map.values())
+          .sort((a, b) => b.score - a.score || (b.tx.date || "").localeCompare(a.tx.date || ""))
+          .slice(0, 5)
+          .map(v => v.tx);
+
+        if (!templates.length) {
+          container.innerHTML = `<span class="text-[11px] font-medium text-slate-400">${t("smart_template_empty")}</span>`;
+          return;
+        }
+
+        container.innerHTML = templates.map(tx => {
+          const label = `${tx.category} • ${Utils.formatMoney(tx.amount, tx.currency)}`;
+          return `<button type="button" data-action="apply-smart-template" data-id="${tx.id}" class="template-chip">${label}</button>`;
+        }).join("");
       },
       history(txs) {
         const list = document.getElementById("historyList");
         if (txs.length === 0) {
-          list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm font-medium">No transactions found for this month.</p>`; return;
+          list.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm font-medium">${t("history_no_transactions")}</p>`; return;
         }
         list.innerHTML = txs.sort((a,b) => b.date.localeCompare(a.date)).map(t => `
           <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 p-4 bg-white/80 rounded-[1.5rem] border-2 border-slate-50 hover:shadow-md hover:border-purple-100 transition-all">
             <div>
               <p class="font-bold text-slate-700">${t.category} <span class="text-xs font-semibold text-slate-400 ml-2 bg-slate-100 px-2 py-0.5 rounded-md">${t.date}</span></p>
-              <p class="text-sm font-medium text-slate-500 mt-1">${t.note || 'No notes'}${t.type === "expense" ? ` <span class="text-purple-300">•</span> ${CONFIG.SPENDING_MOODS[t.mood || "planned"]}` : ""}</p>
+              <p class="text-sm font-medium text-slate-500 mt-1">${t.note || t("history_no_notes")}${t.type === "expense" ? ` <span class="text-purple-300">•</span> ${Utils.moodLabel(t.mood || "planned")}` : ""}</p>
             </div>
             <div class="sm:text-right flex flex-col sm:items-end">
               <p class="font-bold text-lg ${t.type === 'income' ? 'text-emerald-500' : 'text-slate-800'}">
                 ${t.type === 'income' ? '+' : '-'}${Utils.formatMoney(t.amount, t.currency)}
               </p>
               <div class="flex gap-3 mt-1.5">
-                  <button data-action="edit-tx" data-id="${t.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-blue-100 hover:text-blue-600 font-bold transition-colors">Edit</button>
-                  <button data-action="delete-tx" data-id="${t.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition-colors">Delete</button>
+                  <button data-action="edit-tx" data-id="${t.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-blue-100 hover:text-blue-600 font-bold transition-colors">${t("history_edit")}</button>
+                  <button data-action="delete-tx" data-id="${t.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-rose-100 hover:text-rose-600 font-bold transition-colors">${t("history_delete")}</button>
               </div>
             </div>
           </div>
@@ -1148,7 +1873,7 @@
 
         const renderList = (id, dataObj, totalAmt) => {
             const el = document.getElementById(id);
-            if (!Object.keys(dataObj).length) el.innerHTML = `<p class="text-sm text-slate-400 py-2">No records logged yet.</p>`;
+            if (!Object.keys(dataObj).length) el.innerHTML = `<p class="text-sm text-slate-400 py-2">${t("insights_no_records")}</p>`;
             else el.innerHTML = Object.entries(dataObj).sort((a,b) => b[1] - a[1]).map(([cat, val]) => `
                 <div class="flex justify-between items-center text-sm py-3 border-b border-slate-50 last:border-0">
                   <span class="text-slate-600 font-bold">${cat}</span>
@@ -1163,7 +1888,7 @@
         if (this.runtime.spendingMoodChart) this.runtime.spendingMoodChart.destroy();
         this.runtime.spendingMoodChart = new Chart(moodChartCtx, {
           type: "doughnut",
-          data: { labels: moodLabels.map(m => CONFIG.SPENDING_MOODS[m]), datasets: [{ data: moodLabels.map(m => moodTotals[m].amount).some(v => v > 0) ? moodLabels.map(m => moodTotals[m].amount) : [1, 0, 0], backgroundColor: ["#4ade80", "#fbbf24", "#fb7185"], borderWidth: 0 }] },
+          data: { labels: moodLabels.map(m => Utils.moodLabel(m)), datasets: [{ data: moodLabels.map(m => moodTotals[m].amount).some(v => v > 0) ? moodLabels.map(m => moodTotals[m].amount) : [1, 0, 0], backgroundColor: ["#4ade80", "#fbbf24", "#fb7185"], borderWidth: 0 }] },
           options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, cutout: "70%", borderRadius: 8 }
         });
 
@@ -1173,14 +1898,14 @@
         this.runtime.moodCategoryChart = new Chart(moodCatCtx, {
           type: "bar",
           data: {
-            labels: moodLabels.map(m => CONFIG.SPENDING_MOODS[m]),
+            labels: moodLabels.map(m => Utils.moodLabel(m)),
             datasets: rankedCategories.length ? rankedCategories.map(([cat, vals], i) => ({ label: cat, data: moodLabels.map(m => vals[m] || 0), backgroundColor: pastelColors[i % pastelColors.length], stack: "category", borderRadius: 4 })) : [{ label: "No Data", data: [0, 0, 0], backgroundColor: "#e2e8f0", stack: "category" }]
           },
           options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true } } }
         });
 
         const impulseAmountShare = totalAmount > 0 ? (moodTotals.impulse.amount / totalAmount) * 100 : 0;
-        document.getElementById("behaviorInsightCard").innerHTML = `<p class="py-1">✨ Impulse spending is at <span class="insight-note-kpi">${impulseAmountShare.toFixed(1)}%</span>.</p>`;
+        document.getElementById("behaviorInsightCard").innerHTML = `<p class="py-1">✨ ${t("insights_impulse_rate", { pct: impulseAmountShare.toFixed(1) }).replace(`${impulseAmountShare.toFixed(1)}%`, `<span class=\"insight-note-kpi\">${impulseAmountShare.toFixed(1)}%</span>`)}</p>`;
       },
       budget() {
         document.getElementById("budgetLimitInput").value = Store.state.settings.monthlyBudget || '';
@@ -1195,22 +1920,22 @@
         const used = expense, remaining = Math.max(0, effectiveBudget - used), overspent = Math.max(0, used - effectiveBudget), usagePct = effectiveBudget > 0 ? (used / effectiveBudget) * 100 : 0;
         
         if (overspent > 0) {
-          document.getElementById("budgetUsedRemainLabel").textContent = "Used / Overspent";
+          document.getElementById("budgetUsedRemainLabel").textContent = t("budget_used_overspent");
           document.getElementById("budgetUsedRemainValue").textContent = `${Utils.formatMoney(used, "HKD")} / ${Utils.formatMoney(overspent, "HKD")}`;
           document.getElementById("budgetUsedRemainValue").className = "text-lg font-bold text-rose-500 mt-1";
-          document.getElementById("budgetUsagePctValue").textContent = `${usagePct.toFixed(1)}% (over)`;
+          document.getElementById("budgetUsagePctValue").textContent = t("budget_over_suffix", { pct: usagePct.toFixed(1) });
           document.getElementById("budgetUsagePctValue").className = "text-sm font-bold text-rose-600 mt-2 bg-rose-100 inline-block px-2 py-0.5 rounded-lg";
         } else {
-          document.getElementById("budgetUsedRemainLabel").textContent = "Used / Remaining";
+          document.getElementById("budgetUsedRemainLabel").textContent = t("budget_used_remaining");
           document.getElementById("budgetUsedRemainValue").textContent = `${Utils.formatMoney(used, "HKD")} / ${Utils.formatMoney(remaining, "HKD")}`;
           document.getElementById("budgetUsedRemainValue").className = "text-lg font-bold text-slate-700 mt-1";
-          document.getElementById("budgetUsagePctValue").textContent = `${usagePct.toFixed(1)}% used`;
+          document.getElementById("budgetUsagePctValue").textContent = t("budget_used_suffix", { pct: usagePct.toFixed(1) });
           document.getElementById("budgetUsagePctValue").className = "text-sm font-bold text-purple-600 mt-2 bg-purple-100 inline-block px-2 py-0.5 rounded-lg";
         }
 
-        document.getElementById("budgetInsightCard").innerHTML = `<p class="budget-insight-item font-medium">Keep tracking! Your total usage is ${usagePct.toFixed(1)}%.</p>`;
+        document.getElementById("budgetInsightCard").innerHTML = `<p class="budget-insight-item font-medium">${t("budget_keep_tracking", { pct: usagePct.toFixed(1) })}</p>`;
         
-        wrap.innerHTML = categoryEntries.length === 0 ? `<p class="text-sm font-medium text-slate-400">No category budgets set.</p>` : categoryEntries.map(([cat, limit]) => {
+        wrap.innerHTML = categoryEntries.length === 0 ? `<p class="text-sm font-medium text-slate-400">${t("budget_no_category")}</p>` : categoryEntries.map(([cat, limit]) => {
           const spent = byCat[cat] || 0, ratio = Math.max(0, (spent / limit) * 100), barRatio = Math.min(100, ratio);
           const colorClass = ratio > 100 ? "bg-rose-400" : ratio > 85 ? "bg-amber-400" : "bg-emerald-400";
           return `
@@ -1218,16 +1943,16 @@
               <div class="flex justify-between items-start gap-3 mb-2">
                 <div>
                   <p class="font-bold text-slate-700">${cat}</p>
-                  <p class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Limit ${Utils.formatMoney(limit, "HKD")}</p>
+                  <p class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">${t("budget_limit", { amount: Utils.formatMoney(limit, "HKD") })}</p>
                 </div>
-                <span class="text-[11px] font-bold px-3 py-1 rounded-full ${ratio > 100 ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600"}">${ratio > 100 ? "Over" : "Good"}</span>
+                <span class="text-[11px] font-bold px-3 py-1 rounded-full ${ratio > 100 ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600"}">${ratio > 100 ? t("budget_state_over") : t("budget_state_good")}</span>
               </div>
               <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner mb-3">
                 <div class="h-full ${colorClass} transition-all duration-500 rounded-full" style="width: ${barRatio}%"></div>
               </div>
               <div class="flex justify-between text-xs font-medium text-slate-500 bg-slate-50 p-2 rounded-xl">
-                <span>Spent: <strong class="text-slate-700">${Utils.formatMoney(spent, "HKD")}</strong></span>
-                <span>Left: <strong class="text-slate-700">${Utils.formatMoney(Math.max(0, limit - spent), "HKD")}</strong></span>
+                  <span>${t("budget_spent", { amount: Utils.formatMoney(spent, "HKD") })}</span>
+                  <span>${t("budget_left", { amount: Utils.formatMoney(Math.max(0, limit - spent), "HKD") })}</span>
               </div>
             </div>`;
         }).join("");
@@ -1239,17 +1964,18 @@
             <div class="flex justify-between items-start">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 inline-block px-2 py-1 rounded-md">${a.type}</p>
               <div class="flex gap-2">
-                <button data-action="set-account-pin" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 font-bold transition-colors">${a.pin ? "Change PIN" : "Set PIN"}</button>
-                <button data-action="edit-account-balance" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-purple-100 hover:text-purple-600 font-bold transition-colors">Edit Balance</button>
+                  <button data-action="set-account-pin" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 font-bold transition-colors">${a.pin ? t("account_change_pin") : t("account_set_pin")}</button>
+                  <button data-action="edit-account-balance" data-id="${a.id}" class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 hover:bg-purple-100 hover:text-purple-600 font-bold transition-colors">${t("account_edit_balance")}</button>
               </div>
             </div>
             <h4 class="font-bold text-slate-700 text-xl mt-3">${a.name}</h4>
             <div class="overflow-x-auto no-scrollbar pb-1">
                 <p class="text-3xl font-bold text-slate-800 mt-1 whitespace-nowrap">${Utils.formatMoney(bals[a.id], a.currency)}</p>
             </div>
-            <p class="mt-2 text-xs font-bold ${a.pin ? "text-emerald-600" : "text-slate-400"}">PIN: ${a.pin ? "Set" : "Not set"}</p>
+              <p class="mt-2 text-xs font-bold ${a.pin ? "text-emerald-600" : "text-slate-400"}">${t("account_pin_status", { status: a.pin ? t("status_set") : t("status_not_set") })}</p>
           </div>
         `).join("");
+        this.notifications();
       },
       settings() {
         const languageSelect = document.getElementById("languageSelect");
@@ -1273,6 +1999,68 @@
         if (detailTransactions) detailTransactions.textContent = String(txCount);
         if (detailStorage) detailStorage.textContent = CONFIG.STORAGE_KEY;
       },
+      notifications() {
+        const notifyList = document.getElementById("notifyList");
+        const notifyCount = document.getElementById("notifyCount");
+        const notifySummary = document.getElementById("notifySummary");
+        const todoList = document.getElementById("todoList");
+        if (!notifyList || !notifyCount || !notifySummary || !todoList) return;
+
+        const balances = Logic.computeAccountBalances();
+        const overdrawn = Store.state.accounts
+          .filter(a => Number(balances[a.id] || 0) < 0)
+          .map(a => ({
+            type: "alert",
+            title: t("notify_overdrawn", { count: 1 }),
+            body: t("notify_overdrawn_msg", { name: a.name, amount: Utils.formatMoney(balances[a.id], a.currency) })
+          }));
+
+        const thisMonthTx = Logic.getFilteredTransactions(Store.state.selectedMonth);
+        const thisMonthIncome = thisMonthTx.filter(tx => tx.type === "income" && tx.category !== "Transfer").length;
+        const todo = [];
+        if (Number(Store.state.settings.monthlyBudget || 0) <= 0) todo.push(t("todo_set_budget"));
+        if (thisMonthIncome === 0) todo.push(t("todo_add_income"));
+        todo.push(t("todo_review_ocr"));
+        if (Store.state.accounts.some(a => !a.pin)) todo.push(t("todo_secure_accounts"));
+
+        const events = [
+          ...overdrawn,
+          ...todo.slice(0, 4).map(task => ({ type: "todo", title: t("notify_todo_title"), body: task }))
+        ];
+
+        const personalTodos = (Store.state.settings.todoItems || []).slice().sort((a, b) => {
+          if (a.done !== b.done) return a.done ? 1 : -1;
+          return b.createdAt - a.createdAt;
+        });
+
+        notifySummary.textContent = String(events.length);
+        if (events.length === 0) {
+          notifyCount.classList.add("hidden");
+          notifyList.innerHTML = `<div class="notify-item text-sm font-medium text-slate-500">${t("notify_empty")}</div>`;
+        } else {
+          notifyCount.classList.remove("hidden");
+          notifyCount.textContent = String(events.length > 9 ? "9+" : events.length);
+          notifyList.innerHTML = events.map(item => `
+            <div class="notify-item">
+              <p class="text-xs font-bold uppercase tracking-widest ${item.type === "alert" ? "text-rose-500" : "text-indigo-500"}">${item.title}</p>
+              <p class="mt-1 text-sm font-medium text-slate-600">${item.body}</p>
+            </div>
+          `).join("");
+        }
+
+        if (!personalTodos.length) {
+          todoList.innerHTML = `<div class="notify-item text-sm font-medium text-slate-500">${t("todo_empty_hint")}</div>`;
+          return;
+        }
+
+        todoList.innerHTML = personalTodos.map(item => `
+          <div class="todo-row ${item.done ? "done" : ""}">
+            <input type="checkbox" data-action="toggle-todo" data-id="${item.id}" ${item.done ? "checked" : ""}>
+            <span class="todo-text text-sm font-medium text-slate-700">${item.text}</span>
+            <button type="button" data-action="delete-todo" data-id="${item.id}" class="text-[11px] font-bold text-rose-500 hover:text-rose-600">${t("todo_delete")}</button>
+          </div>
+        `).join("");
+      },
       lockScreen() {
         const lockEl = document.getElementById("appLockScreen");
         const needsLock = !!Store.state.settings.appPin && !AppRuntime.unlocked;
@@ -1283,14 +2071,20 @@
     const Events = {
       init() {
         const ocrStatusEl = document.getElementById("receiptScanStatus");
+        const ocrTemplateHintEl = document.getElementById("ocrTemplateHint");
         const ocrProgressText = document.getElementById("ocrProgressText");
         const ocrStageText = document.getElementById("ocrStageText");
         const ocrProgressBar = document.getElementById("ocrProgressBar");
         const setOCRStatus = (msg, tone = "neutral") => {
           if (!ocrStatusEl) return;
-          const toneClass = tone === "error" ? "text-rose-500" : tone === "good" ? "text-emerald-600" : "text-slate-500";
-          ocrStatusEl.className = `mt-2 text-xs font-medium ${toneClass}`;
+          const toneClass = tone === "error" ? "text-rose-500" : tone === "good" ? "text-emerald-600" : "text-slate-600";
+          ocrStatusEl.className = `text-xs font-bold truncate ${toneClass}`;
           ocrStatusEl.textContent = msg;
+        };
+
+        const setOCRTemplateHint = (msg = "") => {
+          if (!ocrTemplateHintEl) return;
+          ocrTemplateHintEl.textContent = msg;
         };
 
         const setOCRProgress = (pct, stage = t("ocr_stage_idle")) => {
@@ -1306,6 +2100,10 @@
         const monthGrid = document.getElementById("monthGrid");
         const monthPrevYearBtn = document.getElementById("monthPrevYearBtn");
         const monthNextYearBtn = document.getElementById("monthNextYearBtn");
+        const notifyBtn = document.getElementById("notifyBtn");
+        const notifyPanel = document.getElementById("notifyPanel");
+        const todoQuickForm = document.getElementById("todoQuickForm");
+        const todoQuickInput = document.getElementById("todoQuickInput");
         const languageSelect = document.getElementById("languageSelect");
         const appPinForm = document.getElementById("appPinForm");
         const clearAppPinBtn = document.getElementById("clearAppPinBtn");
@@ -1315,7 +2113,12 @@
         const renderMonthGrid = () => {
           if (!monthGrid || !monthYearLabel) return;
           monthYearLabel.textContent = `${monthCursorYear}`;
-          monthGrid.innerHTML = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+          const monthLabels = {
+            en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            "zh-HK": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+            "zh-CN": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
+          };
+          monthGrid.innerHTML = (monthLabels[getLang()] || monthLabels.en)
             .map((m, idx) => {
               const monthNo = String(idx + 1).padStart(2, "0");
               const value = `${monthCursorYear}-${monthNo}`;
@@ -1399,15 +2202,72 @@
           };
         };
 
+        const detectTemplateFromHistory = (parsed) => {
+          const txs = Store.state.transactions
+            .filter(tx => tx.type === "expense" && tx.category !== "Transfer")
+            .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+            .slice(0, 80);
+
+          if (!txs.length) return null;
+
+          const noteKey = (parsed.note || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9\u4e00-\u9fff]+/g, " ")
+            .trim()
+            .split(" ")
+            .find(v => v.length >= 3) || "";
+
+          let best = null;
+          let bestScore = -1;
+          txs.forEach(tx => {
+            let score = 0;
+            if (parsed.category && tx.category === parsed.category) score += 3;
+            if (parsed.amount && Math.abs(Number(tx.amount || 0) - Number(parsed.amount || 0)) <= 8) score += 2;
+            if (noteKey && String(tx.note || "").toLowerCase().includes(noteKey)) score += 4;
+            if (score > bestScore) {
+              bestScore = score;
+              best = tx;
+            }
+          });
+
+          return bestScore >= 3 ? best : null;
+        };
+
+        const applyTemplateToForm = (tx, parsed = {}) => {
+          if (!tx) return;
+          const amountInput = document.getElementById("amountInput");
+          const dateInput = document.getElementById("dateInput");
+          const noteInput = document.getElementById("noteInput");
+          const categoryInput = document.getElementById("categoryInput");
+          const typeInput = document.getElementById("typeInput");
+          const accountInput = document.getElementById("accountInput");
+          const currencyInput = document.getElementById("currencyInput");
+          const moodInput = document.getElementById("moodInput");
+
+          typeInput.value = "expense";
+          typeInput.dispatchEvent(new Event("change"));
+
+          if (!parsed.category && tx.category) categoryInput.value = tx.category;
+          if (!parsed.amount && Number(tx.amount || 0) > 0) amountInput.value = Number(tx.amount).toFixed(2);
+          if (!parsed.date) dateInput.value = Utils.formatISO(new Date());
+          if (!parsed.note && tx.note) noteInput.value = tx.note;
+          if (tx.accountId) accountInput.value = tx.accountId;
+          if (tx.currency) currencyInput.value = tx.currency;
+          if (tx.mood && !moodInput.disabled) moodInput.value = tx.mood;
+          syncMoodEmojiBadge();
+        };
+
         const handleReceiptOCR = async (file) => {
           if (!file) return;
           if (typeof Tesseract === "undefined") {
             setOCRStatus(t("ocr_unavailable"), "error");
+            setOCRTemplateHint("");
             setOCRProgress(0, t("ocr_stage_unavailable"));
             return;
           }
 
           setOCRStatus(t("ocr_scanning"));
+          setOCRTemplateHint(t("ocr_auto_assist"));
           setOCRProgress(5, t("ocr_stage_preparing"));
           try {
             const result = await Tesseract.recognize(file, "eng+chi_tra+chi_sim", {
@@ -1429,6 +2289,7 @@
             const noteInput = document.getElementById("noteInput");
             const categoryInput = document.getElementById("categoryInput");
             const typeInput = document.getElementById("typeInput");
+            const categoryOptions = Array.from(categoryInput.options).map(o => o.value);
 
             typeInput.value = "expense";
             typeInput.dispatchEvent(new Event("change"));
@@ -1436,16 +2297,25 @@
             if (parsed.amount) amountInput.value = parsed.amount.toFixed(2);
             if (parsed.date) dateInput.value = parsed.date;
             if (parsed.note) noteInput.value = parsed.note;
-
-            const categoryOptions = Array.from(categoryInput.options).map(o => o.value);
             categoryInput.value = categoryOptions.includes(parsed.category) ? parsed.category : "Other";
+
+            const template = detectTemplateFromHistory(parsed);
+            if (template) {
+              applyTemplateToForm(template, parsed);
+              setOCRTemplateHint(t("ocr_template_applied", { label: template.category }));
+            } else {
+              setOCRTemplateHint(t("ocr_auto_assist"));
+            }
 
             const filledCount = [parsed.amount, parsed.date, parsed.note].filter(Boolean).length;
             if (filledCount === 0) setOCRStatus(t("ocr_empty_result"), "error");
             else setOCRStatus(t("ocr_prefilled"), "good");
             setOCRProgress(100, t("ocr_stage_complete"));
+            wizardStep = 3;
+            refreshWizard();
           } catch (err) {
             setOCRStatus(t("ocr_failed"), "error");
+            setOCRTemplateHint("");
             setOCRProgress(0, t("ocr_stage_failed"));
           }
         };
@@ -1462,6 +2332,59 @@
           moodInput.disabled = type !== "expense";
           if (type === "expense" && !moodInput.value) moodInput.value = "planned";
           syncMoodEmojiBadge();
+        };
+
+        let wizardStep = 1;
+        const wizardPrevBtn = document.getElementById("wizardPrevBtn");
+        const wizardNextBtn = document.getElementById("wizardNextBtn");
+        const wizardSubmitBtn = document.getElementById("transactionSubmitBtn");
+        const wizardStepEls = Array.from(document.querySelectorAll("#transactionWizardSteps .wizard-step"));
+        const wizardFields = Array.from(document.querySelectorAll("[data-form-step]"));
+
+        const refreshWizard = () => {
+          const compact = window.innerWidth < 1024;
+          if (!compact) {
+            wizardStepEls.forEach(el => {
+              el.classList.remove("active", "done");
+            });
+            wizardFields.forEach(el => el.classList.remove("hidden"));
+            if (wizardPrevBtn) wizardPrevBtn.classList.add("hidden");
+            if (wizardNextBtn) wizardNextBtn.classList.add("hidden");
+            if (wizardSubmitBtn) wizardSubmitBtn.classList.remove("hidden");
+            return;
+          }
+
+          wizardStepEls.forEach(el => {
+            const stepNo = Number(el.dataset.step || 1);
+            el.classList.toggle("active", stepNo === wizardStep);
+            el.classList.toggle("done", stepNo < wizardStep);
+          });
+          wizardFields.forEach(el => {
+            const stepNo = Number(el.dataset.formStep || 1);
+            el.classList.toggle("hidden", stepNo !== wizardStep);
+          });
+          if (wizardPrevBtn) wizardPrevBtn.classList.toggle("hidden", wizardStep === 1);
+          if (wizardNextBtn) wizardNextBtn.classList.toggle("hidden", wizardStep === 3);
+          if (wizardSubmitBtn) wizardSubmitBtn.classList.toggle("hidden", wizardStep !== 3);
+        };
+
+        const resetWizard = () => {
+          wizardStep = 1;
+          refreshWizard();
+        };
+
+        const maybeAdvanceWizardFromInputs = () => {
+          if (window.innerWidth >= 1024) return;
+          const typeOk = !!document.getElementById("typeInput").value;
+          const catOk = !!document.getElementById("categoryInput").value;
+          const amt = Number(document.getElementById("amountInput").value || 0);
+          if (wizardStep === 1 && typeOk && catOk) {
+            wizardStep = 2;
+          }
+          if (wizardStep <= 2 && amt > 0) {
+            wizardStep = 3;
+          }
+          refreshWizard();
         };
 
         document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
@@ -1482,12 +2405,36 @@
         document.getElementById("transactionForm").addEventListener("submit", (e) => {
           e.preventDefault(); const form = e.target, type = document.getElementById("typeInput").value;
           const txData = { amount: document.getElementById("amountInput").value, currency: document.getElementById("currencyInput").value, type, category: document.getElementById("categoryInput").value, date: document.getElementById("dateInput").value || Utils.formatISO(new Date()), note: document.getElementById("noteInput").value, accountId: document.getElementById("accountInput").value, mood: type === "expense" ? document.getElementById("moodInput").value : "planned" };
-          if (form.dataset.editId) { Store.updateTransaction(form.dataset.editId, txData); delete form.dataset.editId; document.getElementById("transactionSubmitBtn").textContent = "Save Transaction"; document.getElementById("cancelEditBtn").classList.add("hidden"); } else { Store.addTransaction(txData); }
-          form.reset(); document.getElementById("moodInput").value = "planned"; document.getElementById("dateInput").value = Utils.formatISO(new Date()); syncTransactionTypeUI(); Render.dashboard();
+          if (form.dataset.editId) { Store.updateTransaction(form.dataset.editId, txData); delete form.dataset.editId; document.getElementById("transactionSubmitBtn").textContent = t("history_save_transaction"); document.getElementById("cancelEditBtn").classList.add("hidden"); } else { Store.addTransaction(txData); }
+          form.reset(); document.getElementById("moodInput").value = "planned"; document.getElementById("dateInput").value = Utils.formatISO(new Date()); syncTransactionTypeUI(); setOCRTemplateHint(""); resetWizard(); Render.dashboard();
         });
 
-        document.getElementById("cancelEditBtn").addEventListener("click", (e) => { e.preventDefault(); const form = document.getElementById("transactionForm"); form.reset(); delete form.dataset.editId; document.getElementById("moodInput").value = "planned"; document.getElementById("dateInput").value = Utils.formatISO(new Date()); document.getElementById("transactionSubmitBtn").textContent = "Save Transaction"; e.target.classList.add("hidden"); syncTransactionTypeUI(); });
+        document.getElementById("cancelEditBtn").addEventListener("click", (e) => { e.preventDefault(); const form = document.getElementById("transactionForm"); form.reset(); delete form.dataset.editId; document.getElementById("moodInput").value = "planned"; document.getElementById("dateInput").value = Utils.formatISO(new Date()); document.getElementById("transactionSubmitBtn").textContent = t("history_save_transaction"); e.target.classList.add("hidden"); syncTransactionTypeUI(); setOCRTemplateHint(""); resetWizard(); });
+        if (wizardPrevBtn) wizardPrevBtn.addEventListener("click", () => {
+          wizardStep = Math.max(1, wizardStep - 1);
+          refreshWizard();
+        });
+        if (wizardNextBtn) wizardNextBtn.addEventListener("click", () => {
+          if (window.innerWidth >= 1024) {
+            refreshWizard();
+            return;
+          }
+          if (wizardStep === 1) {
+            const typeOk = !!document.getElementById("typeInput").value;
+            const catOk = !!document.getElementById("categoryInput").value;
+            if (!typeOk || !catOk) return;
+          }
+          if (wizardStep === 2) {
+            const amt = Number(document.getElementById("amountInput").value || 0);
+            if (!(amt > 0)) return;
+          }
+          wizardStep = Math.min(3, wizardStep + 1);
+          refreshWizard();
+        });
+        window.addEventListener("resize", refreshWizard);
         document.getElementById("typeInput").addEventListener("change", syncTransactionTypeUI);
+        document.getElementById("categoryInput").addEventListener("change", maybeAdvanceWizardFromInputs);
+        document.getElementById("amountInput").addEventListener("change", maybeAdvanceWizardFromInputs);
         document.getElementById("moodInput").addEventListener("change", syncMoodEmojiBadge);
         document.getElementById("receiptScanBtn").addEventListener("click", () => document.getElementById("receiptImageInput").click());
         document.getElementById("receiptImageInput").addEventListener("change", async (e) => {
@@ -1522,6 +2469,11 @@
             Store.persist();
             Render.language();
             Render.settings();
+            Render.dashboard();
+            if (!document.getElementById("tab-insights").classList.contains("hidden")) Render.insights();
+            if (!document.getElementById("tab-budget").classList.contains("hidden")) Render.budget();
+            if (!document.getElementById("tab-accounts").classList.contains("hidden")) Render.accounts();
+            Render.notifications();
           });
         }
 
@@ -1578,6 +2530,31 @@
           if (monthPopover.contains(e.target) || monthPickerBtn?.contains(e.target)) return;
           closeMonthPopover();
         });
+
+        if (notifyBtn && notifyPanel) {
+          notifyBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notifyPanel.classList.toggle("hidden");
+          });
+        }
+
+        if (todoQuickForm && todoQuickInput) {
+          todoQuickForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const text = (todoQuickInput.value || "").trim();
+            if (!text) return;
+            Store.state.settings.todoItems.unshift({ id: Utils.uid(), text: text.slice(0, 120), done: false, createdAt: Date.now() });
+            Store.persist();
+            todoQuickInput.value = "";
+            Render.notifications();
+          });
+        }
+
+        document.addEventListener("click", (e) => {
+          if (!notifyPanel || notifyPanel.classList.contains("hidden")) return;
+          if (notifyPanel.contains(e.target) || notifyBtn?.contains(e.target)) return;
+          notifyPanel.classList.add("hidden");
+        });
         
         document.getElementById("transferForm").addEventListener("submit", (e) => {
           e.preventDefault(); const amt = document.getElementById("transferAmount").value, from = document.getElementById("fromAccountInput").value, to = document.getElementById("toAccountInput").value;
@@ -1588,18 +2565,39 @@
           e.target.reset(); Render.accounts(); Render.dashboard(); 
         });
 
-        document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value); Store.persist(); Render.budget(); alert("Limit updated."); });
+        document.getElementById("monthlyBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.settings.monthlyBudget = Number(document.getElementById("budgetLimitInput").value); Store.persist(); Render.budget(); alert(t("budget_limit_updated")); });
         document.getElementById("categoryBudgetForm").addEventListener("submit", (e) => { e.preventDefault(); const cat = document.getElementById("categoryBudgetSelect").value, amt = Number(document.getElementById("categoryBudgetAmount").value); if(amt <= 0) delete Store.state.settings.categoryBudgets[cat]; else Store.state.settings.categoryBudgets[cat] = amt; Store.persist(); Render.budget(); document.getElementById("categoryBudgetAmount").value = ""; });
         document.getElementById("addAccountForm").addEventListener("submit", (e) => { e.preventDefault(); Store.state.accounts.push({ id: Utils.uid(), name: document.getElementById("newAccountName").value, type: document.getElementById("newAccountType").value, currency: document.getElementById("newAccountCurrency").value, initialBalance: Number(document.getElementById("newAccountBalance").value || 0), pin: null }); Store.persist(); e.target.reset(); Render.dropdowns(); Render.accounts(); });
 
         document.addEventListener("click", (e) => {
-          const btn = e.target.closest("button[data-action]"); if (!btn) return; const act = btn.dataset.action;
-          if (act === "delete-tx" && confirm("Delete record?")) { Store.deleteTransaction(btn.dataset.id); Render.dashboard(); }
+          const btn = e.target.closest("[data-action]"); if (!btn) return; const act = btn.dataset.action;
+          if (act === "delete-tx" && confirm(t("tx_delete_confirm"))) { Store.deleteTransaction(btn.dataset.id); Render.dashboard(); }
+          else if (act === "delete-todo") {
+            Store.state.settings.todoItems = (Store.state.settings.todoItems || []).filter(item => item.id !== btn.dataset.id);
+            Store.persist();
+            Render.notifications();
+          }
+          else if (act === "toggle-todo") {
+            const item = (Store.state.settings.todoItems || []).find(v => v.id === btn.dataset.id);
+            if (!item) return;
+            item.done = !item.done;
+            Store.persist();
+            Render.notifications();
+          }
+          else if (act === "apply-smart-template") {
+            const tx = Store.state.transactions.find(v => v.id === btn.dataset.id);
+            if (!tx) return;
+            applyTemplateToForm(tx, {});
+            setOCRTemplateHint(t("ocr_template_applied", { label: tx.category }));
+            wizardStep = 3;
+            refreshWizard();
+            document.getElementById("recordTransactionSection").scrollIntoView({ behavior: "smooth", block: "center" });
+          }
           else if (act === "edit-tx") {
             const tx = Store.state.transactions.find(t => t.id === btn.dataset.id); if (!tx) return;
             document.getElementById("amountInput").value = tx.amount; document.getElementById("currencyInput").value = tx.currency; document.getElementById("typeInput").value = tx.type; document.getElementById("typeInput").dispatchEvent(new Event('change'));
             document.getElementById("categoryInput").value = tx.category; document.getElementById("dateInput").value = tx.date; document.getElementById("accountInput").value = tx.accountId; document.getElementById("noteInput").value = tx.note || ""; document.getElementById("moodInput").value = tx.mood || "planned"; syncMoodEmojiBadge();
-            const form = document.getElementById("transactionForm"); form.dataset.editId = tx.id; document.getElementById("transactionSubmitBtn").textContent = "Update Transaction"; document.getElementById("cancelEditBtn").classList.remove("hidden");
+            const form = document.getElementById("transactionForm"); form.dataset.editId = tx.id; document.getElementById("transactionSubmitBtn").textContent = t("history_update_transaction"); document.getElementById("cancelEditBtn").classList.remove("hidden"); wizardStep = 3; refreshWizard();
             document.getElementById("recordTransactionSection").scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
           else if (act === "edit-account-balance") {
@@ -1609,7 +2607,7 @@
             const currentBals = Logic.computeAccountBalances();
             const currentBal = currentBals[acc.id];
             
-            const newBalStr = prompt(`Edit current balance for ${acc.name} (${acc.currency}):`, currentBal);
+            const newBalStr = prompt(t("account_edit_balance_prompt", { name: acc.name, currency: acc.currency }), currentBal);
             
             if (newBalStr !== null && newBalStr.trim() !== "" && !isNaN(newBalStr)) {
               const desiredCurrentBalance = Number(newBalStr);
@@ -1627,8 +2625,8 @@
 
             const input = prompt(
               acc.pin
-                ? `Set a new PIN for ${acc.name} (4-6 digits). Type CLEAR to remove PIN.`
-                : `Create a PIN for ${acc.name} (4-6 digits).`,
+                ? t("account_change_pin_prompt", { name: acc.name })
+                : t("account_create_pin_prompt", { name: acc.name }),
               ""
             );
             if (input === null) return;
@@ -1639,19 +2637,19 @@
               acc.pin = null;
               Store.persist();
               Render.accounts();
-              alert("PIN removed.");
+              alert(t("account_pin_removed"));
               return;
             }
 
             if (!/^\d{4,6}$/.test(value)) {
-              alert("PIN must be 4 to 6 digits.");
+              alert(t("pin_digits_error"));
               return;
             }
 
             acc.pin = value;
             Store.persist();
             Render.accounts();
-            alert("PIN saved.");
+            alert(t("account_pin_saved"));
           }
         });
 
@@ -1664,7 +2662,7 @@
         const exportSettingBtn = document.getElementById("exportCsvBtnSetting");
         if (exportSettingBtn) exportSettingBtn.addEventListener("click", exportCsv);
 
-        syncTransactionTypeUI(); syncMoodEmojiBadge();
+        syncTransactionTypeUI(); syncMoodEmojiBadge(); resetWizard();
       }
     };
 
@@ -1674,11 +2672,26 @@
       toMonthValue: (date) => { const offset = date.getTimezoneOffset() * 60000; return new Date(date.getTime() - offset).toISOString().slice(0, 7); },
       previousMonth: (monthValue) => { const [year, month] = monthValue.split("-").map(Number); const d = new Date(year, month - 1, 1); d.setMonth(d.getMonth() - 1); return Utils.toMonthValue(d); },
       toHKD: (amt, cur) => Number(amt || 0) * (CONFIG.FX_TO_HKD[cur] || 1),
-      formatMoney: (val, cur) => new Intl.NumberFormat('en-HK', { style: 'currency', currency: cur || 'HKD' }).format(val),
+      locale: () => {
+        const lang = Store.state?.settings?.language || "en";
+        if (lang === "zh-HK") return "zh-HK";
+        if (lang === "zh-CN") return "zh-CN";
+        return "en-HK";
+      },
+      moodLabel: (mood) => {
+        const lang = Store.state?.settings?.language || "en";
+        const table = {
+          en: { planned: "🤓 Planned", hesitant: "😣 Hesitant", impulse: "🤯 Impulse" },
+          "zh-HK": { planned: "🤓 計劃", hesitant: "😣 猶豫", impulse: "🤯 衝動" },
+          "zh-CN": { planned: "🤓 计划", hesitant: "😣 犹豫", impulse: "🤯 冲动" }
+        };
+        return (table[lang] || table.en)[mood] || (table[lang] || table.en).planned;
+      },
+      formatMoney: (val, cur) => new Intl.NumberFormat(Utils.locale(), { style: 'currency', currency: cur || 'HKD' }).format(val),
       formatMonthLabel: (monthValue) => {
         const [y, m] = (monthValue || Utils.toMonthValue(new Date())).split("-").map(Number);
         const d = new Date(y, (m || 1) - 1, 1);
-        return d.toLocaleDateString("en-HK", { month: "short", year: "numeric" });
+        return d.toLocaleDateString(Utils.locale(), { month: "short", year: "numeric" });
       }
     };
 
