@@ -178,6 +178,33 @@
       transition: width 0.25s ease;
     }
 
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      border: 2px solid #f1f5f9;
+      border-radius: 0.9rem;
+      background: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .app-lock {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: linear-gradient(145deg, rgba(255, 228, 230, 0.95), rgba(224, 231, 255, 0.95), rgba(250, 232, 255, 0.95));
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -258,6 +285,11 @@
         width: 100%;
       }
 
+      #appLockCard {
+        border-radius: 1.35rem;
+        padding: 1.15rem;
+      }
+
       #totalBalance,
       #monthlyBudgetUsage,
       #netFlow {
@@ -312,7 +344,7 @@
     <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-slate-800">PocketHK <span class="text-xl">🌸</span></h1>
-        <p class="text-sm text-slate-500 font-medium">Smart Budgeting · Local First</p>
+        <p id="appTagline" class="text-sm text-slate-500 font-medium" data-i18n-key="tagline">Smart Budgeting · Local First</p>
       </div>
       <div class="relative w-full sm:w-auto">
         <button type="button" id="monthPickerBtn" class="w-full sm:w-auto inline-flex items-center justify-between gap-2 rounded-full border-2 border-white bg-white/80 px-5 py-2 text-sm font-bold shadow-sm outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all text-slate-600">
@@ -610,12 +642,57 @@
       </div>
     </main>
 
+    <main id="tab-settings" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-[2.5rem] p-6 space-y-5">
+        <div>
+          <p class="insight-title mb-1" data-i18n-key="settings_label">Preferences</p>
+          <h3 class="font-bold text-slate-800 text-lg" data-i18n-key="settings_title">Settings</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-slate-600" data-i18n-key="settings_general">General</h4>
+            <label class="setting-row">
+              <span data-i18n-key="settings_language">Language</span>
+              <select id="languageSelect" class="rounded-xl border-2 border-slate-100 px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:border-purple-400">
+                <option value="en">English</option>
+                <option value="zh-HK">繁體中文</option>
+                <option value="zh-CN">简体中文</option>
+              </select>
+            </label>
+            <button id="exportCsvBtnSetting" class="w-full rounded-2xl bg-teal-500 text-white py-3 font-bold hover:bg-teal-600 transition-colors" data-i18n-key="settings_export">Export CSV</button>
+          </div>
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-slate-600" data-i18n-key="settings_security">Security</h4>
+            <div class="setting-row">
+              <span data-i18n-key="settings_app_pin">App PIN</span>
+              <span id="appPinStatus" class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-500">Not set</span>
+            </div>
+            <form id="appPinForm" class="flex gap-2">
+              <input id="appPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="4-6 digits" class="flex-1 rounded-xl border-2 border-slate-100 px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:border-purple-400">
+              <button class="rounded-xl bg-purple-500 text-white px-4 py-2 text-sm font-bold hover:bg-purple-600" data-i18n-key="settings_save_pin">Save</button>
+            </form>
+            <button id="clearAppPinBtn" class="text-xs font-bold text-rose-500 hover:text-rose-600 underline text-left" data-i18n-key="settings_clear_pin">Clear app PIN</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-[2.5rem] p-6 space-y-4">
+        <h3 class="font-bold text-slate-700" data-i18n-key="settings_details">App Details</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="setting-row"><span data-i18n-key="details_month">Selected Month</span><span id="detailMonth">-</span></div>
+          <div class="setting-row"><span data-i18n-key="details_accounts">Accounts</span><span id="detailAccounts">0</span></div>
+          <div class="setting-row"><span data-i18n-key="details_transactions">Transactions</span><span id="detailTransactions">0</span></div>
+          <div class="setting-row"><span data-i18n-key="details_storage">Storage Key</span><span id="detailStorage" class="truncate max-w-[150px] text-right">-</span></div>
+        </div>
+      </div>
+    </main>
+
     <nav class="desktop-nav fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 glass-nav p-3 rounded-[2rem] shadow-2xl shadow-purple-200/50 z-50 overflow-x-auto w-[92%] sm:w-auto justify-center">
-      <button data-tab="dashboard" class="tab-btn active px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all whitespace-nowrap">Overview</button>
-      <button data-tab="insights" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Insights</button>
-      <button data-tab="budget" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Budget</button>
-      <button data-tab="accounts" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap">Accounts</button>
-      <button id="exportCsvBtn" class="px-5 sm:px-6 py-3 rounded-full font-bold text-sm text-teal-500 hover:bg-teal-50 transition-all whitespace-nowrap border-2 border-teal-100 ml-1">Export</button>
+      <button data-tab="dashboard" class="tab-btn active px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all whitespace-nowrap" data-i18n-key="nav_overview">Overview</button>
+      <button data-tab="insights" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap" data-i18n-key="nav_insights">Insights</button>
+      <button data-tab="budget" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap" data-i18n-key="nav_budget">Budget</button>
+      <button data-tab="accounts" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap" data-i18n-key="nav_accounts">Accounts</button>
+      <button data-tab="settings" class="tab-btn px-5 sm:px-6 py-3 rounded-full font-bold text-sm transition-all hover:bg-purple-50 whitespace-nowrap" data-i18n-key="nav_settings">Settings</button>
     </nav>
 
     <nav class="mobile-app-nav" aria-label="Primary">
@@ -626,7 +703,7 @@
             <path d="M5 10v10h14V10"></path>
           </svg>
         </span>
-        <span>Overview</span>
+        <span data-i18n-key="nav_overview">Overview</span>
       </button>
       <button data-tab="insights" class="tab-btn mobile-nav-btn" aria-label="Insights">
         <span class="mobile-nav-icon" aria-hidden="true">
@@ -635,7 +712,7 @@
             <path d="M6 16l4-4 3 3 5-6"></path>
           </svg>
         </span>
-        <span>Insights</span>
+        <span data-i18n-key="nav_insights">Insights</span>
       </button>
       <button data-tab="budget" class="tab-btn mobile-nav-btn" aria-label="Budget">
         <span class="mobile-nav-icon" aria-hidden="true">
@@ -644,7 +721,7 @@
             <circle cx="12" cy="12" r="2.5"></circle>
           </svg>
         </span>
-        <span>Budget</span>
+        <span data-i18n-key="nav_budget">Budget</span>
       </button>
       <button data-tab="accounts" class="tab-btn mobile-nav-btn" aria-label="Accounts">
         <span class="mobile-nav-icon" aria-hidden="true">
@@ -654,22 +731,186 @@
             <circle cx="16" cy="13" r="0.8" fill="currentColor" stroke="none"></circle>
           </svg>
         </span>
-        <span>Accounts</span>
+        <span data-i18n-key="nav_accounts">Accounts</span>
       </button>
-      <button id="exportCsvBtnMobile" class="mobile-nav-btn export-btn" aria-label="Export CSV">
+      <button data-tab="settings" class="tab-btn mobile-nav-btn" aria-label="Settings">
         <span class="mobile-nav-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 4v10"></path>
-            <path d="M8 10l4 4 4-4"></path>
-            <path d="M4 20h16"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </span>
-        <span>Export</span>
+        <span data-i18n-key="nav_settings">Settings</span>
       </button>
     </nav>
   </div>
 
+  <section id="appLockScreen" class="app-lock hidden">
+    <div id="appLockCard" class="w-full max-w-sm glass-card rounded-[2rem] p-6 space-y-4">
+      <h2 class="text-xl font-bold text-slate-800" data-i18n-key="lock_title">App Locked</h2>
+      <p class="text-sm text-slate-500 font-medium" data-i18n-key="lock_sub">Enter your app PIN to continue.</p>
+      <form id="unlockForm" class="space-y-3">
+        <input id="unlockPinInput" type="password" inputmode="numeric" maxlength="6" class="w-full rounded-2xl border-2 border-slate-100 p-3.5 text-sm font-bold outline-none focus:border-purple-400" placeholder="PIN">
+        <button class="w-full rounded-2xl bg-purple-500 text-white py-3.5 font-bold hover:bg-purple-600" data-i18n-key="lock_unlock">Unlock</button>
+      </form>
+      <p id="unlockError" class="text-xs font-bold text-rose-500 hidden" data-i18n-key="lock_error">Incorrect PIN. Please try again.</p>
+    </div>
+  </section>
+
   <script>
+    const I18N = {
+      en: {
+        tagline: "Smart Budgeting · Local First",
+        nav_overview: "Overview",
+        nav_insights: "Insights",
+        nav_budget: "Budget",
+        nav_accounts: "Accounts",
+        nav_settings: "Settings",
+        settings_label: "Preferences",
+        settings_title: "Settings",
+        settings_general: "General",
+        settings_language: "Language",
+        settings_export: "Export CSV",
+        settings_security: "Security",
+        settings_app_pin: "App PIN",
+        settings_save_pin: "Save",
+        settings_clear_pin: "Clear app PIN",
+        settings_details: "App Details",
+        details_month: "Selected Month",
+        details_accounts: "Accounts",
+        details_transactions: "Transactions",
+        details_storage: "Storage Key",
+        lock_title: "App Locked",
+        lock_sub: "Enter your app PIN to continue.",
+        lock_unlock: "Unlock",
+        lock_error: "Incorrect PIN. Please try again.",
+        status_set: "Set",
+        status_not_set: "Not set",
+        pin_digits_error: "PIN must be 4 to 6 digits.",
+        app_pin_saved: "App PIN saved.",
+        app_pin_clear_confirm: "Clear app PIN?",
+        transfer_invalid: "Select different accounts and valid amount.",
+        ocr_unavailable: "OCR library failed to load. Please refresh and try again.",
+        ocr_scanning: "Scanning receipt... this may take a few seconds.",
+        ocr_scanning_pct: "Scanning receipt... {pct}%",
+        ocr_empty_result: "Scan complete, but no reliable fields were found. You can still enter manually.",
+        ocr_prefilled: "Scan complete. Fields were prefilled, please review before saving.",
+        ocr_failed: "OCR failed for this image. Try a clearer, well-lit receipt photo.",
+        ocr_stage_idle: "Idle",
+        ocr_stage_unavailable: "Unavailable",
+        ocr_stage_preparing: "Preparing",
+        ocr_stage_loading: "Loading",
+        ocr_stage_initializing: "Initializing",
+        ocr_stage_recognizing: "Recognizing",
+        ocr_stage_processing: "Processing",
+        ocr_stage_complete: "Complete",
+        ocr_stage_failed: "Failed"
+      },
+      "zh-HK": {
+        tagline: "智能理財 · 本地儲存",
+        nav_overview: "總覽",
+        nav_insights: "分析",
+        nav_budget: "預算",
+        nav_accounts: "帳戶",
+        nav_settings: "設定",
+        settings_label: "偏好",
+        settings_title: "設定",
+        settings_general: "一般",
+        settings_language: "語言",
+        settings_export: "匯出 CSV",
+        settings_security: "安全",
+        settings_app_pin: "應用程式 PIN",
+        settings_save_pin: "儲存",
+        settings_clear_pin: "清除應用程式 PIN",
+        settings_details: "應用程式資料",
+        details_month: "目前月份",
+        details_accounts: "帳戶數",
+        details_transactions: "交易數",
+        details_storage: "儲存鍵",
+        lock_title: "應用程式已鎖定",
+        lock_sub: "請輸入應用程式 PIN 繼續。",
+        lock_unlock: "解鎖",
+        lock_error: "PIN 錯誤，請再試一次。",
+        status_set: "已設定",
+        status_not_set: "未設定",
+        pin_digits_error: "PIN 必須為 4 至 6 位數字。",
+        app_pin_saved: "應用程式 PIN 已儲存。",
+        app_pin_clear_confirm: "確定清除應用程式 PIN？",
+        transfer_invalid: "請選擇不同帳戶並輸入有效金額。",
+        ocr_unavailable: "OCR 元件載入失敗，請重新整理後再試。",
+        ocr_scanning: "正在掃描單據，可能需要幾秒鐘。",
+        ocr_scanning_pct: "正在掃描單據... {pct}%",
+        ocr_empty_result: "掃描完成，但未找到可靠欄位。你仍可手動輸入。",
+        ocr_prefilled: "掃描完成，已預填部分欄位，請儲存前再次確認。",
+        ocr_failed: "OCR 失敗，請嘗試更清晰、光線更好的單據照片。",
+        ocr_stage_idle: "閒置",
+        ocr_stage_unavailable: "不可用",
+        ocr_stage_preparing: "準備中",
+        ocr_stage_loading: "載入中",
+        ocr_stage_initializing: "初始化",
+        ocr_stage_recognizing: "辨識中",
+        ocr_stage_processing: "處理中",
+        ocr_stage_complete: "完成",
+        ocr_stage_failed: "失敗"
+      },
+      "zh-CN": {
+        tagline: "智能理财 · 本地存储",
+        nav_overview: "总览",
+        nav_insights: "分析",
+        nav_budget: "预算",
+        nav_accounts: "账户",
+        nav_settings: "设置",
+        settings_label: "偏好",
+        settings_title: "设置",
+        settings_general: "通用",
+        settings_language: "语言",
+        settings_export: "导出 CSV",
+        settings_security: "安全",
+        settings_app_pin: "应用 PIN",
+        settings_save_pin: "保存",
+        settings_clear_pin: "清除应用 PIN",
+        settings_details: "应用详情",
+        details_month: "当前月份",
+        details_accounts: "账户数",
+        details_transactions: "交易数",
+        details_storage: "存储键",
+        lock_title: "应用已锁定",
+        lock_sub: "请输入应用 PIN 继续。",
+        lock_unlock: "解锁",
+        lock_error: "PIN 错误，请重试。",
+        status_set: "已设置",
+        status_not_set: "未设置",
+        pin_digits_error: "PIN 必须为 4 到 6 位数字。",
+        app_pin_saved: "应用 PIN 已保存。",
+        app_pin_clear_confirm: "确定清除应用 PIN？",
+        transfer_invalid: "请选择不同账户并输入有效金额。",
+        ocr_unavailable: "OCR 组件加载失败，请刷新后重试。",
+        ocr_scanning: "正在扫描小票，可能需要几秒钟。",
+        ocr_scanning_pct: "正在扫描小票... {pct}%",
+        ocr_empty_result: "扫描完成，但未找到可靠字段。你仍可手动输入。",
+        ocr_prefilled: "扫描完成，已预填部分字段，请保存前确认。",
+        ocr_failed: "OCR 失败，请尝试更清晰、光线更好的小票照片。",
+        ocr_stage_idle: "空闲",
+        ocr_stage_unavailable: "不可用",
+        ocr_stage_preparing: "准备中",
+        ocr_stage_loading: "加载中",
+        ocr_stage_initializing: "初始化",
+        ocr_stage_recognizing: "识别中",
+        ocr_stage_processing: "处理中",
+        ocr_stage_complete: "完成",
+        ocr_stage_failed: "失败"
+      }
+    };
+
+    const AppRuntime = { unlocked: true };
+
+    const getLang = () => Store.state?.settings?.language || "en";
+    const t = (key, vars = {}) => {
+      const lang = getLang();
+      const template = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+      return String(template).replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+    };
+
     const CONFIG = {
       STORAGE_KEY: "pockethk-v3-eng",
       SUPPORTED_CURRENCIES: ["HKD", "USD", "CNY", "JPY", "EUR", "GBP"],
@@ -689,7 +930,7 @@
       init() {
         const fallback = {
           selectedMonth: Utils.toMonthValue(new Date()),
-          settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS] },
+          settings: { monthlyBudget: 15000, categoryBudgets: {}, quickPresets: [...CONFIG.DEFAULT_QUICK_PRESETS], language: "en", appPin: null },
           customExpenseCategories: [], customIncomeCategories: [],
           accounts: [
             { id: "acc-cash", name: "Wallet Cash", type: "Cash", currency: "HKD", initialBalance: 1000, pin: null },
@@ -700,6 +941,13 @@
         const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
         this.state = raw ? JSON.parse(raw) : fallback;
         if (!this.state.selectedMonth) this.state.selectedMonth = fallback.selectedMonth;
+        this.state.settings = {
+          monthlyBudget: Number(this.state.settings?.monthlyBudget ?? 15000),
+          categoryBudgets: this.state.settings?.categoryBudgets || {},
+          quickPresets: this.state.settings?.quickPresets || [...CONFIG.DEFAULT_QUICK_PRESETS],
+          language: ["en", "zh-HK", "zh-CN"].includes(this.state.settings?.language) ? this.state.settings.language : "en",
+          appPin: typeof this.state.settings?.appPin === "string" && /^\d{4,6}$/.test(this.state.settings.appPin) ? this.state.settings.appPin : null
+        };
         this.state.accounts = (this.state.accounts || []).map(a => ({
           ...a,
           pin: typeof a.pin === "string" && /^\d{4,6}$/.test(a.pin) ? a.pin : null
@@ -762,7 +1010,7 @@
 
     const Render = {
       runtime: { selectedQuickCategory: "Food", expensePieChart: null, incomePieChart: null, lineChart: null, spendingMoodChart: null, moodCategoryChart: null, budgetCategoryStatusChart: null },
-      all() { this.dropdowns(); this.dashboard(); this.accounts(); this.budget(); },
+      all() { this.dropdowns(); this.dashboard(); this.accounts(); this.budget(); this.settings(); },
       dropdowns() {
         const curOpts = CONFIG.SUPPORTED_CURRENCIES.map(c => `<option value="${c}">${c}</option>`).join("");
         ["currencyInput", "newAccountCurrency"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = curOpts; });
@@ -775,6 +1023,15 @@
       monthPicker() {
         const label = document.getElementById("monthPickerLabel");
         if (label) label.textContent = Utils.formatMonthLabel(Store.state.selectedMonth);
+      },
+      language() {
+        const lang = Store.state.settings.language || "en";
+        const dict = I18N[lang] || I18N.en;
+        document.documentElement.lang = lang;
+        document.querySelectorAll("[data-i18n-key]").forEach(el => {
+          const key = el.dataset.i18nKey;
+          if (dict[key]) el.textContent = dict[key];
+        });
       },
       dashboard() {
         const txs = Logic.getFilteredTransactions(Store.state.selectedMonth, document.getElementById("searchInput").value);
@@ -993,6 +1250,33 @@
             <p class="mt-2 text-xs font-bold ${a.pin ? "text-emerald-600" : "text-slate-400"}">PIN: ${a.pin ? "Set" : "Not set"}</p>
           </div>
         `).join("");
+      },
+      settings() {
+        const languageSelect = document.getElementById("languageSelect");
+        if (languageSelect) languageSelect.value = Store.state.settings.language || "en";
+
+        const appPinStatus = document.getElementById("appPinStatus");
+        if (appPinStatus) {
+          const hasPin = !!Store.state.settings.appPin;
+          appPinStatus.textContent = hasPin ? t("status_set") : t("status_not_set");
+          appPinStatus.className = `text-xs px-2 py-1 rounded-lg ${hasPin ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-500"}`;
+        }
+
+        const txCount = Store.state.transactions.length;
+        const accCount = Store.state.accounts.length;
+        const detailMonth = document.getElementById("detailMonth");
+        const detailAccounts = document.getElementById("detailAccounts");
+        const detailTransactions = document.getElementById("detailTransactions");
+        const detailStorage = document.getElementById("detailStorage");
+        if (detailMonth) detailMonth.textContent = Utils.formatMonthLabel(Store.state.selectedMonth);
+        if (detailAccounts) detailAccounts.textContent = String(accCount);
+        if (detailTransactions) detailTransactions.textContent = String(txCount);
+        if (detailStorage) detailStorage.textContent = CONFIG.STORAGE_KEY;
+      },
+      lockScreen() {
+        const lockEl = document.getElementById("appLockScreen");
+        const needsLock = !!Store.state.settings.appPin && !AppRuntime.unlocked;
+        if (lockEl) lockEl.classList.toggle("hidden", !needsLock);
       }
     };
 
@@ -1009,7 +1293,7 @@
           ocrStatusEl.textContent = msg;
         };
 
-        const setOCRProgress = (pct, stage = "Idle") => {
+        const setOCRProgress = (pct, stage = t("ocr_stage_idle")) => {
           const safePct = Math.max(0, Math.min(100, Number(pct || 0)));
           if (ocrProgressText) ocrProgressText.textContent = `${Math.round(safePct)}%`;
           if (ocrStageText) ocrStageText.textContent = stage;
@@ -1022,6 +1306,10 @@
         const monthGrid = document.getElementById("monthGrid");
         const monthPrevYearBtn = document.getElementById("monthPrevYearBtn");
         const monthNextYearBtn = document.getElementById("monthNextYearBtn");
+        const languageSelect = document.getElementById("languageSelect");
+        const appPinForm = document.getElementById("appPinForm");
+        const clearAppPinBtn = document.getElementById("clearAppPinBtn");
+        const unlockForm = document.getElementById("unlockForm");
         let monthCursorYear = Number((Store.state.selectedMonth || Utils.toMonthValue(new Date())).split("-")[0]);
 
         const renderMonthGrid = () => {
@@ -1114,24 +1402,24 @@
         const handleReceiptOCR = async (file) => {
           if (!file) return;
           if (typeof Tesseract === "undefined") {
-            setOCRStatus("OCR library failed to load. Please refresh and try again.", "error");
-            setOCRProgress(0, "Unavailable");
+            setOCRStatus(t("ocr_unavailable"), "error");
+            setOCRProgress(0, t("ocr_stage_unavailable"));
             return;
           }
 
-          setOCRStatus("Scanning receipt... this may take a few seconds.");
-          setOCRProgress(5, "Preparing");
+          setOCRStatus(t("ocr_scanning"));
+          setOCRProgress(5, t("ocr_stage_preparing"));
           try {
-            const result = await Tesseract.recognize(file, "eng", {
+            const result = await Tesseract.recognize(file, "eng+chi_tra+chi_sim", {
               logger: ({ status, progress }) => {
                 const pct = Math.round((progress || 0) * 100);
                 const stageMap = {
-                  loading: "Loading",
-                  initializing: "Initializing",
-                  "recognizing text": "Recognizing"
+                  loading: t("ocr_stage_loading"),
+                  initializing: t("ocr_stage_initializing"),
+                  "recognizing text": t("ocr_stage_recognizing")
                 };
-                setOCRProgress(pct, stageMap[status] || "Processing");
-                if (status === "recognizing text") setOCRStatus(`Scanning receipt... ${pct}%`);
+                setOCRProgress(pct, stageMap[status] || t("ocr_stage_processing"));
+                if (status === "recognizing text") setOCRStatus(t("ocr_scanning_pct", { pct }));
               }
             });
 
@@ -1153,12 +1441,12 @@
             categoryInput.value = categoryOptions.includes(parsed.category) ? parsed.category : "Other";
 
             const filledCount = [parsed.amount, parsed.date, parsed.note].filter(Boolean).length;
-            if (filledCount === 0) setOCRStatus("Scan complete, but no reliable fields were found. You can still enter manually.", "error");
-            else setOCRStatus("Scan complete. Fields were prefilled, please review before saving.", "good");
-            setOCRProgress(100, "Complete");
+            if (filledCount === 0) setOCRStatus(t("ocr_empty_result"), "error");
+            else setOCRStatus(t("ocr_prefilled"), "good");
+            setOCRProgress(100, t("ocr_stage_complete"));
           } catch (err) {
-            setOCRStatus("OCR failed for this image. Try a clearer, well-lit receipt photo.", "error");
-            setOCRProgress(0, "Failed");
+            setOCRStatus(t("ocr_failed"), "error");
+            setOCRProgress(0, t("ocr_stage_failed"));
           }
         };
 
@@ -1183,7 +1471,10 @@
             document.querySelectorAll(".tab-btn[data-tab]").forEach(b => b.classList.remove("active"));
             document.getElementById(`tab-${tab}`).classList.remove("hidden");
             document.querySelectorAll(`.tab-btn[data-tab="${tab}"]`).forEach(b => b.classList.add("active"));
-            if (tab === 'insights') Render.insights(); if (tab === 'budget') Render.budget(); if (tab === 'accounts') Render.accounts();
+            if (tab === 'insights') Render.insights();
+            if (tab === 'budget') Render.budget();
+            if (tab === 'accounts') Render.accounts();
+            if (tab === 'settings') Render.settings();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           });
         });
@@ -1223,6 +1514,65 @@
             closeMonthPopover();
           });
         }
+
+        if (languageSelect) {
+          languageSelect.addEventListener("change", (e) => {
+            const nextLang = e.target.value;
+            Store.state.settings.language = ["en", "zh-HK", "zh-CN"].includes(nextLang) ? nextLang : "en";
+            Store.persist();
+            Render.language();
+            Render.settings();
+          });
+        }
+
+        if (appPinForm) {
+          appPinForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const pinInput = document.getElementById("appPinInput");
+            const pin = (pinInput?.value || "").trim();
+            if (!/^\d{4,6}$/.test(pin)) {
+              alert(t("pin_digits_error"));
+              return;
+            }
+            Store.state.settings.appPin = pin;
+            Store.persist();
+            AppRuntime.unlocked = true;
+            if (pinInput) pinInput.value = "";
+            Render.settings();
+            Render.lockScreen();
+            alert(t("app_pin_saved"));
+          });
+        }
+
+        if (clearAppPinBtn) {
+          clearAppPinBtn.addEventListener("click", () => {
+            if (!Store.state.settings.appPin) return;
+            const ok = confirm(t("app_pin_clear_confirm"));
+            if (!ok) return;
+            Store.state.settings.appPin = null;
+            Store.persist();
+            AppRuntime.unlocked = true;
+            Render.settings();
+            Render.lockScreen();
+          });
+        }
+
+        if (unlockForm) {
+          unlockForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const input = document.getElementById("unlockPinInput");
+            const err = document.getElementById("unlockError");
+            const value = (input?.value || "").trim();
+            if (value === Store.state.settings.appPin) {
+              AppRuntime.unlocked = true;
+              if (input) input.value = "";
+              if (err) err.classList.add("hidden");
+              Render.lockScreen();
+            } else {
+              if (err) err.classList.remove("hidden");
+            }
+          });
+        }
         document.addEventListener("click", (e) => {
           if (!monthPopover || monthPopover.classList.contains("hidden")) return;
           if (monthPopover.contains(e.target) || monthPickerBtn?.contains(e.target)) return;
@@ -1231,7 +1581,7 @@
         
         document.getElementById("transferForm").addEventListener("submit", (e) => {
           e.preventDefault(); const amt = document.getElementById("transferAmount").value, from = document.getElementById("fromAccountInput").value, to = document.getElementById("toAccountInput").value;
-          if (from === to || !amt) return alert("Select different accounts and valid amount.");
+          if (from === to || !amt) return alert(t("transfer_invalid"));
           const date = Utils.formatISO(new Date()), fromName = Store.state.accounts.find(a => a.id === from)?.name, toName = Store.state.accounts.find(a => a.id === to)?.name;
           Store.addTransaction({ amount: amt, currency: "HKD", type: "expense", category: "Transfer", note: `To ${toName}`, accountId: from, date });
           Store.addTransaction({ amount: amt, currency: "HKD", type: "income", category: "Transfer", note: `From ${fromName}`, accountId: to, date, mood: "planned" });
@@ -1311,10 +1661,8 @@
           Store.state.transactions.forEach(t => csv.push(`${t.date},${t.category},${t.type},${t.mood || ""},${t.amount},${t.currency},"${t.note || ''}"`));
           const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" })); a.download = `PocketHK_${Store.state.selectedMonth}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         };
-        const exportDesktopBtn = document.getElementById("exportCsvBtn");
-        const exportMobileBtn = document.getElementById("exportCsvBtnMobile");
-        if (exportDesktopBtn) exportDesktopBtn.addEventListener("click", exportCsv);
-        if (exportMobileBtn) exportMobileBtn.addEventListener("click", exportCsv);
+        const exportSettingBtn = document.getElementById("exportCsvBtnSetting");
+        if (exportSettingBtn) exportSettingBtn.addEventListener("click", exportCsv);
 
         syncTransactionTypeUI(); syncMoodEmojiBadge();
       }
@@ -1335,8 +1683,14 @@
     };
 
     document.addEventListener("DOMContentLoaded", () => {
-      Store.init(); Events.init(); Render.all();
+      Store.init();
+      AppRuntime.unlocked = !Store.state.settings.appPin;
+      Events.init();
+      Render.all();
+      Render.language();
       Render.monthPicker();
+      Render.settings();
+      Render.lockScreen();
       document.getElementById("dateInput").value = Utils.formatISO(new Date()); document.getElementById("moodInput").value = "planned";
     });
   </script>
