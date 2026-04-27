@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.v.tuangouai.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -34,6 +34,13 @@
       background-attachment: fixed;
       color: var(--ink);
       min-height: 100vh;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    html {
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     /* Chunky, Cute Glassmorphism */
@@ -314,6 +321,10 @@
       box-shadow: 0 14px 34px rgba(76, 29, 149, 0.08);
     }
 
+    .entry-shell > * {
+      min-width: 0;
+    }
+
     .entry-panel {
       border: 2px solid #ede9fe;
       border-radius: 1.4rem;
@@ -334,6 +345,7 @@
       border-radius: 1.4rem;
       background: #ffffff;
       padding: 0.95rem;
+      min-width: 0;
     }
 
     .entry-field {
@@ -807,7 +819,7 @@
 
       <section class="grid grid-cols-1 gap-6">
         <div class="glass-card rounded-[2.5rem] p-6 sm:p-7 w-full max-w-4xl mx-auto shadow-lg shadow-purple-100/50" id="recordTransactionSection">
-          <div class="entry-shell grid grid-cols-1 lg:grid-cols-[300px,1fr] gap-4">
+          <div class="entry-shell grid grid-cols-1 xl:grid-cols-[300px,minmax(0,1fr)] gap-4">
             <aside class="entry-panel space-y-3">
               <div class="flex items-start justify-between gap-2">
                 <div>
