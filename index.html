@@ -1424,7 +1424,10 @@
         input_monthly_limit: "Monthly Limit",
         input_budget_limit: "Budget Limit",
         input_transfer_amount: "Transfer Amount",
-        input_pin_digits: "4-6 digits"
+        input_pin_digits: "4-6 digits",
+        storage_quota_exceeded: "Storage limit reached!",
+        storage_quota_action: "Please export your transaction history as CSV and clear old data to free up space.",
+        tx_scheduled_future: "✅ Transaction scheduled for future dates. It will be excluded from budget calculations until that date."
       },
       "zh-HK": {
         tagline: "智能理財 · 本地儲存",
@@ -1601,7 +1604,10 @@
         input_monthly_limit: "每月上限",
         input_budget_limit: "預算上限",
         input_transfer_amount: "轉帳金額",
-        input_pin_digits: "4-6 位數"
+        input_pin_digits: "4-6 位數",
+        storage_quota_exceeded: "儲存空間已滿！",
+        storage_quota_action: "請匯出您的交易記錄為CSV檔案，並清除舊資料以釋放空間。",
+        tx_scheduled_future: "✅ 交易已排定在未來日期。在該日期前，它將被排除在預算計算之外。"
       },
       "zh-CN": {
         tagline: "智能理财 · 本地存储",
@@ -1780,7 +1786,10 @@
         input_monthly_limit: "每月上限",
         input_budget_limit: "预算上限",
         input_transfer_amount: "转账金额",
-        input_pin_digits: "4-6 位数字"
+        input_pin_digits: "4-6 位数字",
+        storage_quota_exceeded: "存储空间已满！",
+        storage_quota_action: "请导出您的交易记录为CSV文件，并清除旧数据以释放空间。",
+        tx_scheduled_future: "✅ 交易已安排在未来日期。在该日期之前，它将被排除在预算计算之外。"
       }
     };
 
@@ -1843,13 +1852,47 @@
           pin: typeof a.pin === "string" && /^\d{4,6}$/.test(a.pin) ? a.pin : null
         }));
       },
-      persist() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.state)); },
+      persist() {
+        try {
+          localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.state));
+        } catch (e) {
+          if (e.name === 'QuotaExceededError' || e.code === 22) {
+            const msg = t('storage_quota_exceeded');
+            alert(msg + '\n\n' + t('storage_quota_action'));
+            console.error('localStorage quota exceeded', e);
+          } else {
+            throw e;
+          }
+        }
+      },
       addTransaction(tx) { this.state.transactions.push({ id: Utils.uid(), ...tx }); this.persist(); },
       updateTransaction(id, updatedTx) {
         const index = this.state.transactions.findIndex(t => t.id === id);
         if (index !== -1) { this.state.transactions[index] = { id, ...updatedTx }; this.persist(); }
       },
-      deleteTransaction(id) { this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.persist(); }
+      deleteTransaction(id) { 
+        this.state.transactions = this.state.transactions.filter(t => t.id !== id); 
+        this.persist(); 
+      },
+      getAccountName(accountId) {
+        const account = this.state.accounts.find(a => a.id === accountId);
+        return account ? account.name : '⚠️ Unknown Account';
+      }
+    };
+
+    const Utils_EdgeCase = {
+      isTransactionFuture: (dateStr) => {
+        const txDate = new Date(dateStr + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return txDate > today;
+      },
+      getTransactionDateWarning: (dateStr) => {
+        if (Utils_EdgeCase.isTransactionFuture(dateStr)) {
+          return '📅 Scheduled for future';
+        }
+        return '';
+      }
     };
 
     const Logic = {
@@ -1859,13 +1902,15 @@
       computeSummary(txs) {
         let income = 0, expense = 0;
         const byCat = {}, incomeByCat = {};
-        txs.forEach(t => {
+        // Exclude future transactions from summary calculations
+        const relevantTxs = txs.filter(t => !Utils_EdgeCase.isTransactionFuture(t.date));
+        relevantTxs.forEach(t => {
           if (t.category === "Transfer") return;
           const val = Utils.toHKD(t.amount, t.currency);
           if (t.type === "expense") { expense += val; byCat[t.category] = (byCat[t.category] || 0) + val; } 
           else if (t.type === "income") { income += val; incomeByCat[t.category] = (incomeByCat[t.category] || 0) + val; }
         });
-        return { income, expense, byCat, incomeByCat };
+        return { income, expense, byCat, incomeByCat, futureTransactionCount: txs.length - relevantTxs.length };
       },
       computeAccountBalances() {
         const balances = {};
@@ -2051,8 +2096,8 @@
         list.innerHTML = txs.sort((a,b) => b.date.localeCompare(a.date)).map(tx => `
           <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 p-4 bg-white/80 rounded-[1.5rem] border-2 border-slate-50 hover:shadow-md hover:border-purple-100 transition-all">
             <div>
-              <p class="font-bold text-slate-700">${tx.category} <span class="text-xs font-semibold text-slate-400 ml-2 bg-slate-100 px-2 py-0.5 rounded-md">${tx.date}</span></p>
-              <p class="text-sm font-medium text-slate-500 mt-1">${tx.note || t("history_no_notes")}${tx.type === "expense" ? ` <span class="text-purple-300">•</span> ${Utils.moodLabel(tx.mood || "planned")}` : ""}</p>
+              <p class="font-bold text-slate-700">${tx.category} <span class="text-xs font-semibold text-slate-400 ml-2 bg-slate-100 px-2 py-0.5 rounded-md">${tx.date}</span>${Utils_EdgeCase.isTransactionFuture(tx.date) ? ` <span class="text-xs font-semibold text-blue-500 ml-2 bg-blue-50 px-2 py-0.5 rounded-md">📅 Future</span>` : ""}</p>
+              <p class="text-sm font-medium text-slate-500 mt-1">${tx.note || t("history_no_notes")}${tx.type === "expense" ? ` <span class="text-purple-300">•</span> ${Utils.moodLabel(tx.mood || "planned")}` : ""}${tx.accountId ? ` <span class="text-slate-400">•</span> <span class="text-slate-500 text-xs">${Store.getAccountName(tx.accountId)}</span>` : ""}</p>
             </div>
             <div class="sm:text-right flex flex-col sm:items-end">
               <p class="font-bold text-lg ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-800'}">
@@ -2757,7 +2802,20 @@
             document.getElementById("transactionSubmitBtn").textContent = t("history_save_transaction");
             document.getElementById("cancelEditBtn").classList.add("hidden");
           } else {
+            // Auto-correct negative amounts
+            if (txData.amount && Number(txData.amount) < 0) {
+              txData.amount = Math.abs(Number(txData.amount));
+            }
             Store.addTransaction(txData);
+            const futureWarning = Utils_EdgeCase.isTransactionFuture(txData.date)
+              ? t('tx_scheduled_future')
+              : '';
+            if (futureWarning) {
+              const notifyEl = document.getElementById('notifyPanel');
+              if (notifyEl) {
+                alert(futureWarning);
+              }
+            }
           }
           form.reset();
           document.getElementById("moodInput").value = "planned";
@@ -3062,7 +3120,20 @@
         };
         return (table[lang] || table.en)[mood] || (table[lang] || table.en).planned;
       },
-      formatMoney: (val, cur) => new Intl.NumberFormat(Utils.locale(), { style: 'currency', currency: cur || 'HKD' }).format(val),
+      formatMoney: (val, cur) => {
+        const absVal = Math.abs(Number(val) || 0);
+        let displayVal = absVal;
+        let suffix = '';
+        if (absVal >= 1000000) {
+          displayVal = (absVal / 1000000).toFixed(1);
+          suffix = 'M';
+        } else if (absVal >= 1000) {
+          displayVal = (absVal / 1000).toFixed(1);
+          suffix = 'K';
+        }
+        const formatted = new Intl.NumberFormat(Utils.locale(), { style: 'currency', currency: cur || 'HKD' }).format(displayVal);
+        return (val < 0 ? '-' : '') + formatted.replace('-', '') + suffix;
+      },
       formatMonthLabel: (monthValue) => {
         const [y, m] = (monthValue || Utils.toMonthValue(new Date())).split("-").map(Number);
         const d = new Date(y, (m || 1) - 1, 1);
@@ -3076,10 +3147,12 @@
           const amt = parseFloat(txData.amount);
           if (isNaN(amt)) {
             errors.push('Amount must be a valid number');
-          } else if (amt <= 0) {
-            errors.push('Amount must be greater than 0');
-          } else if (amt > 999999999) {
-            errors.push('Amount exceeds maximum allowed (HKD 999,999,999)');
+          } else if (amt === 0) {
+            errors.push('Amount must not be zero');
+          } else if (Math.abs(amt) > 999999999) {
+            errors.push('Amount exceeds maximum allowed magnitude (999,999,999)');
+          } else if (amt < 0) {
+            errors.push('Amount cannot be negative. Did you mean ' + Math.abs(amt) + '?');
           }
         }
         if (!txData.category || txData.category === '') {
@@ -3091,8 +3164,11 @@
           const date = new Date(txData.date + 'T00:00:00');
           if (isNaN(date.getTime())) {
             errors.push('Date is invalid');
-          } else if (date > new Date()) {
-            errors.push('Date cannot be in the future');
+          }
+          const tooFarPast = new Date();
+          tooFarPast.setFullYear(tooFarPast.getFullYear() - 100);
+          if (date < tooFarPast) {
+            errors.push('Date is too far in the past (over 100 years)');
           }
         }
         if (!txData.type || (txData.type !== 'income' && txData.type !== 'expense')) {
