@@ -1,97 +1,45 @@
 # COMP1110 A03 - PocketHK
 
-PocketHK is a local-first personal budgeting web app built for quick daily finance tracking.
-It supports expense/income recording, account management, monthly budgeting, visual insights, and receipt OCR-assisted form filling.
+PocketHK is a local-first personal budgeting web app for quick daily finance tracking.
+It focuses on fast transaction logging, simple budget control, and clear monthly summaries.
 
-## Project Plan
+## Project Overview
 
-- Project plan document: https://docs.google.com/document/d/13agy1rkJSFGr5e16rZ1nf5E-pS5grBgb4C_Dy_cXGEA/edit?tab=t.0
+- Record income and expense transactions with categories, notes, and dates
+- Manage multiple accounts and track balances in one place
+- Set monthly budgets and view basic spending summaries
+- Review insights with charts for categories and trends
+- Local-first: data stays in your browser storage
 
 ## Key Features
 
-- Record transactions with:
-	- amount, currency, type (expense/income), category, date, note, account
-	- spending mood tags for expense entries
-- Receipt OCR auto-entry:
-	- upload a receipt image to prefill amount/date/note/category (best-effort)
-- Monthly dashboard:
-	- total net worth (aggregated across accounts with FX conversion to HKD)
-	- monthly budget usage
-	- monthly net flow
-- Insights tab:
-	- expense and income category breakdown charts
-	- trend forecast (income vs expense)
-	- spending mindset analytics
-- Budget tab:
-	- total monthly budget
-	- category budget setup and progress tracking
-- Accounts tab:
-	- add cash/card/e-wallet accounts
-	- edit account current balance
-	- transfer between accounts
-	- optional account PIN setup
+- Transaction logging (income/expense), category, date, note, account
+- Monthly dashboard: net flow, budget usage, net worth summary
+- Accounts: add/edit balances, transfer between accounts
+- Insights: category breakdown and simple trends
+- Receipt OCR: optional auto-fill from receipt images
 - CSV export for transaction history
 
 ## Tech Stack
 
-- HTML + Tailwind CSS (via CDN)
+- HTML + Tailwind CSS (CDN)
 - Vanilla JavaScript
-- Chart.js (charts)
-- Tesseract.js (OCR)
-- Browser LocalStorage (data persistence)
+- Chart.js
+- Tesseract.js
+- Browser LocalStorage
 
-## Run the App
+## Use the App
 
-Use the deployed version directly:
+Open the deployed version directly:
 
 - https://lwvvm.github.io/COMP1110_A03/
-
-
-
-## File Structure
-
-```text
-.
-|- index.html        # main application (UI + logic)
-|- index_test.html   # testing/alternate page snapshot
-`- README.md
-```
 
 ## Data Storage
 
 - Data is stored in LocalStorage with key: pockethk-v3-eng
-- Main stored state includes:
-	- selectedMonth
-	- settings (monthly budget, category budgets, quick presets)
-	- accounts
-	- transactions
-- Clearing browser site data or local storage will remove saved app data.
-
-## Usage Guide
-
-1. Add one or more accounts in the Accounts tab.
-2. Record income/expense transactions in Overview.
-3. Set monthly and category budgets in Budget.
-4. Check trends and behavior in Insights.
-5. Export CSV if needed for reporting or backup.
+- Clearing browser site data will remove saved app data
 
 ## Known Limitations
 
-- OCR extraction quality depends heavily on image quality and receipt format.
-- All data is local to one browser/device unless exported manually.
-- Currency conversion uses fixed rates defined in source code.
-
-## Demo Checklist
-
-For a clean demonstration, prepare these before presenting:
-
-- at least 2 accounts with different account types
-- at least 10-15 transactions across multiple categories
-- both income and expense records in the selected month
-- one transfer between accounts
-- monthly budget plus 2-3 category budgets
-- one OCR scan example (optional)
-
-## Authors
-
-- COMP1110 A03 team
+- OCR accuracy depends on receipt quality
+- Data is local to one browser/device unless exported
